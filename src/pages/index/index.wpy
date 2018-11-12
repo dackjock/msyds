@@ -1,0 +1,30 @@
+<template lang="wxml" minapp="wepy">
+  <view>xx</view>
+  <botBar curr='1'></botBar>
+</template>
+
+<script>
+import wepy from 'wepy';
+import { request } from '_mixins/request.js';
+import botBar from '@/components/botBar';
+
+export default class Index extends wepy.page {
+  async onShow() {
+    // 请求示例
+    let result = await this.$parent.queryData('app/index.do', {
+      enterpriseId: '-1',
+      userId: '',
+      type: 1
+    });
+    console.log(result);
+  };
+  components = {
+    botBar
+  };
+}
+</script>
+
+<style lang="stylus">
+
+  
+</style>

@@ -1,0 +1,19 @@
+<template lang="wxml" minapp="wepy">
+  <view class="sign-wrap">
+    <header title="马上银，马上赢"></header>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header'
+
+export default class Login extends wepy.page {
+  components = {
+    header
+  }
+}
+</script>
+
+<style>
+</style>

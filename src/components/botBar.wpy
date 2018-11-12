@@ -1,0 +1,54 @@
+<template lang="wxml" minapp="wepy">
+  <view class="bot-bar">
+    <view wx:for="{{navList}}" wx:key="" class="b-item {{curr == index + 1 ? 'active' : ''}}" @tap.stop="navLinkTo({{item.link}})">
+      <view class="icon"></view>
+      <text class="name">{{item.name}}</text>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class botBar extends wepy.component {
+  props = {
+    curr: {
+      type: String,
+      default: 1
+    }
+  };
+  data = {
+    // curr:'2',
+    navList: [
+      {
+        name: '首页',
+        link: ''
+      },
+      {
+        name: '资讯',
+        link: ''
+      },
+      {
+        name: '商城',
+        link: '../mallIndex/mallIndex'
+      },
+      {
+        name: '订单',
+        link: ''
+      },
+      {
+        name: '我的',
+        link: ''
+      }
+    ]
+  };
+  methods = {
+    navLinkTo(e) {
+      this.$parent.$parent.linkPage(e, 2);
+    }
+  };
+}
+</script>
+
+<style lang='stylus'>
+@import '../assets/style/footer';
+</style>

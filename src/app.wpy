@@ -1,0 +1,60 @@
+<style lang="less">
+page,
+.container {
+  height: 100%;
+}
+</style>
+
+<script>
+import wepy from 'wepy';
+import 'wepy-async-function';
+import { request } from '_mixins/request.js';
+import routerBefore from '_mixins/routerBefore.js';
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/index/index',
+      'pages/login/login',
+      'pages/mallIndex/mallIndex'
+    ],
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#d7092d',
+      navigationBarTitleText: '马上银',
+      navigationBarTextStyle: 'white'
+    }
+  };
+
+  globalData = {
+    picPath:'http://d7.cto.shovesoft.com/msywap/images/',
+    userInfo: ''
+  };
+
+  constructor() {
+    super();
+    this.use('requestfix');
+    this.use('promisify');
+  }
+
+  onLaunch() {
+    
+  }
+
+  sleep(s) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('promise resolved');
+      }, s * 1000);
+    });
+  }
+
+  async queryData(...d){
+    return await request(...d)
+  }
+
+  linkPage(url,type){
+    routerBefore(url,type,this.globalData.userInfo)
+  }
+}
+</script>

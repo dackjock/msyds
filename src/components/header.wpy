@@ -1,0 +1,35 @@
+<template lang="wxml" minapp="wepy">
+  <view class="header-wrap">
+    <!-- 返回按钮 -->
+    <view wx:if="{{hasBack}}" class="h-back" @tap.stop="navBack()"></view>
+    <!-- 标题 -->
+    <text wx:if="{{title}}" class="h-title">{{title}}</text>
+    <!-- 右侧按钮容器 -->
+    <view class="h-right">
+      
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class botBar extends wepy.component {
+  props = {
+    hasBack: String,
+    title: String
+  };
+  data = {
+    hasBack:true
+  };
+  methods = {
+    navBack() {
+      wepy.navigateBack();
+    }
+  };
+}
+</script>
+
+<style lang='stylus'>
+@import '../assets/style/header';
+  
+</style>
