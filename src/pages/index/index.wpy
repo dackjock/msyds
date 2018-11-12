@@ -1,30 +1,81 @@
 <template lang="wxml" minapp="wepy">
-  <view>xx</view>
+  <header></header>
+  <view class="container">
+    <!-- 轮播图 -->
+      <view class="f-swiper-section">
+        <swiper indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}">
+          <block wx:for="{{imgUrls}}" wx:key="{{item.index}}">
+            <swiper-item>
+              <image src="{{item}}" class="slide-image" width="355" height="150"/>
+            </swiper-item>
+          </block>
+        </swiper>
+      </view>
+
+      <!-- 二级菜单 -->
+    <view class="f-er-menu">
+      <navigator url="#">
+        <image src="http://d7.cto.shovesoft.com/msywap/images/icon/cmenu_hq.png">
+        <p>行情信息</p>
+      </navigator>
+      <navigator url="../../pages/shopping/index">
+        <image src="http://d7.cto.shovesoft.com/msywap/images/icon/cmenu_yjb.png">
+        <p>商城</p>
+      </navigator>
+      <navigator url="#">
+        <image src="http://d7.cto.shovesoft.com/msywap/images/icon/cmenu_gd.png">
+        <p>我要挂单</p>
+      </navigator>
+    </view>
+  </view>
+  
   <botBar curr='1'></botBar>
 </template>
 
 <script>
 import wepy from 'wepy';
-import { request } from '_mixins/request.js';
 import botBar from '@/components/botBar';
+import header from '@/components/header';
 
 export default class Index extends wepy.page {
-  async onShow() {
-    // 请求示例
+  data = {
+    indicatorDots: true, // 指示点
+    autoplay: true, // 自动轮播
+    interval: 2000, // 自动切换时间间隔
+    duration: 500, // 滑动动画时长
+    imgUrls: [], // 轮播图
+  }
+  methods={
+    
+  }
+  onLoad() {
+    this.getData()
+  }
+
+  //获取首页信息
+  async getData() {
     let result = await this.$parent.queryData('app/index.do', {
       enterpriseId: '-1',
       userId: '',
       type: 1
     });
     console.log(result);
+    //轮播图
+    let that = this
+    for (let i=0; i < result.bannerList.length; i++) {
+      that.imgUrls.push(result.bannerList[i].image)
+    }
+    this.$apply()
+    console.log(that.imgUrls)
   };
   components = {
-    botBar
+    botBar,
+    header
   };
 }
 </script>
 
 <style lang="stylus">
-
+@import '../../assets/style/index';
   
 </style>
