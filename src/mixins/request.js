@@ -46,6 +46,7 @@ async function request(url, data = {}, method = 'GET') {
       resultData = res.data.returnMap
     } else {
       // 失败
+      // console.log(res)
       wepy.showToast({
         title: res.data.msg,
         icon: 'none'
@@ -54,7 +55,7 @@ async function request(url, data = {}, method = 'GET') {
   }).catch((err) => {
     // 异常
     wepy.showToast({
-      title: '数据查询异常',
+      title: '请求接口异常',
       icon: 'none'
     })
   })
