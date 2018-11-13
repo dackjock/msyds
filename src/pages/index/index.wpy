@@ -1,6 +1,6 @@
-<template >
+<template lang="wxml" minapp="wepy">
   <view class="container">
-    <header></header>
+    <header searchbx="true"></header>
     <!-- 轮播图 -->
       <view class="f-swiper-section">
         <swiper indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}">
@@ -15,21 +15,108 @@
       <!-- 二级菜单 -->
     <view class="f-er-menu">
       <navigator url="#">
-        <image src="http://d7.cto.shovesoft.com/msywap/images/icon/cmenu_hq.png">
+        <image src="{{hqxximg}}"></image>
         <p>行情信息</p>
       </navigator>
-      <navigator url="../../pages/shopping/index">
-        <image src="http://d7.cto.shovesoft.com/msywap/images/icon/cmenu_yjb.png">
+      <navigator url="#">
+        <image src="{{scimg}}"></image>
         <p>商城</p>
       </navigator>
       <navigator url="#">
-        <image src="http://d7.cto.shovesoft.com/msywap/images/icon/cmenu_gd.png">
+        <image src="{{wygdimg}}"></image>
         <p>我要挂单</p>
       </navigator>
     </view>
+    <!-- 白银价格 -->
+    <view class="f-byjg">
+      <view class="mb-jzj">
+        <span>今日白银均价</span>
+        <em>{{indexfore.junjia}}</em>
+      </view>
+      <view class="mb-byjg">
+          <view class="mby-box">
+            <p class="mby-bytitle">白银价格</p>
+            <navigator url="#">查看更多&gt;</navigator>
+          </view>
+          <view class="mby-box">
+            <p class="mby-small-txt">白银（T+D）</p>
+            <p class="mby-big-txt {{indexfore.timePrice<0? 'lv':'red'}}">{{indexfore.timePrice}}</p>
+            <p class="mby-small-txt {{indexfore.differencePrice < 0? 'lv':'red'}}">
+              <em wx:if="{{indexfore.differencePrice > 0}}">+</em>{{indexfore.differencePrice}}
+              <em wx:if="{{indexfore.differenceRate > 0}}">+</em>{{indexfore.differenceRate}}
+            </p>
+          </view>
+          <view class="mby-box">
+            <p class="mby-small-txt">沪银主力</p>
+            <p class="mby-big-txt {{indexfore.timePriceF<0? 'lv':'red'}}">{{indexfore.timePriceF}}</p>
+            <p class="mby-small-txt {{indexfore.differencePriceF < 0? 'lv':'red'}}">
+              <em wx:if="{{indexfore.differencePriceF > 0}}">+</em>{{indexfore.differencePriceF}}%
+              <em wx:if="{{indexfore.differenceRateF > 0}}">+</em>{{indexfore.differenceRateF}}%
+            </p>
+          </view>
+      </view>
+    </view>
+    <!-- 资讯滚动 -->
+    <view class="f-zxbox">
+      <view class="mz-qian">
+        <i class="mz-lb-icon"></i>
+        <span>资讯：</span>
+      </view>
+      <view class="mz-con">
+        <swiper class="mzc-list" vertical="true" autoplay="false" interval="{{interval}}" duration="800" circular="true">
+          <block wx:for="{{zxTxt}}" wx:key="{{item.index}}">
+            <swiper-item class="mzc-list-item">
+              <navigator url="#">{{item}}</navigator>
+            </swiper-item>
+          </block>
+        </swiper>
+      </view>
+    </view>
+    <!--自营-按提货地点 -->
+    <view class="f-zy-box">
+      <view class="l-title-box l-title-box-no">
+        <span>自营-按提货地点</span>
+      </view>
+      <view class="mz-page">
+        <swiper class="mzp-list" display-multiple-items="3" autoplay="false" interval="{{interval}}" duration="500" circular="true">
+          <block wx:for="{{zyHot}}" wx:key="{{item.index}}">
+            <swiper-item class="mzp-list-item">
+              <view class="mzpl-item">
+                <view class="mzpl-title">自营热门</view>
+                <view class="mzpl-jg">
+                  <span>{{statueTxt}}</span>
+                  <span class="{{item.main_price>0?'red':'lv'}}">
+                    <em wx:if = "{{item.main_price>0}}">+</em>
+                    <em>{{item.main_price}}</em>
+                  </span>
+                </view>
+                <view class="mzpl-adress">
+                  <image src="{{addrimg}}"></image>
+                  <span>{{item.depot_name}}</span>
+                </view>
+                <view class="mzpl-nums">
+                  <span>库存数量：</span>
+                  <span>{{item.goods_total_weight}}KG</span>
+                </view>
+                <view class="mzpl-nums">
+                  <span class="l-cred">成交数量：</span>
+                  <span>{{item.buy_weight}}KG</span>
+                </view>
+                <view class="mzpl-button-page">
+                  <view class="{{item.goods_total_weight>0?'':'huiActive'}}" bindtap="yikoujia">一口价</view>
+                  <view class="redActive {{item.goods_total_weight>0?'':'huiActive'}}">我要议价</view>
+                </view>
+                <view class="mzpl-time">{{item.create_time}}</view>
+              </view>
+            </swiper-item>
+          </block>
+        </swiper>
+      </view>
+    </view>
+    
     <botBar curr='1'></botBar>
   </view>
-  
+   
 </template>
 
 <script>
@@ -44,12 +131,33 @@ export default class Index extends wepy.page {
     interval: 2000, // 自动切换时间间隔
     duration: 500, // 滑动动画时长
     imgUrls: [], // 轮播图
+    hqxximg: '', //行情信息图片url
+    scimg: '',//商城图片url
+    wygdimg: '',//我要挂单图片url
+    addrimg: '',//地址小图标url
+    indexfore: {},//白银价格
+    zxTxt: [],//咨询
+    zyHot: [],//自营-按提货地点
+    statueTxt: 'TD', // TD 沪银主力
+    userInfo:'',
+    cdimgUrl:''
   }
   methods={
-    
+    //一口价
+    yikoujia() {
+      console.log('一口价点击事件')
+    }
   }
-  onLoad() {
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.cdimgUrl = this.$parent.globalData.picPath
     this.getData()
+    let cdimgUrl = this.$parent.globalData.picPath
+    this.hqxximg = cdimgUrl+'icon/cmenu_hq.png'
+    this.scimg = cdimgUrl+'icon/cmenu_yjb.png'
+    this.wygdimg = cdimgUrl+'icon/cmenu_gd.png'
+    this.addrimg = cdimgUrl+'icon/dingwei.png'
+    
   }
 
   //获取首页信息
@@ -65,8 +173,42 @@ export default class Index extends wepy.page {
     for (let i=0; i < result.bannerList.length; i++) {
       that.imgUrls.push(result.bannerList[i].image)
     }
+    //今日成交均价
+    let tPrice = {}
+    if(result.todayPrice !== 0){
+      tPrice.junjia = result.todayPrice 
+    }else {
+      if(result.lastAvgPrice !== 0){
+        tPrice.junjia = result.lastAvgPrice
+      }else{
+        tPrice.junjia = result.averagePrice
+      }
+    }
+    //白银价格
+    tPrice.timePrice = result.timePrice // 现货
+    tPrice.differencePrice = result.differencePrice // 白银现货差价
+    tPrice.differenceRate = result.differenceRate // 白银现货差价百分比
+    tPrice.timePriceF = result.timePriceF // 期货
+    tPrice.differencePriceF = result.differencePriceF // 白银期货差价
+    tPrice.differenceRateF = result.differenceRateF // 白银期货差价百分比
+    that.indexfore = tPrice
+    //资讯
+    for(let zx = 0; zx<result.consultList.length; zx++){
+      that.zxTxt.push(result.consultList[zx].name)
+    }
+    //自营-按提货地点
+    for(let zy =0; zy<result.deliveryGoodsList.length; zy++){
+      that.zyHot.push({
+        goods_name: result.deliveryGoodsList[zy].goods_name,
+        main_price: result.deliveryGoodsList[zy].main_price,
+        depot_name: result.deliveryGoodsList[zy].depot_name,
+        goods_total_weight: result.deliveryGoodsList[zy].goods_total_weight.toFixed(4),
+        buy_weight: result.deliveryGoodsList[zy].buy_weight.toFixed(4),
+        create_time: result.deliveryGoodsList[zy].create_time,
+      })
+    }
     this.$apply()
-    console.log(that.imgUrls)
+    
   };
   components = {
     botBar,
