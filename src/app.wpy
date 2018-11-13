@@ -18,6 +18,7 @@ export default class extends wepy.app {
       'pages/index/index',
       'pages/login/login',
       'pages/mallIndex/mallIndex'
+      'pages/enterpriseIden1/enterpriseIden1'
     ],
     window: {
       backgroundTextStyle: 'light',
