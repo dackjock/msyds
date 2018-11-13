@@ -1,0 +1,32 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="企业认证"></header>
+    <view class="iden-header">
+      <block wx:for="{{progress}}" wx:key="">
+        <view class="{{index == 1 ? 'active' : ''}}">
+          <text class="num">{{index+1}}</text>
+          <text>{{item}}</text>
+        </view>
+        <text wx:if="{{index<2}}">&gt;</text>
+      </block>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class enterpriseIden2 extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    progress: ['填写资料', '上传加盖公章复印件', '补充财务信息']
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/enterpriseIden.styl';
+</style>
