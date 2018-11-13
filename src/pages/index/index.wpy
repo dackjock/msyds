@@ -1,6 +1,6 @@
-<template lang="wxml" minapp="wepy">
-  <header></header>
+<template >
   <view class="container">
+    <header></header>
     <!-- 轮播图 -->
       <view class="f-swiper-section">
         <swiper indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}">
@@ -27,9 +27,9 @@
         <p>我要挂单</p>
       </navigator>
     </view>
+    <botBar curr='1'></botBar>
   </view>
   
-  <botBar curr='1'></botBar>
 </template>
 
 <script>

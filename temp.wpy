@@ -1,0 +1,22 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import botBar from '@/components/botBar';
+
+export default class Index extends wepy.page {
+
+  components = {
+    botBar
+  };
+}
+</script>
+
+<style lang="stylus">
+
+  
+</style>

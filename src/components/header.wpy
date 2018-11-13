@@ -1,7 +1,7 @@
 <template lang="wxml" minapp="wepy">
   <view class="header-wrap">
     <!-- 返回按钮 -->
-    <view wx:if="{{hasBack}}" class="h-back" @tap.stop="navBack()"></view>
+    <view wx:if="{{false}}" class="h-back" @tap.stop="navBack"></view>
     <!-- 标题 -->
     <text wx:if="{{title}}" class="h-title">{{title}}</text>
     <!-- 右侧按钮容器 -->
