@@ -1,0 +1,81 @@
+.container
+  padding-top: 90rpx
+  background: #eee
+.iden-header
+  position: fixed
+  left: 0
+  right: 0
+  top: 85rpx
+  background: #fff
+  display: flex
+  justify-content: space-between
+  align-items: center
+  padding: 0 15rpx
+  font-size: 24rpx
+  color: #999
+  line-height: 80rpx
+  >view
+    display: flex
+    align-items: center
+    line-height: 30rpx
+  .num
+    width: 30rpx
+    height: 30rpx
+    text-align: center
+    flex: 0 0 30rpx
+    border-radius: 100%
+    margin-right: 6rpx
+  .active
+    color: #d7092d
+    .num
+      background: #d7092d
+      color: #fff
+.iden-form
+  font-size: 24rpx
+  color: #666
+  .f-line
+    padding: 15rpx 30rpx
+    background: #fff
+    display: flex
+    justify-content: space-between
+    align-items: center
+    margin-bottom: 2rpx
+    &:nth-child(3n)
+      margin-bottom: 10rpx
+  .f-text
+    width: 440rpx
+    flex: 0 0 440rpx
+    height: 60rpx
+    text-align: right
+    &.full
+      line-height: 60rpx
+  .f-btn
+    width: 685rpx
+    height: 80rpx
+    line-height: 80rpx
+    background: #d7092d
+    color: #fff
+    margin-top: 20rpx
+    font-size: 30rpx
+  .f-picker
+    display: flex
+    align-items: center
+    >text
+      position: relative
+      height: 60rpx
+      box-sizing: border-box
+      line-height: 58rpx
+      margin-left: 10rpx
+      border-radius: 10rpx
+      padding: 0 40rpx 0 20rpx
+      border: 2rpx solid #c8c8c8
+      :after
+        content: ''
+        display: block
+        width: 0
+        height: 0
+        border: 10rpx solid transparent
+        border-top-color: #999
+        position: absolute
+        right: 10rpx
+        top: 25rpx
