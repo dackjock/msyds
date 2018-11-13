@@ -1,7 +1,6 @@
 <template lang="wxml" minapp="wepy">
   <view class="container">
-    <view>xx</view>
-    <botBar curr='1'></botBar>
+    
   </view>
 </template>
 
@@ -10,15 +9,7 @@ import wepy from 'wepy';
 import botBar from '@/components/botBar';
 
 export default class Index extends wepy.page {
-  async onShow() {
-    // 请求示例
-    let result = await this.$parent.queryData('app/index.do', {
-      enterpriseId: '-1',
-      userId: '',
-      type: 1
-    });
-    console.log(result);
-  };
+
   components = {
     botBar
   };

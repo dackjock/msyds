@@ -2,6 +2,7 @@
 page,
 .container {
   height: 100%;
+  font-size: 28rpx;
 }
 </style>
 
@@ -28,7 +29,8 @@ export default class extends wepy.app {
 
   globalData = {
     picPath:'http://d7.cto.shovesoft.com/msywap/images/',
-    userInfo: ''
+    userInfo: '',
+    wxUser:''
   };
 
   constructor() {
@@ -37,8 +39,9 @@ export default class extends wepy.app {
     this.use('promisify');
   }
 
-  onLaunch() {
-    
+  async onLaunch() {
+    let code = await wepy.login();
+    code = code.code
   }
 
   sleep(s) {
