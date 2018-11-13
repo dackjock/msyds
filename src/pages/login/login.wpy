@@ -31,6 +31,14 @@ export default class Login extends wepy.page {
   };
   onShow() {
     this.picPath = this.$parent.globalData.picPath;
+    this.preToLogin({
+      detail: {
+        value: {
+          userName: 15527105253,
+          pwd: 123456
+        }
+      }
+    });
   }
   methods = {
     async toLogin(even) {
@@ -49,9 +57,30 @@ export default class Login extends wepy.page {
         loginName: userName,
         pwd: pwd
       });
-      console.log(result);
+      this.$parent.globalData.userInfo = result;
+      console.log('*********** 登录成功 ***********');
     }
   };
+  async preToLogin(even) {
+    let userName = even.detail.value.userName;
+    let pwd = even.detail.value.pwd;
+    let msg = '';
+    msg = userName == '' || pwd == '' ? '账号或密码不可为空' : '';
+    if (msg != '') {
+      wepy.showToast({
+        title: msg,
+        icon: 'none'
+      });
+      return false;
+    }
+    let result = await this.$parent.queryData('app/appUserLogin.do', {
+      loginName: userName,
+      pwd: pwd
+    });
+    this.$parent.globalData.userInfo = result;
+    console.log('*********** 登录成功 ***********');
+    this.$parent.linkPage('../enterpriseIden1/enterpriseIden1',1)
+  }
 }
 </script>
 

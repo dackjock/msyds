@@ -1,0 +1,221 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="企业认证"></header>
+    <view class="iden-header">
+      <block wx:for="{{progress}}" wx:key="">
+        <view class="{{index == 0 ? 'active' : ''}}">
+          <text class="num">{{index+1}}</text>
+          <text>{{item}}</text>
+        </view>
+        <text wx:if="{{index<2}}">&gt;</text>
+      </block>
+    </view>
+    <!-- 表单 -->
+    <form class="iden-form" bindsubmit="toIden">
+      <view class="f-line">
+        <text>企业地址</text>
+        <picker name="addrs" wx:if="{{citys}}" mode="multiSelector" range="{{citys}}" range-key="name" value="{{cityIndex}}" bindcolumnchange="changeCity">
+          <view class="f-picker">
+            <text>{{citys[0][cityIndex[0]].name}}</text>
+            <text>{{citys[1][cityIndex[1]].name}}</text>
+          </view>
+        </picker>
+      </view>
+      <view class="f-line">
+        <text>企业名称</text>
+        <input name="enterpriseName" value="{{defaultData.enterpriseName}}" class="f-text" bindblur="blurShort" placeholder="请填写企业全称"/>
+      </view>
+      <view class="f-line">
+        <text>企业简称</text>
+        <textarea name="shortName" value="{{defaultData.shortName}}" bindinput="inputShort" value="{{defaultData.shortName}}" class="f-text {{hasShort}}" placeholder="省份+公司简称,拼音首字母大写如：'湖南省-正和通'→'HN-ZHT'"></textarea>
+      </view>
+      <view class="f-line" wx:for="{{inputList}}" wx:key="">
+        <text>{{item.title}}</text>
+        <input class="f-text" name="{{item.name}}" value="{{defaultData[item.name]}}" placeholder="请输入{{item.title}}"/>
+      </view>
+      <button class="f-btn" form-type="submit">下一步</button>
+    </form>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class enterpriseIden2 extends wepy.page {
+  components = {
+    header
+  };
+  computed = {
+    hasShort() {
+      return this.defaultData.shortName != '' ? 'full' : '';
+    }
+  };
+  data = {
+    progress: ['填写资料', '上传加盖公章复印件', '补充财务信息'],
+    userInfo: [],
+    citys: [],
+    allProvs: [],
+    allCitys: [],
+    nowCitys: [],
+    cityIndex: [0, 0],
+    inputList: [
+      {
+        name: 'address',
+        title: '详细地址'
+      },
+      {
+        name: 'legalPeople',
+        title: '法定代表人姓名'
+      },
+      {
+        name: 'legalPeopleIdCard',
+        title: '法人身份证号'
+      },
+      {
+        name: 'agentPeople',
+        title: '代理人姓名'
+      },
+      {
+        name: 'agentPeoplePhone',
+        title: '代理人手机号码'
+      },
+      {
+        name: 'agentPeopleIdCard',
+        title: '代理人身份证号码'
+      },
+      {
+        name: 'contactEmail',
+        title: '代理人邮箱'
+      }
+    ],
+    defaultData: {
+      enterpriseName: '',
+      shortName: '',
+      provinceId: '',
+      cityId: '',
+      address: '',
+      legalPeople: '',
+      legalPeopleIdCard: '',
+      contactEmail: '',
+      agentPeople: '',
+      agentPeoplePhone: '',
+      agentPeopleIdCard: ''
+    }
+  };
+  methods = {
+    changeCity(event) {
+      let mock = this.cityIndex;
+      let col = event.detail.column;
+      let val = event.detail.value;
+      mock[col] = val;
+      if (col == 0) {
+        let prov = this.allProvs[val].id;
+        this.citys[1] = this.getCity(prov);
+        mock[1] = 0;
+      }
+      this.cityIndex = mock;
+      this.citys = this.citys;
+      this.$apply();
+    },
+    inputShort(event) {
+      this.defaultData.shortName = event.detail.value;
+    },
+    async blurShort(event) {
+      if (event.detail.value == '') {
+        return false;
+      }
+      let result = await this.$parent.queryData('app/getShortTitle.do', {
+        enterpriseName: event.detail.value
+      });
+      this.defaultData.shortName = result.shortName;
+      this.$apply();
+    },
+    async toIden(event) {
+      let formData = event.detail.value;
+      formData['provinceId'] = this.allProvs[formData.addrs[0]].id;
+      formData['cityId'] = this.nowCitys[formData.addrs[1]].id;
+      formData['id'] = this.userInfo.id;
+      formData['userId'] = this.userInfo.userId;
+      delete formData.addrs;
+      let result = await this.$parent.queryData(
+        'app/appEnterpriseCertification.do',
+        formData
+      );
+      if (result == '') {
+        return false;
+      }
+    }
+  };
+  async onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    await this.getCityData();
+    this.initPageData();
+  }
+  async getCityData() {
+    let result = await this.$parent.queryData(
+      'app/appEnterpriseRegisterInit.do',
+      {
+        id: this.userInfo.id,
+        userId: this.userInfo.userId
+      }
+    );
+    // console.log(result);
+    let mock = [];
+    this.allProvs = result.provinces;
+    this.allCitys = result.citys;
+    let tCitys = await this.getCity(1);
+    mock.push(result.provinces, tCitys);
+    this.citys = mock;
+    this.$apply();
+  }
+  getCity(prov) {
+    let allCitys = this.allCitys;
+    let tCitys = [];
+    for (let i in allCitys) {
+      if (allCitys[i].parentid == prov) {
+        tCitys.push(allCitys[i]);
+      }
+    }
+    this.nowCitys = tCitys;
+    return tCitys;
+  }
+  async initPageData() {
+    let result = await this.$parent.queryData(
+      'app/appEnterpriseCertificationInit.do',
+      {
+        id: this.userInfo.id,
+        userId: this.userInfo.userId
+      }
+    );
+    // console.log(result.enterprise);
+    var defaultData = this.defaultData;
+    for (let key in defaultData) {
+      defaultData[key] = result.enterprise[key];
+    }
+    let allProvs = this.allProvs;
+    let a = 0,
+      b = 0;
+    for (let i = 0; i < allProvs.length; i++) {
+      if (allProvs[i].id == defaultData.provinceId) {
+        a = i;
+      }
+    }
+    this.citys[1] = await this.getCity(defaultData.provinceId);
+    let nowCitys = this.nowCitys;
+    // console.log(nowCitys);
+    for (let j = 0; j < nowCitys.length; j++) {
+      if (nowCitys[j].id == defaultData.cityId) {
+        b = j;
+      }
+    }
+    this.cityIndex = [a, b];
+    this.defaultData = defaultData;
+    this.$apply();
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/enterpriseIden.styl';
+</style>
