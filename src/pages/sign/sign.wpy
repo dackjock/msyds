@@ -1,22 +1,102 @@
 <template lang="wxml" minapp="wepy">
   <view class="container">
-    
+    <header title="马上银注册"></header>
+    <view class="sign-wrap">
+      <image class="s-logo" wx:if="{{picPath}}" src="{{picPath + 'logo.png'}}" mode="aspectFit"/>
+      <form class="s-form" bindsubmit="toSign">
+        <view class="f-line">
+          <input class="f-text tel" name="tel" bindinput="gettel" placeholder="请输入手机号码" />
+        </view>
+        <view class="f-line">
+          <input class="f-text pwd" name="pwd" password placeholder="请输入6~12位的密码" />
+        </view>
+        <view class="f-line">
+          <input class="f-text pwd" name="pwdb" password placeholder="请再次输入6~12位的密码" />
+        </view>
+        <view class="f-line">
+          <input class="f-text yzm" name="yzm"  placeholder="请输入手机验证码" />
+          <view class="s-getyzm" bindtap="getyzm">获取验证码</view>
+        </view>
+        <button class="f-btn" form-type="submit">注册</button>
+        <navigator hover-class="none" class="f-login" url="../login/login">已有账号，点击登录</navigator>
+      </form>
+    </view>
   </view>
 </template>
 
 <script>
 import wepy from 'wepy';
-import botBar from '@/components/botBar';
+import header from '@/components/header';
 
 export default class Sign extends wepy.page {
+  data = {
+    picPath:'',
+    phonenum:'',
+  };
+  onShow() {
+    this.picPath = this.$parent.globalData.picPath;
+  };
+  gettel(e){
+    this.phonenum = e.detail.value;
+    this.$apply()
+  }
+  methods = {
+    async toSign(e) {
+      let tel = e.detail.value.tel;
+      let pwd = e.detail.value.pwd;
+      let pwdb = e.detail.value.pwdb;
+      let yzm = e.detail.value.yzm;
+      if(!tel){
+        this.$parent.showTip('请输入手机号码')
+        return false
+      }else if(!(pwd || pwdb)){
+        this.$parent.showTip('请输入密码')
+        return false
+      }else if(pwd.length<6 || pwd.length>12){
+        this.$parent.showTip('请输入6~12位的密码')
+         return false
+      }else if(pwd !== pwdb){
+        this.$parent.showTip('两次输入的密码不一样')
+         return false
+      }else if(!yzm){
+        this.$parent.showTip('请输入验证码')
+        return false
+      }else{
+        let result = await this.$parent.queryData('app/appMemberRegister.do', {
+          phone: tel,
+          passWord: pwd,
+          repassWord: pwdb,
+          code: yzm,
+          type: 2,
+        });
+        //console.log(result);
+        this.$parent.globalData.userInfo = result;
+        this.$parent.linkPage('../signsuccess/signsuccess',1)
+      }
 
+    },
+    async  getyzm() {
+      console.log(this.phonenum)
+      if(!this.phonenum){
+        this.$parent.showTip('请输入手机号码')
+        return false
+      }else{
+        let result = await this.$parent.queryData('reg/sendValidateCode.do', {
+          phone: this.phonenum,
+          type: 1,
+        });
+        
+      }
+    }
+  };
+  
   components = {
-    botBar
+    header
   };
 }
 </script>
 
 <style lang="stylus">
-
+@import '../../assets/style/sign';
   
 </style>

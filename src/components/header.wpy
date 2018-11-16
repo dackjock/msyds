@@ -1,7 +1,7 @@
 <template lang="wxml" minapp="wepy">
   <view class="header-wrap">
     <!-- 返回按钮 -->
-    <view wx:if="{{false}}" class="h-back" @tap.stop="navBack"></view>
+    <view wx:if="{{hasBack == 'true'}}" class="h-back" @tap.stop="navBack"></view>
     <!-- 标题 -->
     <text wx:if="{{title}}" class="h-title">{{title}}</text>
     <!-- 搜索输入框 -->
@@ -11,7 +11,7 @@
     </view>
     <!-- 右侧按钮容器 -->
     <view class="h-right">
-      
+      <navigator wx:if="{{tofirstpage == 'true'}}" url="../../pages/index/index">返回首页</navigator>
     </view>
   </view>
 </template>
@@ -23,9 +23,10 @@ export default class botBar extends wepy.component {
     hasBack: String,
     title: String,
     searchbx: String,
+    tofirstpage: String,
   };
   data = {
-    hasBack:true
+    //hasBack:true
   };
   onLoad() {
     

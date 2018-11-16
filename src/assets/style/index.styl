@@ -141,6 +141,10 @@ p
   &.l-title-box-no
     &:after
       display: none
+  .l-more-link
+    padding-right:30rpx;
+    font-size:24rpx;
+    display:inline-block;
   span 
     border-left: 5rpx solid $theme-color
     padding-left: 15rpx
@@ -211,3 +215,330 @@ p
             font-size: 20rpx
             color:#999
             text-align: center
+.f-byzy-box
+  .mbb-list-page
+    background-color: #eee
+    padding: 10rpx 10rpx 1rpx
+    .mbbl-item
+      background-color: #fff
+      padding:15rpx 5rpx
+      border-radius: 10rpx
+      display: flex
+      justify-content: space-between
+      align-items: center
+      text-align: center
+      margin-bottom: 15rpx
+      >view 
+        height: 70rpx
+        border-right:2rpx solid #eee
+        display: inline-block
+        vertical-align: middle
+        width: 19%
+        font-size: 18rpx
+        line-height: 30rpx
+        &:first-child
+          width: 24%
+        &:last-child
+          border-right: none 
+      .mbbl-one
+        font-size: 22rpx
+        line-height: 60rpx
+        text-align: left
+        padding-left:5rpx
+      .mbbl-yuan
+        display: inline-block
+        vertical-align: middle
+        border-radius: 50%
+        border:2rpx solid #999
+        color:#999
+        width: 40rpx
+        height: 40rpx
+        line-height: 40rpx
+        text-align: center
+        margin-right: 10rpx
+      .mbl-middle
+        display: inline-block
+        vertical-align: middle
+        font-size: 18rpx
+        &.big
+          font-size: 30rpx
+      .mbbl-fyp
+        border:2rpx solid #999
+        border-radius: 6rpx
+        padding: 0 10rpx
+        display: inline-block
+        vertical-align: middle
+        color:#999
+      .i-zhuanfa
+        display: inline-block
+        vertical-align: middle
+        background:url($picPath + 'icon/zhuanfa.png') no-repeat
+        background-size: contain
+        width: 29rpx
+        height: 20rpx
+      .mbbl-zf-txt
+        margin-left: 5rpx
+      .mbbl-time
+        font-size: 20rpx
+        color:#999
+      .mbbl-btn
+        width: 80%
+        margin: 0 auto
+        border-radius: 6rpx
+        padding: 5rpx 0
+        color: #ffffff
+        background-color: $theme-color
+.f-jkzy-box
+  .mjb-switch
+    switch
+      margin-right: 20rpx
+    .wx-switch-input
+      width:78rpx !important
+      height:50rpx !important
+      background: $theme-color !important
+      border: $theme-color !important
+    /*白色样式（false的样式）*/
+    .wx-switch-input::before
+      background-color: $theme-color !important
+      width:78rpx !important
+      height: 50rpx !important
+    /*红色样式（true的样式）*/
+    .wx-switch-input::after
+      content: '整单' !important
+      font-size: 17rpx
+      text-align: center
+      line-height: 40rpx
+      color: $theme-color
+      width: 40rpx !important
+      height: 40rpx !important
+      margin-top: 5rpx
+    &.switchChecked
+      .wx-switch-input::after
+        content: '子单' !important
+  .mjb-list-page
+    background-color:#eee
+    padding:10rpx 10rpx 1rpx
+    .mjb-item
+      background-color: #fff
+      padding:15rpx 5rpx
+      border-radius:10rpx
+      display:flex
+      justify-content:space-between
+      align-items:center
+      text-align:center
+      margin-bottom:15rpx
+      >view 
+        height: 70rpx
+        line-height: 70rpx
+      .mjbi-one
+        width 20%
+        .mjbi-yuan
+          display:inline-block
+          vertical-align:middle
+          border-radius:50%
+          border:2rpx solid #999
+          color:#999
+          width:40rpx
+          height:40rpx
+          line-height:40rpx
+          text-align:center
+          margin-right:10rpx
+        >span 
+          vertical-align: middle
+          color: #333
+      .mjbi-two
+        width: 58%
+        border-left:2rpx solid #eee
+        border-right:2rpx solid #eee
+        line-height: 20rpx
+        color:#666
+        .mjbi-head-jf
+          display: flex
+          justify-content: space-between
+          align-items: center
+          border-bottom:2rpx solid #eee
+          height: 30rpx
+          line-height: 30rpx
+          font-size:20rpx
+          padding-bottom: 5rpx
+          >span
+            display: block
+            border-right: 2rpx solid #eee
+            text-align: center
+            flex:1
+            &:last-child
+              border-right none 
+          .mhbi-em
+            border:2rpx solid #999
+            border-radius: 6rpx
+            width: 75%
+            margin: 0 auto
+            display: block
+            height: 28rpx
+            line-height: 28rpx
+        .mjbi-txt-yc
+          overflow: hidden
+          text-overflow: ellipsis
+          white-space: nowrap
+          height: 35rpx
+          line-height: 35rpx
+          font-size: 20rpx
+      .mjbi-three
+        width: 20%
+        line-height: 30rpx
+        font-size: 20rpx
+        color:#999
+        .mbbl-btn
+          width: 80%
+          margin: 0 auto
+          border-radius: 6rpx
+          padding: 5rpx 0
+          height: 30rpx
+          line-height: 30rpx
+          font-size: 18rpx
+          color: #ffffff
+          background-color: $theme-color
+.f-zxcjxx-box
+  .mzb-section
+    padding: 10rpx 10rpx 1rpx
+    background-color: #eee
+    .mzbs-item
+      background-color: #fff
+      margin-bottom: 15rpx
+      border-radius: 6rpx
+      .mzbsi-title
+        padding: 10rpx 20rpx 10rpx 30rpx
+        display: flex
+        justify-content: space-between
+        align-items: center
+        .mzbsi-jktitle
+          color: #666
+          width: 70%
+          overflow:hidden
+          text-overflow:ellipsis
+          white-space:nowrap
+        >p
+          color: #666666
+        .mzbsi-bor
+          border: 2rpx solid #999
+          border-radius: 6rpx
+          padding: 4rpx 20rpx
+          font-size: 20rpx
+      .mzbsi-body
+        padding:15rpx 0
+        display: flex
+        justify-content: space-between
+        align-items: center
+        font-size: 30rpx
+        color: #666
+        >view 
+          width: 33.333%
+          text-align: center
+        .mzbis-nr  
+          text-align: left
+          padding-left: 20rpx
+          .mbbl-yuan
+            display:inline-block
+            vertical-align:middle
+            border-radius:50%
+            border:2rpx solid #999
+            color:#999
+            width:40rpx
+            height:40rpx
+            line-height:40rpx
+            text-align:center
+            margin-right:10rpx
+            font-size: 22rpx
+          >span 
+            font-size: 35rpx
+            color: $theme-color
+            display: inline-block
+            vertical-align: middle
+        .mzbis-nums
+          border-right:2rpx solid #eee
+      .mzbis-times
+        text-align: right
+        font-size: 24rpx
+        padding:0 15rpx 10rpx
+        color:#999
+        .mzbis-je
+          margin-right: 20rpx
+.mainTab
+    width: 80rpx
+    height: 80rpx
+    line-height: 80rpx
+    border-radius: 50%
+    border: 2rpx solid $theme-color
+    background-color: #fff
+    color: $theme-color
+    text-align: center
+    position: fixed
+    left: 0
+    top: 40%
+.rightTips
+  padding-left: 10%
+  width: 90%
+  height: 90rpx
+  color: #fff
+  background-color: rgba(220,55,84,0.9)
+  border-top-left-radius: 120rpx
+  border-bottom-left-radius: 120rpx
+  position: fixed
+  right: -90%
+  top: 60%
+  animation: rightTipsOne 0.5s
+  display: flex
+  justify-content: space-between
+  align-items: center
+  &.suo
+    animation: rightTips 0.5s
+    right: 0%
+  .right-page
+    width: 45%
+    border-right: 5rpx solid #fff
+    &.rightbx
+      border-right: none 
+      margin-left: 5%
+    .rp-nr
+      font-size: 20rpx
+      span 
+        margin-right: 15rpx
+      .prn-bigf
+        font-size: 25rpx
+        font-weight: bold
+      .prnb-img
+        &.on
+          image
+            transform: rotate(180deg)
+        image
+          width: 13rpx
+          height: 18rpx
+          margin-right: 5rpx
+  .rtImg
+    position: fixed
+    right: 23rpx
+    top: 62%
+    transition: 0.3s ease
+    &.on
+      transform: rotate(180deg)
+    image
+      width: 24rpx
+      height: 41rpx
+@css{
+  @keyframes rightTips{
+    0%{  
+      right: -90%;
+    }
+    100%{
+      right: 0%;
+    }
+  }
+  @keyframes rightTipsOne{
+    0%{
+      right: 0%;
+    }
+    100%{
+      right: -90%;
+    }
+  }  
+}
