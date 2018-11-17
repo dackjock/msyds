@@ -27,5 +27,4 @@ export default class Index extends wepy.page {
 
 <style lang="stylus">
 
-  
 </style>

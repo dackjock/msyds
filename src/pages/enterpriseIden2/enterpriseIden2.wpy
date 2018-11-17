@@ -10,6 +10,7 @@
         <text wx:if="{{index<2}}">&gt;</text>
       </block>
     </view>
+    
   </view>
 </template>
 
