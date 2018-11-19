@@ -142,8 +142,8 @@ export default class enterpriseIden2 extends wepy.page {
         'app/appEnterpriseCertification.do',
         formData
       );
-      if (result == '') {
-        return false;
+      if (result != '') {
+        this.$parent.linkPage('../enterpriseIden2/enterpriseIden2',1)
       }
     }
   };
