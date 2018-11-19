@@ -1,0 +1,52 @@
+<template lang="wxml" minapp="wepy">
+    <view>
+        <header title="企业认证"></header>
+        <view class="news1">
+            <view><text class="new_sel">资讯</text></view>
+            <view><text>服务</text></view>
+        </view>
+        <view class="news2" id="news2">
+            <view>
+                <text class="new_sel">行情资讯</text>
+            </view>
+            <view>
+                <text>企业公告</text>
+            </view>
+            <view>
+                <text>企业新闻</text>
+            </view>
+        </view>
+
+        <view class="new_main">
+            <image src=""></image>
+            <view class="new_mr">
+                <text>
+                    {{}}
+                </text>
+            </view>
+        </view>
+
+    </view>
+</template>
+
+<script>
+import wepy from "wepy";
+import header from '@/components/header';
+
+export default class EnterpriseN extends wepy.page {
+    components = {
+        header
+    };
+    onLoad() {
+        
+    }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/news.styl'
+page{
+    background:#EEEEEE
+}
+</style>
+

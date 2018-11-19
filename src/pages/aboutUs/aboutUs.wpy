@@ -55,5 +55,8 @@ export default class EnterpriseN extends wepy.page {
 
 <style lang="stylus">
 @import '../../assets/style/aboutus'
+page{
+    background:#EEEEEE
+}
 </style>
 
