@@ -1,0 +1,23 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="企业认证"></header>
+    3
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class enterpriseIden3 extends wepy.page {
+
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+
+  
+</style>
