@@ -241,7 +241,7 @@
     <view class="f-zxcjxx-box">
       <view class="l-title-box ">
         <span>最新成交信息(白银)</span>
-        <navigator url="#" class="l-more-link">查看更多</navigator>
+        <navigator url="../newDealby/newDealby" class="l-more-link">查看更多</navigator>
       </view>
       <view class="mzb-section">
         <view class="mzbs-item"  wx:for= "{{cjbyItem}}" wx:key="{{item.index}}">
@@ -258,7 +258,8 @@
               <em class="mbbl-yuan" wx:if="{{item.goods_type == '散单'}}">散</em>
               <span>{{item.price}}</span>
             </view>
-            <view class="mzbis-nums">{{item.depot_name}}</view>
+            <view class="mzbis-nums" wx:if="{{item.depot_name}}">{{item.depot_name}}</view>
+            <view class="mzbis-nums" wx:if="{{item.storehouse && !item.depot_name}}">{{item.storehouse}}</view>
             <view>{{item.brand_name}}</view>
           </view>
           <view class="mzbis-times">成交时间：{{item.create_time}}</view>
@@ -269,7 +270,7 @@
     <view class="f-zxcjxx-box">
       <view class="l-title-box ">
         <span>最新成交信息(精矿)</span>
-        <navigator url="#" class="l-more-link">查看更多</navigator>
+        <navigator url="../newDealjk/newDealjk" class="l-more-link">查看更多</navigator>
       </view>
       <view class="mzb-section">
         <view class="mzbs-item"  wx:for= "{{cjjkItem}}" wx:key="{{item.index}}">

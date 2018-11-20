@@ -1,0 +1,73 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="马上银，马上赢" hasBack="true" ></header>
+    <view class="sign-wrap">
+      <image class="s-logo" wx:if="{{picPath}}" src="{{picPath + 'logo.png'}}" mode="aspectFit"/>
+      <view class="s-ssp">尊敬的会员，您的企业资料已提交成功，我们会在1-2个工作日对当前的信息进行审核！</view>
+      <view class="s-ssp mt10">登录马上银官网<text class="red">(www.msyds.com)</text>进行查看。</view>
+      <view class="s-rztit mt50">
+        <view class="fwb">您现在需要做的是：</view>
+        <navigator url="#" class="s-down">下载模板</navigator>
+      </view>
+      <view class="s-rzcon">
+        <view >1、填写数字证书申请表；</view>
+        <view >2、营业执照副本复印件（若非三证合一，则需要营业执照和组织机构代码证）、法人身份证及账户管理人身份证（如有）正反面复印件；</view>
+      </view>
+      <view class="s-rzadd">
+        <view>邮寄地址：湖南省郴州市苏仙区高新区林邑路创新创业园2栋</view>
+        <view>联系电话：400-666-3989</view>
+        <view>联系人：朱海雄</view>
+      </view>
+      <view class="s-rzzt">当前状态：
+        <text class="zt" wx:if="{{status == 0}}">审核中</text>
+        <text class="zt" wx:if="{{status == 1}}">审核成功</text>
+        <text class="zt" wx:if="{{status == 2}}">审核不通过</text>
+        </view>
+      <view class="s-ztbtnbx" wx:if="{{status == 0 || status == 2}}">
+        <navigator url="#" class="s-ztbtn mr40">返回个人中心</navigator>
+        <navigator url="#" class="s-ztbtn s-ztbtb">重新修改</navigator>
+      </view>
+      <view class="s-ztbtnbx" wx:if="{{status == 1}}">
+        <navigator url="#" class="s-ztbtn s-ztbtc">返回个人中心</navigator>
+      </view>
+    </view>
+  </view>
+</template>
+      
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class signSuccessstate extends wepy.page {
+  data = {
+    picPath:'',
+    userInfo:'',
+    status:0,
+  };
+  onShow() {
+    this.picPath = this.$parent.globalData.picPath;
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.getState()
+  };
+  
+  async getState() {
+    let result = await this.$parent.queryData('app/appEnterpriseRegisterInit.do', {
+      id: this.userInfo.id,
+      userId: this.userInfo.userId,
+    });
+    console.log(result);
+    let that = this
+    that.status = result.enterprise.status
+    this.$apply()
+  }
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/signSuccessstate';
+  
+</style>

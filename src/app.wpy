@@ -1,10 +1,9 @@
 <style lang="less">
 page,
 .container {
-  height: 100%;
+  min-height: 100%;
   font-size: 28rpx;
   box-sizing: border-box;
-  overflow: auto;
 }
 </style>
 
@@ -17,10 +16,15 @@ import routerBefore from '_mixins/routerBefore.js';
 export default class extends wepy.app {
   config = {
     pages: [
+      'pages/login/login',
+      'pages/negotiate/negotiate',
+      'pages/newDealjk/newDealjk',
+      'pages/newDealby/newDealby',
+      'pages/index/index',
+      'pages/forgetPass/forgetPass',
+      'pages/signSuccessstate/signSuccessstate',
       'pages/signSuccess/signSuccess',
       'pages/sign/sign',
-      'pages/login/login',
-      'pages/index/index',
       'pages/enterpriseIden2/enterpriseIden2',
       'pages/enterpriseIden1/enterpriseIden1',
       'pages/mallIndex/mallIndex',

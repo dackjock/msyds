@@ -1,3 +1,20 @@
 $picPath = 'http://d7.cto.shovesoft.com/msywap/images/'
 
 $theme-color = #d7092d
+
+//清除滚动条
+::-webkit-scrollbar
+  width: 0
+  height: 0
+  color: transparent
+
+.clearfix
+  zoom: 1
+.clearfix:after
+  content: ""
+  clear: both
+  visibility: hidden
+  display: block
+  font-size: 0
+  height: 0
+  line-height: 0

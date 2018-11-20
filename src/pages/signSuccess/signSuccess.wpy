@@ -3,7 +3,7 @@
     <header title="注册成功" hasBack="true" tofirstpage="true"></header>
     <view class="sign-wrap">
       <image class="s-logo" wx:if="{{picPath}}" src="{{picPath + 'logo.png'}}" mode="aspectFit"/>
-      <view class="s-ssp mb40">恭喜，当前企业用户{{userInfo.loginAccount}}注册成功！当前基本信息已提交到平台。"</view>
+      <view class="s-ssp mb40">恭喜，当前企业用户{{userInfo.loginAccount}}注册成功！当前基本信息已提交到平台。</view>
       <view class="s-ssp">当前账号只能浏览咨询、查看商品，如需开通自营产品的购买、产能预售等功能，请完成个人中心的企业认证。</view>
       <view class="s-btnbx">
         <navigator class="f-btn" url="../../pages/enterpriseIden1/enterpriseIden1">企业认证</navigator>

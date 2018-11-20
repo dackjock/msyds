@@ -76,7 +76,6 @@ export default class Sign extends wepy.page {
 
     },
     async  getyzm() {
-      console.log(this.phonenum)
       if(!this.phonenum){
         this.$parent.showTip('请输入手机号码')
         return false

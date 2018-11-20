@@ -1,0 +1,123 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="精矿最新成交信息" hasBack="true"></header>
+    <view class="n-top">
+      <view class="n-topcon">
+        <text>当前成交信息为最新</text>
+        <view class="n-topsx" bindtap="sxclick">筛选</view>
+      </view> 
+    </view>
+    <view class="mzb-section">
+      <view class="mzbs-item"  wx:for= "{{cjjkItem}}" wx:key="{{item.index}}">
+        <view class="mzbsi-title">
+          <view class="mzbsi-jktitle" >
+            <text class="mzbsi-jktxt" wx:for= "{{cjjkItem[index].specList}}" wx:key="{{item.index}}">
+              {{item.specName + item.specValue}}
+            </text>
+          </view>
+          <p class="mzbsi-bor">{{item.settlement_type_name}}</p>
+        </view>
+        <view class="mzbsi-body">
+          <view class="mzbis-nr">
+            <em class="mbbl-yuan" wx:if="{{item.contract_type == 1}}">整</em>
+            <em class="mbbl-yuan" wx:if="{{item.contract_type == 2}}">子</em>
+            <span>{{item.name}}</span>
+          </view>
+          <view class="mzbis-nums">{{item.con_weight}}T</view>
+          <view>{{item.delivery}}</view>
+        </view>
+        <view class="mzbis-times">
+          <span class="mzbis-je">成交金额：
+            <em class="red" wx:if="{{item.contract_type == 1}}">{{item.totalturnoverMoney}}</em>
+            <em class="red" wx:if="{{item.contract_type == 2}}">{{item.turnover_money}}</em>
+          </span>
+          <span>成交时间：{{item.create_time}}</span>
+        </view>
+      </view>
+    </view>
+ 
+    <!--筛选 -->
+    <dealScreenjk :showfn.sync="showbx" :showconfn.sync="showcon" @changeid.user="shownewid"></dealScreenjk>
+  </view>
+</template>
+    
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+import dealScreenjk from '@/components/dealScreenjk';
+
+export default class newDealby extends wepy.page {
+  data = {
+    cjjkItem: [], // 最新成交信息（精矿）
+    pageNum: 1,
+    contractType: '1',
+    nameId: '',
+    settlementTypeId: '',
+    flage: false,
+    showbx: '',
+    showcon: '',
+    
+  };
+  onShow() {
+    this.cjjkItem = []
+    this.queryDealConcentratePage(this.pageNum,this.contractType,this.nameId,this.settlementTypeId)
+  };
+  async queryDealConcentratePage(pageNum,contractType,nameId,settlementTypeId) {
+    let result = await this.$parent.queryData('msyApp/queryDealConcentratePage.do', {
+      pageNum:pageNum,
+      contractType:contractType,
+      nameId:nameId,
+      settlementTypeId:settlementTypeId,
+    })
+    console.log('最新成交 精矿', result);
+    let resultjk = result.pageBean
+    let that = this
+    let list = []
+    let specListJk = ''
+    if(that.pageNum<=resultjk.pages){
+      that.flage= true
+      that.cjjkItem = that.cjjkItem.concat(resultjk.list)
+      //console.log('that.cjjkItem',that.cjjkItem)
+    } else{
+      console.log('无更多数据')
+      that.flage= false
+    }
+    
+    for(let i = 0;i<that.cjjkItem.length;i++){
+     that.cjjkItem[i].create_time = that.cjjkItem[i].create_time.substring(0, 10)
+    }
+    this.$apply() 
+  }
+  onReachBottom() {
+    let that = this;
+    if (that.flage) {
+        that.pageNum +=1
+        that.queryDealConcentratePage(that.pageNum,that.contractType,that.nameId,that.settlementTypeId)
+    }
+  }
+  methods = {
+    sxclick() {
+      this.showbx = "true";
+      this.showcon = "true"
+    },
+    shownewid(data) {
+      console.log(data)
+      this.cjjkItem = []
+      this.pageNum= 1
+      this.contractType = data.typeid
+      this.nameId = data.cpid
+      this.settlementTypeId = data.jsid
+      this.queryDealConcentratePage(this.pageNum,this.contractType,this.nameId,this.settlementTypeId)
+    }
+  };
+  components = {
+    header,
+    dealScreenjk
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/newDealjk';
+  
+</style>

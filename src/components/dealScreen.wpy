@@ -1,0 +1,149 @@
+<template lang="wxml" minapp="wepy">
+  <view class="d-screen" wx:if="{{showfn == 'true'}}" catchtouchmove="true">
+    <view class="d-bg" bindtap="sxclose"></view>
+    <view class="d-cont {{showconfn == 'true' ? 'show' : ''}}">
+      <view class="d-contbx">
+        <view>
+          <view class="d-conttit">品牌</view>
+          <view class="d-contsel clearfix">
+            <view wx:for="{{branklist}}" class="d-contbtn {{currList.curr1 == item.id ? 'd-btnsel' : ''}}" @tap="changeCurr(1,{{item.id}})" wx:key="{{item.index}}">{{item.name}}</view>
+          </view>
+        </view>
+        <view class="">
+          <view class="d-conttit">产品分类</view>
+          <view class="d-contsel clearfix">
+            <view wx:for="{{typelist}}" class="d-contbtn {{currList.curr2 == item.id ? 'd-btnsel' : ''}}" @tap="changeCurr(2,{{item.id}})" wx:key="{{item.index}}">{{item.name}}</view>
+          </view>
+        </view>
+        <view class="">
+          <view class="d-conttit">仓库</view>
+          <view class="d-contsel clearfix">
+            <view wx:for="{{depotlist}}" class="d-contbtn {{currList.curr3 == item.id ? 'd-btnsel' : ''}}" @tap="changeCurr(3,{{item.id}})" wx:key="{{item.index}}">{{item.name}}</view>
+          </view>
+        </view>
+        <view class="">
+          <view class="d-conttit">开票明细</view>
+          <view class="d-contsel clearfix">
+            <view wx:for="{{kplist}}" class="d-contbtn {{currList.curr4 == item.id ? 'd-btnsel' : ''}}" @tap="changeCurr(4,{{item.id}})" wx:key="{{item.index}}">{{item.name}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <view class="d-btnbx">
+        <view class="d-btnaa" @tap="reset()">重置</view>
+        <view class="d-btnaa d-btnab" bindtap="sxdone">完成</view>
+      </view>
+    </view>
+  </view>
+</template>
+      
+<script>
+import wepy from 'wepy';
+export default class dealScreen extends wepy.component {
+  props = {
+    showfn: {
+      type: String,
+      default: '',
+      twoWay: true
+    },
+    showconfn: {
+      type: String,
+      default: '',
+      twoWay: true
+    }
+  };
+  data = {
+    selbtn: false,
+    branklist: [], //品牌
+    depotlist: [], //仓库
+    typelist: [], //分类
+    kplist: [], //开票明细
+    currList: {
+      curr1: '',
+      curr2: '',
+      curr3: '',
+      curr4: '',
+    },
+    selid:{
+    brankid:'',
+    depotid:'',
+    typeid:'',
+    kpid:'',
+    }
+    
+  };
+  onLoad() {
+    this.getData();
+    this.kplist = [{id:'',name:'全部'},{id:1,name:'当月票'},{id:2,name:'非当月票'}]
+  }
+  async getData() {
+    let result = await this.$parent.$parent.queryData(
+      'app/queryPayEnterpriseOrderInit.do',
+      {}
+    );
+    //console.log('筛选', result);
+    this.branklist.push({
+      id: '',
+      name: '全部'
+    });
+    this.depotlist.push({
+      id: '',
+      name: '全部'
+    });
+    this.typelist.push({
+      id: '',
+      name: '全部'
+    });
+    this.branklist = this.branklist.concat(result.brankList);
+    this.depotlist = this.depotlist.concat(result.depotList);
+    this.typelist = this.typelist.concat(result.goodsTypeList);
+    this.$apply();
+  }
+  methods = {
+    async sxdone() {
+      this.showconfn = 'false';
+      await this.$parent.$parent.sleep(0.5);
+      this.showfn = 'false';
+      if(this.selid.kpid == 2){
+        this.selid.kpid = 0
+      }
+      this.$emit('changeid',this.selid)
+      this.$apply();
+    },
+    sxclose(){
+      this.showconfn = 'false'
+      this.showfn = 'false'
+    },
+    reset() {
+      this.currList.curr1 =''
+      this.currList.curr2 =''
+      this.currList.curr3 =''
+      this.currList.curr4 =''
+      this.$apply()
+    },
+    changeCurr(curr,index){
+      this.currList['curr'+curr] = index
+      switch (curr) {
+        case "1":
+          this.selid.brankid = index
+          break;
+        case "2":
+          this.selid.typeid = index
+          break;
+        case "3":
+          this.selid.depotid = index
+          break;
+        case "4":
+          this.selid.kpid = index
+          break;
+      }
+      
+      this.$apply();
+    }
+  };
+}
+</script>
+ 
+<style lang='stylus'>
+@import '../assets/style/dealScreen';
+</style>

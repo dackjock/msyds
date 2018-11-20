@@ -1,0 +1,34 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="提交议价" hasBack="true"></header>
+    <view>
+      
+    </view>
+  </view>
+</template>
+ 
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class negotiate extends wepy.page {
+  data = {
+    phonenum:'',
+  };
+  onShow() {
+    this.picPath = this.$parent.globalData.picPath;
+  };
+   
+  methods = {
+    
+  };
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/negotiate';
+  
+</style>
