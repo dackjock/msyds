@@ -1,0 +1,17 @@
+<template lang="wxml" minapp="wepy">
+    <view class="">
+
+    </view>
+</template>
+
+<script>
+import wepy from "wepy";
+import header from '../../components/header';
+export default class helpcenter extends wepy.page {
+    
+}
+</script>
+
+<style lang="stylus" scoped>
+@import '../../assets/style/helpcenter'
+</style>

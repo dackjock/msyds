@@ -38,6 +38,27 @@
             </view>
         </view>
 
+        <view class="abus3">
+            <text class="abus3_left">招贤纳士</text>
+            <view class="abus3_right">
+                <image src="../../assets/images/icon/jiantou.png">
+            </view>
+        </view>
+
+        <view class="abus3">
+            <text class="abus3_left">企业介绍</text>
+            <view class="abus3_right">
+                <image src="../../assets/images/icon/jiantou.png">
+            </view>
+        </view>
+
+        <view class="abus3">
+            <text class="abus3_left">关于我们</text>
+            <view class="abus3_right">
+                <image src="../../assets/images/icon/jiantou.png">
+            </view>
+        </view>
+
         <botBar curr='5'></botBar>
     </view>
 </template>
