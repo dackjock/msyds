@@ -46,7 +46,7 @@
 import wepy from "wepy";
 import botBar from '@/components/botBar';
 
-export default class EnterpriseN extends wepy.page {
+export default class aboutus extends wepy.page {
     components = {
         botBar
     };
