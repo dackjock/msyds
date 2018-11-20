@@ -79,7 +79,8 @@ export default class Login extends wepy.page {
     });
     this.$parent.globalData.userInfo = result;
     console.log('*********** 登录成功 ***********');
-    this.$parent.linkPage('../enterpriseIden1/enterpriseIden1',1)
+    console.log('用户信息：',result)
+    this.$parent.linkPage('../enterpriseIden3/enterpriseIden3',1)
   }
 }
 </script>

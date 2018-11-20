@@ -33,7 +33,7 @@
         <text>{{item.title}}</text>
         <input class="f-text" name="{{item.name}}" value="{{defaultData[item.name]}}" placeholder="请输入{{item.title}}"/>
       </view>
-      <button class="f-btn" form-type="submit">下一步</button>
+      <button class="page-btn" form-type="submit">下一步</button>
     </form>
   </view>
 </template>
@@ -142,8 +142,8 @@ export default class enterpriseIden2 extends wepy.page {
         'app/appEnterpriseCertification.do',
         formData
       );
-      if (result == '') {
-        return false;
+      if (result != '') {
+        this.$parent.linkPage('../enterpriseIden2/enterpriseIden2',1)
       }
     }
   };
