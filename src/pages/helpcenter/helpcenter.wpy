@@ -1,6 +1,42 @@
 <template lang="wxml" minapp="wepy">
-    <view class="">
+    <view>
+        <header title="帮助中心"></header>
+        <view class="help_warp">
+            <view>
+                <image src=""></image>
+                <view>法律声明</view>
+            </view>
+            <view class="ml5">
+                <image src=""></image>
+                <view>服务协议</view>
+            </view>
+            <view class="ml5">
+                <image src=""></image>
+                <view>总则</view>
+            </view>
 
+            <view>
+                <image src=""></image>
+                <view>版权信息</view>
+            </view>
+            <view class="ml5">
+                <image src=""></image>
+                <view>平安支付操作文档</view>
+            </view>
+            <view class="ml5">
+                <image src=""></image>
+                <view>隐私政策</view>
+            </view>
+
+            <view>
+                <image src=""></image>
+                <view>操作指引</view>
+            </view>
+            <view class="ml5">
+                <image src=""></image>
+                <view>test</view>
+            </view>
+        </view>
     </view>
 </template>
 
@@ -8,10 +44,15 @@
 import wepy from "wepy";
 import header from '../../components/header';
 export default class helpcenter extends wepy.page {
-    
+    components = {
+        header
+    };
 }
 </script>
 
-<style lang="stylus" scoped>
-@import '../../assets/style/helpcenter'
+<style lang="stylus">
+@import '../../assets/style/helpcenter';
+page{
+    background:#EEEEEE
+}
 </style>
