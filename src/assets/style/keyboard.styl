@@ -1,0 +1,74 @@
+@import './base'
+
+.keybx
+  position: fixed
+  width: 100%
+  height: 100%
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  z-index 10
+  .k-bg
+    position: absolute
+    left 0
+    top: 0
+    background-color: rgba(0,0,0,0.5)
+    z-index:99
+    width 100%
+    height 100%
+  .k-cont
+    position: absolute
+    left:0
+    right 0
+    bottom: 0
+    z-index:100
+    background-color: #ffffff
+    color: #666666
+    font-size: 24rpx
+    border: 2rpx solid #eeeeee
+    .k-top
+      height 60rpx
+      line-height: 60rpx
+      border-bottom: 2rpx solid #eeeeee
+      display: flex
+      .k-topl
+        width 20%
+        text-align: center
+    .k-contbx
+      display: flex
+      .k-contbxl
+        width 20%
+        .k-shui
+          width 100%
+          height 60rpx
+          line-height: 60rpx
+          text-align: center
+          border-right: 2rpx solid #eeeeee
+          border-bottom: 2rpx solid #eeeeee
+      .k-contml
+        height 60rpx
+        line-height: 60rpx
+        border-bottom: 2rpx solid #eeeeee
+        display: flex
+        .k-num
+          border-right: 2rpx solid #eeeeee
+          text-align: center
+      .k-contbxr
+        width 20%
+        .k-rbtn
+          width 100%
+          height 122rpx
+          line-height: 122rpx
+          text-align: center
+          border-bottom: 2rpx solid #eeeeee
+        .k-rbtnb
+          color: #ffffff
+          background-color: #ff9d00
+
+.flex-1
+  flex:1
+.red
+  color: $theme-color
+.lv
+  color: #80c269

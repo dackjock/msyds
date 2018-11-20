@@ -1,0 +1,79 @@
+<template lang="wxml" minapp="wepy">
+  <view class="keybx" catchtouchmove="true" wx:if="{{showfn =='true'}}">
+    <view class="k-bg" bindtap="closefn"></view>
+    <view class="k-cont">
+      <view class="k-top">
+        <view class="k-topl">价格</view>
+        <view class="flex-1 {{stnum >0 ? 'red' : ''}} {{stnum <0 ? 'lv' : ''}}">{{sttype}}{{stnum}}</view>
+      </view>
+      <view class="k-contbx">
+        <view class="k-contbxl">
+          <view class="k-shui" @tap="changeshui(1)">升水</view>
+          <view class="k-shui" @tap="changeshui(2)">平水</view>
+          <view class="k-shui" @tap="changeshui(3)">贴水</view>
+          <view class="k-shui"></view>
+        </view>
+        <view class="k-contbxm flex-1">
+          <view class="k-contml">
+            <view class="k-num flex-1">1</view>
+            <view class="k-num flex-1">2</view>
+            <view class="k-num flex-1">3</view>
+          </view>
+          <view class="k-contml">
+            <view class="k-num flex-1">4</view>
+            <view class="k-num flex-1">5</view>
+            <view class="k-num flex-1">6</view>
+          </view>
+          <view class="k-contml">
+            <view class="k-num flex-1">7</view>
+            <view class="k-num flex-1">8</view>
+            <view class="k-num flex-1">9</view>
+          </view>
+          <view class="k-contml">
+            <view class="k-num flex-1">0</view>
+            <view class="k-num flex-1"></view>
+            <view class="k-num flex-1" bindtap="closefn">取消</view>
+          </view>
+        </view>
+        <view class="k-contbxr">
+          <view class="k-rbtn">删除</view>
+          <view class="k-rbtn k-rbtnb">确定</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+  
+<script>
+import wepy from 'wepy';
+export default class keyboard extends wepy.component {
+  props = {
+    showfn: {
+      type: String,
+      default: '',
+      twoWay: true
+    },
+    
+  };
+  data = {
+    sttype: '平水',
+    stnum: '0'
+  };
+  onLoad() {
+   
+  }
+  methods = {
+    closefn() {
+      this.showfn = 'false'
+    },
+    changeshui(num) {
+      
+    }
+  };
+}
+</script>
+
+<style lang='stylus'>
+@import '../assets/style/keyboard';
+  
+</style>
