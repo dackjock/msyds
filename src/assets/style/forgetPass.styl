@@ -1,0 +1,60 @@
+@import './base'
+.container
+  background: #eee
+.sign-wrap
+  height: 100%
+  display: flex
+  flex-flow: column
+  align-items: center
+  .s-form
+    width: 100%
+  .f-line
+    position: relative
+    padding: 0 20rpx
+    background: #fff
+    margin-bottom: 2rpx
+    .f-text
+      width: 100%
+      height: 80rpx
+      font-size: 30rpx
+      padding-left: 60rpx
+      box-sizing: border-box
+      &.tel
+        background: url($picPath + 'telIcon.png') no-repeat
+        background-size: 23rpx auto
+        background-position: 15rpx center
+      &.pwd
+        background: url($picPath + 'suoIcon.png') no-repeat
+        background-size: 34rpx auto
+        background-position: 8rpx center
+      &.yzm
+        background: url($picPath + 'yztelIcon.png') no-repeat
+        background-size: 34rpx auto
+        background-position: 8rpx center
+    .s-getyzm
+      position: absolute
+      z-index: 2
+      top: 8rpx
+      right:30rpx
+      width 177rpx
+      height 60rpx
+      line-height: 60rpx
+      color: #666666
+      text-align: center
+      font-size: 24rpx
+      background-color: #eeeeee
+      border: 2rpx solid #e8e8e8
+      border-radius: 8rpx
+  .f-btn
+    width: 685rpx
+    height: 80rpx
+    line-height: 80rpx
+    background: #d7092d
+    color: #fff
+    margin-top: 30rpx
+    font-size: 30rpx
+  .f-login
+    text-align: center
+    color: #d7092d
+    font-size: 28rpx
+    margin-top: 30rpx

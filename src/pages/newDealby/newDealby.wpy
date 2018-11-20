@@ -1,0 +1,123 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="最新成交信息" hasBack="true"></header>
+    <view class="n-top">
+      <view class="n-topcon">
+        <text>当前成交信息为最新</text>
+        <view class="n-topsx" bindtap="sxclick">筛选</view>
+      </view> 
+    </view>
+    <view class="mzb-section">
+      <view class="mzbs-item"  wx:for= "{{cjbyItem}}" wx:key="{{item.index}}">
+          <view class="mzbsi-title">
+            <p>{{item.goods_name}}/{{item.goods_spec}}/{{item.goods_attr}}</p>
+            <p>{{item.goods_weight}}KG</p>
+            <p class="mzbsi-bor" wx:if="{{item.month_ticket_status == 1}}">当月票</p>
+            <p class="mzbsi-bor" wx:if="{{item.month_ticket_status == 0}}">非当月票</p>
+          </view>
+          <view class="mzbsi-body">
+            <view class="mzbis-nr">
+              <em class="mbbl-yuan" wx:if="{{item.goods_type == '整单'}}">整</em>
+              <em class="mbbl-yuan" wx:if="{{item.goods_type == '子单'}}">子</em>
+              <em class="mbbl-yuan" wx:if="{{item.goods_type == '散单'}}">散</em>
+              <em class="mbbl-yuan" wx:if="{{item.goods_type == '仓单'}}">仓</em>
+              <span>{{item.price}}</span>
+            </view>
+            <view class="mzbis-nums" wx:if="{{item.depot_name}}">{{item.depot_name}}</view>
+            <view class="mzbis-nums" wx:if="{{item.storehouse && !item.depot_name}}">{{item.storehouse}}</view>
+            <view>{{item.brand_name}}</view>
+          </view>
+          <view class="mzbis-times">成交时间：{{item.create_time}}</view>
+        </view>
+    </view> 
+
+    <!--筛选 -->
+    <dealscreen :showfn.sync="showbx" :showconfn.sync="showcon" @changeid.user="shownewid"></dealscreen>
+  </view>
+</template>
+     
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+import dealscreen from '@/components/dealScreen';
+
+export default class newDealby extends wepy.page {
+  data = {
+    cjbyItem: [], // 最新成交信息（白银）
+    pageNum: 1,
+    pageSize: 10,
+    depotId: '',
+    brandId: '',
+    monthTicketStatus: 1,
+    goodsTypeId: '',
+    flage: false,
+    showbx: '',
+    showcon: '',
+    
+  };
+  onShow() {
+    this.cjbyItem = []
+    this.queryPayEnterpriseOrder(this.pageNum,this.pageSize,this.depotId,this.brandId,this.monthTicketStatus,this.goodsTypeId)
+  };
+  async queryPayEnterpriseOrder(pageNum,pageSize,depotId,brandId,monthTicketStatus,goodsTypeId) {
+    let result = await this.$parent.queryData('app/queryPayEnterpriseOrder.do', {
+      pageNum:pageNum,
+      pageSize:pageSize,
+      depotId:depotId,
+      brandId:brandId,
+      monthTicketStatus:monthTicketStatus,
+      goodsTypeId:goodsTypeId
+    })
+    console.log('最新成交 白银', result);
+    let that = this
+    let list = []
+    if(that.pageNum<=result.pages){
+      that.flage= true
+      //console.log('result.list',result.list)
+      that.cjbyItem = that.cjbyItem.concat(result.list)
+      // console.log('that.cjbyItem',that.cjbyItem)
+    } else{
+      console.log('无更多数据')
+      that.flage= false
+    }
+    for(let i = 0;i<that.cjbyItem.length;i++){
+      that.cjbyItem[i].goods_weight = Number(that.cjbyItem[i].goods_weight).toFixed(4)
+      that.cjbyItem[i].price = Number(that.cjbyItem[i].price).toFixed(2)
+    }
+    
+    this.$apply() 
+  }
+  onReachBottom() {
+      let that = this;
+      if (that.flage) {
+         that.pageNum +=1
+          that.queryPayEnterpriseOrder(that.pageNum,that.pageSize,that.depotId,that.brandId,that.monthTicketStatus,that.goodsTypeId)
+      }
+  }
+  methods = {
+    sxclick() {
+      this.showbx = "true";
+      this.showcon = "true"
+    },
+    shownewid(data) {
+      console.log(data)
+      this.cjbyItem = []
+      this.pageNum= 1
+      this.depotId = data.depotid
+      this.brandId = data.brankid
+      this.monthTicketStatus = data.kpid
+      this.goodsTypeId = data.typeid
+      this.queryPayEnterpriseOrder(this.pageNum,this.pageSize,this.depotId,this.brandId,this.monthTicketStatus,this.goodsTypeId)
+    }
+  };
+  components = {
+    header,
+    dealscreen
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/newDealby';
+  
+</style>

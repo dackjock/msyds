@@ -1,0 +1,129 @@
+<template lang="wxml" minapp="wepy">
+  <view class="d-screen" wx:if="{{showfn == 'true'}}" catchtouchmove="true">
+    <view class="d-bg" bindtap="sxclose"></view>
+    <view class="d-cont {{showconfn == 'true' ? 'show' : ''}}">
+      <view class="d-contbx">
+        <view>
+          <view class="d-conttit">类型</view>
+          <view class="d-contsel clearfix">
+            <view wx:for="{{typelist}}" class="d-contbtn {{currList.curr1 == item.id ? 'd-btnsel' : ''}}" @tap="changeCurr(1,{{item.id}})" wx:key="{{item.index}}">{{item.settingName}}</view>
+          </view>
+        </view>
+        <view class="">
+          <view class="d-conttit">产品品名</view>
+          <view class="d-contsel clearfix">
+            <view wx:for="{{cplist}}" class="d-contbtn {{currList.curr2 == item.id ? 'd-btnsel' : ''}}" @tap="changeCurr(2,{{item.id}})" wx:key="{{item.index}}">{{item.settingName}}</view>
+          </view>
+        </view>
+        <view class="">
+          <view class="d-conttit">结算方式</view>
+          <view class="d-contsel clearfix">
+            <view wx:for="{{jslist}}" class="d-contbtn {{currList.curr3 == item.id ? 'd-btnsel' : ''}}" @tap="changeCurr(3,{{item.id}})" wx:key="{{item.index}}">{{item.settingName}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <view class="d-btnbx">
+        <view class="d-btnaa" @tap="reset()">重置</view>
+        <view class="d-btnaa d-btnab" bindtap="sxdone">完成</view>
+      </view>
+    </view>
+  </view>
+</template>
+      
+<script>
+import wepy from 'wepy';
+export default class dealScreenjk extends wepy.component {
+  props = {
+    showfn: {
+      type: String,
+      default: '',
+      twoWay: true
+    },
+    showconfn: {
+      type: String,
+      default: '',
+      twoWay: true
+    }
+  };
+  data = {
+    selbtn: false,
+    jslist: [], //结算方式
+    cplist: [], //产品品名
+    typelist: [], //类型
+    currList: {
+      curr1: '',
+      curr2: '',
+      curr3: '',
+    },
+    selid:{
+    jsid:'',
+    cpid:'',
+    typeid:'',
+    }
+    
+  };
+  onLoad() {
+    this.typelist = [{id:'',settingName:'全部'},{id:1,settingName:'整单'},{id:2,settingName:'子单'}]
+    this.getData();
+  }
+  async getData() {
+    let result = await this.$parent.$parent.queryData('msyApp/queryDealConcentrateInit.do',
+      {}
+    );
+    //console.log('筛选', result);
+    this.jslist.push({
+      id: '',
+      settingName: '全部'
+    });
+    this.cplist.push({
+      id: '',
+      settingName: '全部'
+    });
+    
+    this.jslist = this.jslist.concat(result.settlementList);
+    this.cplist = this.cplist.concat(result.goodsName);
+    this.$apply();
+  }
+  methods = {
+    async sxdone() {
+      this.showconfn = 'false';
+      await this.$parent.$parent.sleep(0.5);
+      this.showfn = 'false';
+      
+      this.$emit('changeid',this.selid)
+      this.$apply();
+    },
+    sxclose(){
+      this.showconfn = 'false'
+      this.showfn = 'false'
+    },
+    reset() {
+      this.currList.curr1 =''
+      this.currList.curr2 =''
+      this.currList.curr3 =''
+      this.$apply()
+    },
+    changeCurr(curr,index){
+      this.currList['curr'+curr] = index
+      switch (curr) {
+        case "1":
+          this.selid.typeid = index
+          break;
+        case "2":
+          this.selid.cpid = index
+          break;
+        case "3":
+          this.selid.jsid = index
+          break;
+      }
+      
+      this.$apply();
+    }
+  };
+}
+</script>
+ 
+<style lang='stylus'>
+@import '../assets/style/dealScreenjk';
+</style>

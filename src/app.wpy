@@ -16,7 +16,16 @@ export default class extends wepy.app {
       'pages/enterpriseIden1/enterpriseIden1',
       'pages/enterpriseIden2/enterpriseIden2',
       'pages/enterpriseIden3/enterpriseIden3',
+      'pages/negotiate/negotiate',
+      'pages/newDealjk/newDealjk',
+      'pages/newDealby/newDealby',
       'pages/index/index',
+      'pages/forgetPass/forgetPass',
+      'pages/signSuccessstate/signSuccessstate',
+      'pages/signSuccess/signSuccess',
+      'pages/sign/sign',
+      'pages/enterpriseIden2/enterpriseIden2',
+      'pages/enterpriseIden1/enterpriseIden1',
       'pages/mallIndex/mallIndex',
     ],
     window: {
@@ -58,6 +67,13 @@ export default class extends wepy.app {
 
   linkPage(url,type){
     routerBefore(url,type,this.globalData.userInfo)
+  }
+
+  showTip(msg) {
+    wepy.showToast({
+      title: msg,
+      icon: 'none'
+    });
   }
 }
 </script>
