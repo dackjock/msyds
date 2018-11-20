@@ -1,10 +1,6 @@
-<style lang="less">
-page,
-.container {
-  height: 100%;
-  font-size: 28rpx;
-  box-sizing: border-box
-}
+<style lang="stylus">
+@import './assets/style/app'
+
 </style>
 
 <script>
@@ -16,10 +12,18 @@ import routerBefore from '_mixins/routerBefore.js';
 export default class extends wepy.app {
   config = {
     pages: [
-      'pages/enterpriseIden2/enterpriseIden2',
-      'pages/enterpriseIden1/enterpriseIden1',
       'pages/login/login',
+      'pages/enterpriseIden1/enterpriseIden1',
+      'pages/enterpriseIden2/enterpriseIden2',
+      'pages/enterpriseIden3/enterpriseIden3',
+      'pages/negotiate/negotiate',
+      'pages/newDealjk/newDealjk',
+      'pages/newDealby/newDealby',
       'pages/index/index',
+      'pages/forgetPass/forgetPass',
+      'pages/signSuccessstate/signSuccessstate',
+      'pages/signSuccess/signSuccess',
+      'pages/sign/sign',
       'pages/mallIndex/mallIndex',
     ],
     window: {
@@ -61,6 +65,13 @@ export default class extends wepy.app {
 
   linkPage(url,type){
     routerBefore(url,type,this.globalData.userInfo)
+  }
+
+  showTip(msg) {
+    wepy.showToast({
+      title: msg,
+      icon: 'none'
+    });
   }
 }
 </script>

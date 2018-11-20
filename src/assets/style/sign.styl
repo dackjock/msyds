@@ -1,5 +1,5 @@
 @import './base'
-page
+.container
   background: #eee
 .sign-wrap
   height: 100%
@@ -32,13 +32,24 @@ page
         background: url($picPath + 'suoIcon.png') no-repeat
         background-size: 34rpx auto
         background-position: 8rpx center
-    .f-forget
+      &.yzm
+        background: url($picPath + 'yztelIcon.png') no-repeat
+        background-size: 34rpx auto
+        background-position: 8rpx center
+    .s-getyzm
       position: absolute
       z-index: 2
-      top: 0
-      right:40rpx
-      line-height: 80rpx
-      color: #d7092d
+      top: 8rpx
+      right:30rpx
+      width 177rpx
+      height 60rpx
+      line-height: 60rpx
+      color: #666666
+      text-align: center
+      font-size: 24rpx
+      background-color: #eeeeee
+      border: 2rpx solid #e8e8e8
+      border-radius: 8rpx
   .f-btn
     width: 685rpx
     height: 80rpx
@@ -47,8 +58,8 @@ page
     color: #fff
     margin-top: 20rpx
     font-size: 30rpx
-  .f-sign
+  .f-login
     text-align: center
     color: #d7092d
-    font-size: 30rpx
+    font-size: 28rpx
     margin-top: 30rpx

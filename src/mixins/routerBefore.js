@@ -1,7 +1,10 @@
 import wepy from 'wepy'
 
 let firewall = [
-  '../mallIndex/mallIndex'
+  '../mallIndex/mallIndex',
+  '../enterpriseIden1/enterpriseIden1',
+  '../enterpriseIden2/enterpriseIden2',
+  '../enterpriseIden3/enterpriseIden3',
 ]
 
 let actionType = 1

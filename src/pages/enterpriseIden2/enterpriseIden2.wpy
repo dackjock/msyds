@@ -10,6 +10,38 @@
         <text wx:if="{{index<2}}">&gt;</text>
       </block>
     </view>
+    <view class="iden-title">
+      <image src="../../assets/images/icon/icon-zjxx.png" />
+      <text>上传证件信息</text>
+    </view>
+    <view class="chooseIdenType">
+      <view>
+        <text >证件上传</text>
+        <text class="gt-tips">提示：复印件必须加盖公章，公章必须清晰</text>
+      </view>
+      <picker mode="selector" range="{{idenType}}" value="idenTypeCurr" bindchange="changeTypeCurr">
+        <text class="type-curr">{{idenType[idenTypeCurr]}}</text>
+      </picker>
+    </view>
+    <view class="picIden-item" wx:for="{{exampData}}" wx:key="" wx:if="{{index > 5 ? (idenTypeCurr == 1) : true}}">
+      <view>
+        <image src="{{item.pic == '' ? picUpload : item.pic}}" mode="aspectFit" @tap.stop="choosePic({{index}})"/>
+        <text>上传{{item.title}}</text>
+      </view>
+      <view >
+        <image src="{{item.examp}}" mode="aspectFit"/>
+        <text >示例（请点击放大）</text>
+      </view>
+    </view>
+    <view class="iden-info">
+      <text >营业执照注册号</text>
+      <input placeholder="请输入营业执照注册号" value="{{dataList.businessLicence}}" bindinput="changeBusinessLicence"/>
+    </view>
+    <view class="iden-info" wx:if='{{idenTypeCurr == 1}}'>
+      <text class="red-point">组织机构代码</text>
+      <input placeholder="请输入组织机构代码" value="{{dataList.organizationCode}}" bindinput="changeOrganizationCode"/>
+    </view>
+    <button class="page-btn" @tap.stop='submitData'>下一步</button>
   </view>
 </template>
 
@@ -22,8 +54,167 @@ export default class enterpriseIden2 extends wepy.page {
     header
   };
   data = {
-    progress: ['填写资料', '上传加盖公章复印件', '补充财务信息']
+    userInfo: [],
+    progress: ['填写资料', '上传加盖公章复印件', '补充财务信息'],
+    idenType: ['三证合一', '非三证合一'],
+    idenTypeCurr: 0,
+    picUpload: 'http://d7.cto.shovesoft.com/msywap/images/l-uploadAdd.png',
+    exampData: [
+      {
+        title: '营业执照',
+        type: 'businessLicenceImg',
+        examp: 'http://d7.cto.shovesoft.com/msywap/images/yyzz.jpg',
+        pic: ''
+      },
+      {
+        title: '法定代表人身份证正反面',
+        type: 'cardImg',
+        examp: 'http://d7.cto.shovesoft.com/msywap/images/sfz.jpg',
+        pic: ''
+      },
+      {
+        title: '银行开户许可证',
+        type: 'bankLicenceImg',
+        examp: 'http://d7.cto.shovesoft.com/msywap/images/yhkh.jpg',
+        pic: ''
+      },
+      {
+        title: '代理委托函图片',
+        type: 'entrustLetterImg',
+        examp: 'http://d7.cto.shovesoft.com/msywap/images/wts.png',
+        pic: ''
+      },
+      {
+        title: '法大大账户及数字证书申请表',
+        type: 'fddAuthApplyImg',
+        examp: 'http://d7.cto.shovesoft.com/msywap/images/fddApply.png',
+        pic: ''
+      },
+      {
+        title: '代理人身份证正反面',
+        type: 'agentPeopleIdCardImg',
+        examp: 'http://d7.cto.shovesoft.com/msywap/images/sfz.jpg',
+        pic: ''
+      },
+      {
+        title: '税务登记证',
+        type: 'taxRegistrationImg',
+        examp: 'http://d7.cto.shovesoft.com/msywap/images/swdjz.jpg',
+        pic: ''
+      },
+      {
+        title: '组织机构代码证',
+        type: 'organizationCodeImg',
+        examp: 'http://d7.cto.shovesoft.com/msywap/images/zzjg.jpg',
+        pic: ''
+      }
+    ],
+    dataList: {
+      organizationCode: '',
+      businessLicence: ''
+    }
   };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.initPageData();
+  }
+  methods = {
+    choosePic(index) {
+      let that = this;
+      wx.chooseImage({
+        success: function(res) {
+          let base64 = wx
+            .getFileSystemManager()
+            .readFileSync(res.tempFilePaths[0], 'base64');
+          wx.getImageInfo({
+            src: res.tempFilePaths[0],
+            success(res) {
+              that.uploadPic(index, base64, res.type);
+            }
+          });
+        }
+      });
+    },
+    changeTypeCurr(event) {
+      this.idenTypeCurr = event.detail.value;
+      this.$apply();
+    },
+    changeBusinessLicence(event) {
+      this.dataList.businessLicence = event.detail.value;
+      this.$apply();
+    },
+    changeOrganizationCode(event) {
+      this.dataList.organizationCode = event.detail.value;
+      this.$apply();
+    },
+    async submitData() {
+      let dataList = this.dataList;
+      let exampData = this.exampData;
+      for (let k in exampData) {
+        dataList[exampData[k].type] = exampData[k].pic;
+      }
+      dataList['id'] = this.userInfo.id;
+      dataList['userId'] = this.userInfo.userId;
+      dataList['uploadType'] = parseInt(this.idenTypeCurr) + 1;
+      let result = await this.$parent.queryData(
+        '/app/appEnterpriseDocument.do',
+        dataList
+      );
+      if (result != '') {
+        this.$parent.linkPage('../enterpriseIden3/enterpriseIden3', 1);
+      }
+    }
+  };
+  async uploadPic(index, data, filetype) {
+    let result = await this.$parent.queryData(
+      '/upload',
+      {
+        data: data,
+        filetype: filetype,
+        user_id: this.userInfo.id
+      },
+      'POST'
+    );
+    // console.log(result);
+    this.exampData[index].pic = result.imgurl;
+    this.$apply();
+  }
+  async initPageData() {
+    let result = await this.$parent.queryData(
+      'app/appEnterpriseFinanceInit.do',
+      {
+        id: this.userInfo.id,
+        userId: this.userInfo.userId
+      }
+    );
+    let enterprise = result.enterprise;
+    let exampData = this.exampData;
+    let dataList = this.dataList;
+    for (let key in enterprise) {
+      for (let k in exampData) {
+        if (key == exampData[k].type) {
+          exampData[k].pic = enterprise[key];
+        }
+        if (key == 'legalPeopleIdCardImg' && exampData[k].type == 'cardImg') {
+          exampData[k].pic = enterprise[key];
+        }
+      }
+      if (key == 'uploadType') {
+        this.idenTypeCurr = enterprise[key] - 1;
+      }
+      if (key == 'businessLicence') {
+        dataList.businessLicence = enterprise[key];
+      }
+      if (key == 'organizationCode') {
+        dataList.organizationCode = enterprise[key];
+      }
+    }
+    this.exampData = exampData;
+    this.dataList = dataList;
+    // console.log(dataList);
+    this.$apply();
+    // console.log(result);
+  }
 }
 </script>
 

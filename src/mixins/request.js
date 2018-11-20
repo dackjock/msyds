@@ -10,13 +10,17 @@ import {
 } from './md5'
 
 const api = 'http://d7.cto.shovesoft.com/msyapp/'
-
+const uploadPath = 'http://d7.cto.shovesoft.com/msy_upload/file_upload/mobileImageUpload.do'
 async function request(url, data = {}, method = 'GET') {
   wepy.showLoading({
     title: '加载中…'
   })
   // 补全接口地址
-  url = api + url
+  if(url == '/upload'){
+    url = uploadPath
+  }else{
+    url = api + url
+  }
   // 对数据对象进行key值排序
   data = objKeySort(data);
   let mkey = '';
@@ -36,7 +40,7 @@ async function request(url, data = {}, method = 'GET') {
     method: method,
     data: data,
     header: {
-      'content-type': 'application/json'
+      'content-type': 'application/x-www-form-urlencoded'
     }
   }).then((res) => {
     // console.log(res)

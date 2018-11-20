@@ -1,0 +1,97 @@
+@import './base'
+.container
+  background: #eee
+  .n-top
+    position: fixed
+    left: 0
+    right: 0
+    top: 85rpx
+    z-index: 2
+    .n-topcon
+      height 90rpx
+      background-color: #ffffff
+      display: flex
+      justify-content: space-between
+      align-items: center
+      padding: 0 30rpx
+      font-size: 24rpx
+      color: #666666
+      .n-topsx
+        color: $theme-color
+        padding-right: 30rpx
+        position: relative
+        &::after
+          content: ' '
+          background: url($picPath + 'icon/saixuan.png') no-repeat
+          background-size: 26rpx auto
+          position: absolute
+          top: 4rpx
+          right:0rpx
+          width: 26rpx
+          height: 26rpx
+  .mzb-section
+    margin-top: 100rpx
+    padding: 10rpx 10rpx 1rpx
+    background-color: #eee
+    .mzbs-item
+      background-color: #fff
+      margin-bottom: 15rpx
+      border-radius: 6rpx
+      .mzbsi-title
+        padding: 10rpx 20rpx 10rpx 30rpx
+        display: flex
+        justify-content: space-between
+        align-items: center
+        .mzbsi-jktitle
+          color: #666
+          width: 70%
+          overflow:hidden
+          text-overflow:ellipsis
+          white-space:nowrap
+        >p
+          color: #666666
+        .mzbsi-bor
+          border: 2rpx solid #999
+          border-radius: 6rpx
+          padding: 4rpx 20rpx
+          font-size: 20rpx
+      .mzbsi-body
+        padding:15rpx 0
+        display: flex
+        justify-content: space-between
+        align-items: center
+        font-size: 30rpx
+        color: #666
+        >view 
+          width: 33.333%
+          text-align: center
+        .mzbis-nr  
+          text-align: left
+          padding-left: 20rpx
+          .mbbl-yuan
+            display:inline-block
+            vertical-align:middle
+            border-radius:50%
+            border:2rpx solid #999
+            color:#999
+            width:40rpx
+            height:40rpx
+            line-height:40rpx
+            text-align:center
+            margin-right:10rpx
+            font-size: 22rpx
+          >span 
+            font-size: 35rpx
+            color: $theme-color
+            display: inline-block
+            vertical-align: middle
+        .mzbis-nums
+          border-right:2rpx solid #eee
+      .mzbis-times
+        text-align: right
+        font-size: 24rpx
+        padding:0 15rpx 10rpx
+        color:#999
+        .mzbis-je
+          margin-right: 20rpx
+

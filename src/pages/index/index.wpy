@@ -1,31 +1,716 @@
 <template lang="wxml" minapp="wepy">
   <view class="container">
-    <view>xx</view>
+    <header searchbx="true"></header>
+    <!-- 轮播图 -->
+      <view class="f-swiper-section">
+        <swiper indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}">
+          <block wx:for="{{imgUrls}}" wx:key="{{item.index}}">
+            <swiper-item>
+              <image src="{{item}}" class="slide-image" width="355" height="150"/>
+            </swiper-item>
+          </block>
+        </swiper>
+      </view>
+
+      <!-- 二级菜单 -->
+    <view class="f-er-menu" wx:if="{{imgUrl}}">
+      <navigator url="#">
+        <image src="{{imgUrl +'icon/cmenu_hq.png'}}"></image>
+        <p>行情信息</p>
+      </navigator>
+      <navigator url="#">
+        <image src="{{imgUrl + 'icon/cmenu_yjb.png'}}"></image>
+        <p>商城</p>
+      </navigator>
+      <navigator url="#">
+        <image src="{{imgUrl +'icon/cmenu_gd.png'}}"></image>
+        <p>我要挂单</p>
+      </navigator>
+    </view>
+    <!-- 白银价格 -->
+    <view class="f-byjg">
+      <view class="mb-jzj">
+        <span>今日白银均价</span>
+        <em>{{indexfore.junjia}}</em>
+      </view>
+      <view class="mb-byjg">
+          <view class="mby-box">
+            <p class="mby-bytitle">白银价格</p>
+            <navigator url="#">查看更多&gt;</navigator>
+          </view>
+          <view class="mby-box">
+            <p class="mby-small-txt">白银（T+D）</p>
+            <p class="mby-big-txt {{indexfore.timePrice<0? 'lv':'red'}}">{{indexfore.timePrice}}</p>
+            <p class="mby-small-txt {{indexfore.differencePrice < 0? 'lv':'red'}}">
+              <em wx:if="{{indexfore.differencePrice > 0}}">+</em>{{indexfore.differencePrice}}
+              <em wx:if="{{indexfore.differenceRate > 0}}">+</em>{{indexfore.differenceRate}}
+            </p>
+          </view>
+          <view class="mby-box">
+            <p class="mby-small-txt">沪银主力</p>
+            <p class="mby-big-txt {{indexfore.timePriceF<0? 'lv':'red'}}">{{indexfore.timePriceF}}</p>
+            <p class="mby-small-txt {{indexfore.differencePriceF < 0? 'lv':'red'}}">
+              <em wx:if="{{indexfore.differencePriceF > 0}}">+</em>{{indexfore.differencePriceF}}%
+              <em wx:if="{{indexfore.differenceRateF > 0}}">+</em>{{indexfore.differenceRateF}}%
+            </p>
+          </view>
+      </view>
+    </view>
+    <!-- 资讯滚动 -->
+    <view class="f-zxbox">
+      <view class="mz-qian">
+        <i class="mz-lb-icon"></i>
+        <span>资讯：</span>
+      </view>
+      <view class="mz-con">
+        <swiper class="mzc-list" vertical="true" autoplay="false" interval="{{interval}}" duration="800" circular="true">
+          <block wx:for="{{zxTxt}}" wx:key="{{item.index}}">
+            <swiper-item class="mzc-list-item">
+              <navigator url="#">{{item}}</navigator>
+            </swiper-item>
+          </block>
+        </swiper>
+      </view>
+    </view>
+    <!--自营-按提货地点 -->
+    <view class="f-zy-box">
+      <view class="l-title-box l-title-box-no">
+        <span>自营-按提货地点</span>
+      </view>
+      <view class="mz-page">
+        <swiper class="mzp-list" display-multiple-items="3" autoplay="false" interval="{{interval}}" duration="500" circular="true">
+          <block wx:for="{{zyHot}}" wx:key="{{item.index}}">
+            <swiper-item class="mzp-list-item">
+              <view class="mzpl-item">
+                <view class="mzpl-title">自营热门</view>
+                <view class="mzpl-jg">
+                  <span>{{statueTxt}}</span>
+                  <span class="{{item.main_price>0?'red':'lv'}}">
+                    <em wx:if = "{{item.main_price>0}}">+</em>
+                    <em>{{item.main_price}}</em>
+                  </span>
+                </view>
+                <view class="mzpl-adress">
+                  <image src="{{imgUrl + 'icon/dingwei.png'}}"></image>
+                  <span>{{item.depot_name}}</span>
+                </view>
+                <view class="mzpl-nums">
+                  <span>库存数量：</span>
+                  <span>{{item.goods_total_weight}}KG</span>
+                </view>
+                <view class="mzpl-nums">
+                  <span class="l-cred">成交数量：</span>
+                  <span>{{item.buy_weight}}KG</span>
+                </view>
+                <view class="mzpl-button-page">
+                  <view class="{{item.goods_total_weight>0?'':'huiActive'}}" bindtap="yikoujia">一口价</view>
+                  <view class="redActive {{item.goods_total_weight>0?'':'huiActive'}}">我要议价</view>
+                </view>
+                <view class="mzpl-time">{{item.create_time}}</view>
+              </view>
+            </swiper-item>
+          </block>
+        </swiper>
+      </view>
+    </view>
+    <!-- 自营-最新热门(白银) -->
+    <view class="f-byzy-box">
+      <view class="l-title-box ">
+        <span>自营-最新热门(白银)</span>
+        <navigator url="#" class="l-more-link">查看更多</navigator>
+      </view>
+      <view class="mbb-list-page" >
+        <view class="mbbl-item" wx:for= "{{byItem}}" wx:key="{{item.index}}">
+          <view class="mbbl-one">
+            <em class="mbbl-yuan" wx:if="{{item.goodsTypeName == '整单'}}">整</em>
+            <em class="mbbl-yuan" wx:if="{{item.goodsTypeName == '子单'}}">子</em>
+            <em class="mbbl-yuan" wx:if="{{item.goodsTypeName == '散单'}}">散</em>
+            <view class="mbl-middle {{statue == 1? 'big':''}}">
+              <span>{{statueTxt}}</span>
+              <span class="{{item.main_price<0?'lv':'red'}}">
+                <em wx:if="{{item.main_price>0}}">+</em>
+                <em>{{item.main_price}}</em>
+              </span>
+            </view>
+          </view>
+          <view>
+            <view>{{item.goods_name}}</view>
+            <view>{{item.goods_total_weight}}KG</view>
+          </view>
+          <view>
+            <view>{{item.brandName}}</view>
+            <view>{{item.depotName}}</view>
+          </view>
+          <view>
+            <view>
+              <view class="mbbl-fyp" wx:if="{{item.month_ticket_status == 1}}">当月票</view>
+              <view class="mbbl-fyp" wx:if="{{item.month_ticket_status == 0}}">非当月票</view>
+            </view>
+            <view>
+              <i class="i-zhuanfa"></i>
+              <span class="mbbl-zf-txt">转发</span>
+            </view>
+          </view>
+          <view>
+            <view class="mbbl-time">{{item.create_time}}</view>
+            <view class="mbbl-btn l-bgred" bindtap="byGotoBuy({{item.enableBuy}}, 1)">一口价</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 自营-最新热门(精矿)  -->
+    <view class="f-jkzy-box">
+      <view class="l-title-box ">
+        <span>自营-最新热门(精矿)</span>
+        <view class="mjb-switch {{isChecked? 'switchChecked':''}}" >
+          <switch  bindchange="switch1Change"/>
+          <navigator url="#" class="l-more-link">查看更多</navigator>
+        </view>
+      </view>
+      <view class="mjb-list-page">
+        <view class="mjb-item" wx:for="{{jkItem}}" wx:key="{{item.index}}">
+          <view class="mjbi-one">
+            <em class="mjbi-yuan" wx:if="{{item.contract_type == 1}}">整</em>
+            <em class="mjbi-yuan" wx:if="{{item.contract_type == 2}}">子</em>
+            <span>{{item.name}}</span>
+          </view>
+          <view class="mjbi-two">
+            <view class="mjbi-head-jf">
+              <span>{{item.con_weight}}T</span>
+              <span>{{item.price_day_name}}</span>
+              <span class="mjbi-cg-box">
+                <em class="mhbi-em" wx:if="{{item.type == 1}}">销售</em>
+                <em class="mhbi-em" wx:if="{{item.type == 2}}">采购</em>
+              </span>
+            </view>
+            <view class="mjbi-txt-yc">{{item.specList}}</view>
+          </view>
+          <view class="mjbi-three">
+            <view>{{item.create_time}}</view>
+            <view class="mbbl-btn" bindtap="byGotoBuy(true, 2)">{{item.resultType}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 自营-产能预售 -->
+    <view class="f-byzy-box">
+      <view class="l-title-box ">
+        <span>自营-产能预售</span>
+        <navigator url="#" class="l-more-link">查看更多</navigator>
+      </view>
+      <view class="mbb-list-page" >
+        <view class="mbbl-item" wx:for= "{{cnItem}}" wx:key="{{item.index}}">
+          <view class="mbbl-one">
+            <em class="mbbl-yuan" wx:if="{{item.goodsTypeName == '整单'}}">整</em>
+            <em class="mbbl-yuan" wx:if="{{item.goodsTypeName == '子单'}}">子</em>
+            <em class="mbbl-yuan" wx:if="{{item.goodsTypeName == '散单'}}">散</em>
+            <view class="mbl-middle  {{statue == 1? 'big':''}}" >
+              <span>{{statueTxt}}</span>
+              <span class="{{item.main_price<0?'lv':'red'}}">
+                <em wx:if="{{item.main_price>0}}">+</em>
+                <em>{{item.main_price}}</em>
+              </span>
+            </view>
+          </view>
+          <view>
+            <view>{{item.goods_name}}</view>
+            <view>{{item.goods_price}}KG</view>
+          </view>
+          <view>
+            <view>{{item.brandName}}</view>
+            <view>{{item.depotName}}</view>
+          </view>
+          <view>
+            <view>
+              <view class="mbbl-fyp" wx:if="{{item.month_ticket_status == 0}}">非当月票</view>
+              <view class="mbbl-fyp" wx:if="{{item.month_ticket_status == 1}}">当月票</view>
+            </view>
+            <view>
+              <i class="i-zhuanfa"></i>
+              <span class="mbbl-zf-txt">转发</span>
+            </view>
+          </view>
+          <view>
+            <view class="mbbl-time">{{item.create_time}}</view>
+            <view class="mbbl-btn l-bgred" bindtap="byGotoBuy(true, 3)">去购买</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 最新成交信息（白银） -->
+    <view class="f-zxcjxx-box">
+      <view class="l-title-box ">
+        <span>最新成交信息(白银)</span>
+        <navigator url="../newDealby/newDealby" class="l-more-link">查看更多</navigator>
+      </view>
+      <view class="mzb-section">
+        <view class="mzbs-item"  wx:for= "{{cjbyItem}}" wx:key="{{item.index}}">
+          <view class="mzbsi-title">
+            <p>{{item.goods_name}}/{{item.goods_spec}}/{{item.goods_attr}}</p>
+            <p>{{item.goods_weight}}KG</p>
+            <p class="mzbsi-bor" wx:if="{{item.month_ticket_status == 1}}">当月票</p>
+            <p class="mzbsi-bor" wx:if="{{item.month_ticket_status == 0}}">非当月票</p>
+          </view>
+          <view class="mzbsi-body">
+            <view class="mzbis-nr">
+              <em class="mbbl-yuan" wx:if="{{item.goods_type == '整单'}}">整</em>
+              <em class="mbbl-yuan" wx:if="{{item.goods_type == '子单'}}">子</em>
+              <em class="mbbl-yuan" wx:if="{{item.goods_type == '散单'}}">散</em>
+              <span>{{item.price}}</span>
+            </view>
+            <view class="mzbis-nums" wx:if="{{item.depot_name}}">{{item.depot_name}}</view>
+            <view class="mzbis-nums" wx:if="{{item.storehouse && !item.depot_name}}">{{item.storehouse}}</view>
+            <view>{{item.brand_name}}</view>
+          </view>
+          <view class="mzbis-times">成交时间：{{item.create_time}}</view>
+        </view>
+      </view>
+    </view>
+    <!-- 最新成交信息（精矿） -->
+    <view class="f-zxcjxx-box">
+      <view class="l-title-box ">
+        <span>最新成交信息(精矿)</span>
+        <navigator url="../newDealjk/newDealjk" class="l-more-link">查看更多</navigator>
+      </view>
+      <view class="mzb-section">
+        <view class="mzbs-item"  wx:for= "{{cjjkItem}}" wx:key="{{item.index}}">
+          <view class="mzbsi-title">
+            <view class="mzbsi-jktitle">{{item.specList}}</view>
+            <p class="mzbsi-bor">{{item.settlement_type_name}}</p>
+          </view>
+          <view class="mzbsi-body">
+            <view class="mzbis-nr">
+              <em class="mbbl-yuan" wx:if="{{item.contract_type == 1}}">整</em>
+              <em class="mbbl-yuan" wx:if="{{item.contract_type == 2}}">子</em>
+              <span>{{item.name}}</span>
+            </view>
+            <view class="mzbis-nums">{{item.con_weight}}T</view>
+            <view>{{item.delivery}}</view>
+          </view>
+          <view class="mzbis-times">
+            <span class="mzbis-je">成交金额：
+              <em class="red" wx:if="{{item.contract_type == 1}}">{{item.totalturnoverMoney}}</em>
+              <em class="red" wx:if="{{item.contract_type == 2}}">{{item.turnover_money}}</em>
+            </span>
+            <span>成交时间：{{item.create_time}}</span>
+          </view>
+        </view>
+      </view>
+    </view>
+     <!-- TD 期货切换 -->
+    <view class="mainTab" bindtap="tdTab">
+      <em wx:if="{{statue == 1}}">TD</em>
+      <em wx:if="{{statue == 2}}">期</em>
+    </view>
+    <!-- 首页右侧显示 -->
+    <view class="rightTips {{rightTipsBoole ?'suo':''}}"  wx:if={{imgUrl}}>
+      <view class="right-page">
+        <view>Ag(T+D)</view>
+        <view class="rp-nr">
+          <span class="prn-bigf">{{indexfore.timePrice}}</span>
+          <span class="prnb-img {{indexfore.differencePrice < 0?'on':''}}">
+            <image src="{{imgUrl + 'icon/shangtou.png'}}" />
+            {{indexfore.differencePrice}}
+          </span>
+          <span class="prnb-img {{indexfore.differenceRate < 0?'on':''}}">
+            <image src="{{imgUrl + 'icon/shangtou.png'}}" />
+            {{indexfore.differenceRate}}%
+          </span>
+        </view>
+      </view>
+      <view class="right-page rightbx">
+        <view>沪银主力</view>
+        <view class="rp-nr">
+          <span class="prn-bigf">{{indexfore.timePriceF}}</span>
+          <span class="prnb-img {{indexfore.differencePriceF < 0?'on':''}}">
+            <image src="{{imgUrl + 'icon/shangtou.png'}} "/>
+            {{indexfore.differencePriceF}}
+          </span>
+          <span class="prnb-img {{indexfore.differenceRateF < 0?'on':''}}">
+            <image src="{{imgUrl + 'icon/shangtou.png'}}" />
+            {{indexfore.differenceRateF}}%
+          </span>
+        </view>
+      </view>
+      <view class="rtImg {{rightTipsBoole ?'on':''}}" bindtap="rightTips"><image src="{{imgUrl + 'icon/dajiantou.png'}}" /></view>
+    </view>
     <botBar curr='1'></botBar>
   </view>
+  
 </template>
 
 <script>
 import wepy from 'wepy';
 import botBar from '@/components/botBar';
+import header from '@/components/header';
 
 export default class Index extends wepy.page {
-  async onShow() {
-    // 请求示例
+  data = {
+    indicatorDots: true, // 指示点
+    autoplay: true, // 自动轮播
+    interval: 2000, // 自动切换时间间隔
+    duration: 500, // 滑动动画时长
+    imgUrls: [], // 轮播图
+    hqxximg: '', //行情信息图片url
+    scimg: '',//商城图片url
+    wygdimg: '',//我要挂单图片url
+    addrimg: '',//地址小图标url
+    indexfore: {},//白银价格
+    zxTxt: [],//咨询
+    zyHot: [],//自营-按提货地点
+    byItem: [],//自营-最新热门(白银)
+    jkItem: [], // 自营-最新热门精矿
+    cnItem: [], // 自营-产能预售
+    cjbyItem: [], // 最新成交信息（白银）
+    cjjkItem: [], // 最新成交信息（精矿）
+    statueTxt: 'TD', // TD 沪银主力
+    zzDan: 1, // 精矿整单子单切换
+    userInfo:'',
+    imgUrl:'',
+    statue: 1, // TD 期货 
+    enterpriseId:'',//企业id
+    userId:'',//企业id
+    isChecked: false,
+    rightTipsBoole: false,
+    isKai: 1, // 开闭市
+    closetime: '', // 闭市结束时间
+    openTime: '', // 闭市开始时间
+    closeName: '', // 闭市name 判断是否节假日
+  }
+  methods={
+    //一口价
+    yikoujia() {
+      if (this.userInfo !== '') { // 判断是否登录
+        if (this.isKai === 0) { // 闭市
+          this.isOpend(this.isKai, this.closeName, this.openTime, this.closetime)
+        } else { // 开市
+          
+           console.log('跳转到商城')
+        }
+      } else {
+        this.$parent.linkPage('../login/login',1)
+      }
+    },
+    // 自营最新热门白银
+    byGotoBuy(isbuy, idx) {
+       if (this.userInfo !== '') { // 判断是否登录
+        if (this.userInfore.userType === 1) { // 个人用户
+          wx.showModal({
+            title: '温馨提示',
+            content: '当前需要升级企业用户，方可继续操作',
+            confirmText: '前往升级',
+            confirmColor: '#d7092d',
+            success (res) {
+              if (res.confirm) {
+                console.log('用户点击确定')
+              } else if (res.cancel) {
+                console.log('用户点击取消')
+              }
+            }
+          })
+        } else { // 企业用户
+          if (this.isKai === 0) { // 闭市
+            this.isOpend(this.isKai, this.closeName, this.openTime, this.closetime)
+          } else { // 开市
+            if (isbuy === 1) { // 能买
+              // 白银
+              this.$parent.showTip('白银满足条件、能购买（未开发）')
+              
+            } else if (isbuy === 'true') {
+              if (idx === '2') { // 精矿
+              this.$parent.showTip('精矿满足条件、能购买（未开发）')
+               
+              } else if (idx === '3') { // 产能预售
+              this.$parent.showTip('产能满足条件、能购买（未开发）')
+               
+              }
+            } else { // 不能买
+              if (this.userInfore.isMainLogin === 2) {
+                // 企业用户
+                this.$parent.showTip('用户信用等级无法按照此方式购买')
+               
+              } else if (this.userInfore.isMainLogin === 3) {
+                this.$parent.showTip('当前用户权限等级限制，如需操作，请联系总账户！')
+            
+              }
+            }
+            // console.log('开市可以购买')
+          }
+        }
+      } else {
+        // 没登录、跳转到登录
+        this.$parent.linkPage('../login/login',1)
+      }
+    },
+    switch1Change (e) {
+      // e.detail.value
+      if (e.detail.value) {
+        this.zzDan = 2
+        this.isChecked = true
+      } else {
+        this.zzDan = 1
+        this.isChecked = false
+      }
+      this.$apply()
+      this.getchangeZhengOrZi()
+    },
+    tdTab() {
+      if (this.statue === 1) {
+        this.statue = 2
+        this.statueTxt = '沪银主力'
+      } else {
+        this.statue = 1
+        this.statueTxt = 'TD'
+      }
+      this.$apply()
+      this.getData()
+    },
+    rightTips() {
+      this.rightTipsBoole = !this.rightTipsBoole
+      this.$apply()
+    }
+  }
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.imgUrl = this.$parent.globalData.picPath
+    this.getData()
+    if(this.userInfo !== ''){
+      this.enterpriseId = this.userInfo.id
+      this.userId = this.userInfo.userId
+    }
+    console.log('this.userInfo',this.userInfo)
+  }
+
+  //判断开闭市
+  isOpend (isKai, closeName, openTime, closetime) {
+    if (isKai === 0) {
+      if (closeName !== null && closeName !== '') {
+        this.$parent.showTip('节假日闭市')
+      } else {
+        wepy.showToast({
+          title: '当前白银市场已闭市：' + openTime + '-' + closetime,
+          icon: 'none'
+        });
+      }
+      return true
+    } else {
+      return false
+    }
+  }
+  //获取首页信息 
+  async getData() {
     let result = await this.$parent.queryData('app/index.do', {
-      enterpriseId: '-1',
-      userId: '',
-      type: 1
+      enterpriseId: this.enterpriseId,
+      userId: this.userId,
+      type: this.statue
     });
     console.log(result);
+    let that = this
+    // 开闭市
+      that.isKai = result.isopen
+      that.closetime = result.closetime
+      that.openTime = result.openTime
+      that.closeName = result.closeName
+      
+    //轮播图
+    that.imgUrls = []
+    for (let i=0; i < result.bannerList.length; i++) {
+      that.imgUrls.push(result.bannerList[i].image)
+    }
+    //今日成交均价
+    let tPrice = {}
+    if(result.todayPrice !== 0){
+      tPrice.junjia = result.todayPrice 
+    }else {
+      if(result.lastAvgPrice !== 0){
+        tPrice.junjia = result.lastAvgPrice
+      }else{
+        tPrice.junjia = result.averagePrice
+      }
+    }
+    //白银价格
+    tPrice.timePrice = result.timePrice // 现货
+    tPrice.differencePrice = result.differencePrice // 白银现货差价
+    tPrice.differenceRate = result.differenceRate // 白银现货差价百分比
+    tPrice.timePriceF = result.timePriceF // 期货
+    tPrice.differencePriceF = result.differencePriceF // 白银期货差价
+    tPrice.differenceRateF = result.differenceRateF // 白银期货差价百分比
+    that.indexfore = tPrice
+    //资讯
+    that.zxTxt =[]
+    for(let zx = 0; zx<result.consultList.length; zx++){
+      that.zxTxt.push(result.consultList[zx].name)
+    }
+    //自营-按提货地点
+    that.zyHot = []
+    for(let zy =0; zy<result.deliveryGoodsList.length; zy++){
+      that.zyHot.push({
+        goods_name: result.deliveryGoodsList[zy].goods_name,
+        main_price: result.deliveryGoodsList[zy].main_price,
+        depot_name: result.deliveryGoodsList[zy].depot_name,
+        goods_total_weight: result.deliveryGoodsList[zy].goods_total_weight.toFixed(4),
+        buy_weight: result.deliveryGoodsList[zy].buy_weight.toFixed(4),
+        create_time: result.deliveryGoodsList[zy].create_time,
+      })
+    }
+    //最新成交信息（精矿）
+    that.cjjkItem = []
+    let cjjklist = result.dealConcentrateList
+    let specListJk = ''
+    for(let i =0; i<cjjklist.length; i++){
+      for(let j =0; j<cjjklist[i].specList.length; j++){
+        if(j === 0){
+          specListJk += cjjklist[i].specList[j].specName + cjjklist[i].specList[j].specValue
+        } else {
+          specListJk += ( '、' + cjjklist[i].specList[j].specName + cjjklist[i].specList[j].specValue)
+        }
+      }
+      that.cjjkItem.push({
+        name: cjjklist[i].name,
+        type: cjjklist[i].type,
+        con_weight: cjjklist[i].con_weight,
+        delivery: cjjklist[i].delivery,
+        settlement_type_name: cjjklist[i].settlement_type_name,
+        create_time: cjjklist[i].create_time.substring(0, 10),
+        contract_type: cjjklist[i].contract_type,
+        totalturnoverMoney: cjjklist[i].totalturnoverMoney,
+        turnover_money: cjjklist[i].turnover_money,
+        specList: specListJk
+      })
+    }
+    this.$apply()
+    //自营-最新热门(白银)
+    that.getQueryHotGoodsList()
+    //自营-最新热门(精矿)
+    that.getchangeZhengOrZi()
+    //自营-产能预售
+    that.getQueryPresell()
+    //最新成交信息（白银）
+    that.getQueryNewOrderList()
+    
   };
+  //自营-最新热门(白银)
+  async getQueryHotGoodsList() {
+    let result = await this.$parent.queryData('app/appQueryHotGoodsList.do', {
+      enterpriseId: this.enterpriseId,
+      type: this.statue
+    })
+    //console.log('白银', result);
+    let that = this
+    let bylist = result.list
+    that.byItem = []
+    for(let i = 0;i<bylist.length; i++){
+      that.byItem.push({
+        goods_name: bylist[i].goods_name, // 名称
+          goods_spec: bylist[i].goods_spec, // 规格
+          main_price: bylist[i].main_price, // 升贴水
+          goods_price: bylist[i].goods_price, // 单价
+          month_ticket_status: bylist[i].month_ticket_status, // 开票状态1为当月开票0为非当月开票
+          goods_total_weight: bylist[i].goods_total_weight.toFixed(4), // 商品重量
+          brandName: bylist[i].brandName, // 品牌名称
+          depotName: bylist[i].depotName, // 仓库名称
+          goodsTypeName: bylist[i].goodsTypeName, // 商品类型名称
+          id: bylist[i].id, // 商品id（点击购买时用）
+          enableBuy: bylist[i].enableBuy, // 是否购买0否1是（点击购买时用）
+          goods_type: bylist[i].goods_type, // 商品类型0企业 1自营热门2预售 3一口价 4定价现买（点击购买时用）
+          create_time: bylist[i].create_time // 创建时间
+      })
+    }
+    this.$apply() 
+  }
+  //自营-最新热门(精矿)
+  async getchangeZhengOrZi() {
+    let result = await this.$parent.queryData('app/changeZhengOrZi.do', {
+      enterpriseId: this.enterpriseId,
+      contractType: this.zzDan
+    })
+    //console.log('精矿', result);
+    let that = this
+    let specList = []
+    let jklist = result.list
+    that.jkItem = []
+    for(let j = 0;j <jklist.length; j++){
+      for(let i = 0; i<jklist[j].specList.length;i++){
+        if(i ===0){
+          specList += jklist[j].specList[i].specName + jklist[j].specList[i].specValue
+        } else {
+          specList += ('、' + jklist[j].specList[i].specName + jklist[j].specList[i].specValue )
+        }
+      }
+      that.jkItem.push({
+        contract_type: jklist[j].contract_type,
+        name: jklist[j].name,
+        con_weight: jklist[j].con_weight,
+        price_day_name: jklist[j].price_day_name,
+        specList: specList,
+        create_time: jklist[j].create_time.substring(0, 10),
+        supply_start_time: jklist[j].supply_start_time,
+        resultType: jklist[j].resultType,
+        type: jklist[j].type
+      })
+    }
+    this.$apply() 
+  }
+  //自营-产能预售
+  async getQueryPresell() {
+    let result = await this.$parent.queryData('app/appQueryPresellGoodsList.do', {
+      enterpriseId: this.enterpriseId,
+      contractType: this.zzDan
+    })
+    //console.log('产能', result);
+    let that = this
+    let cnlist = result.list
+    that.cnItem = []
+    for (let i = 0; i < cnlist.length; i++) {
+        that.cnItem.push({
+          goods_name: cnlist[i].goods_name,
+          goods_spec: cnlist[i].goods_spec,
+          main_price: cnlist[i].main_price,
+          goods_price: cnlist[i].goods_price,
+          month_ticket_status: cnlist[i].month_ticket_status,
+          goods_total_weight: cnlist[i].goods_total_weight.toFixed(4),
+          brandName: cnlist[i].brandName,
+          depotName: cnlist[i].depotName,
+          create_time: cnlist[i].create_time.substring(0, 10),
+          goodsTypeName: cnlist[i].goodsTypeName
+        })
+      }
+      this.$apply() 
+  }
+  //最新成交信息（白银）
+  async getQueryNewOrderList() {
+    let result = await this.$parent.queryData('app/appQueryNewOrderList.do', {
+
+    })
+    //console.log('最新成交 白银', result);
+    let that = this
+    that.cjbyItem = []
+    for( let i = 0; i<result.length; i++){
+      that.cjbyItem.push({
+          goods_attr: result[i].goods_attr, // 百分比
+          goods_name: result[i].goods_name, // 名称
+          goods_spec: result[i].goods_spec, // 规格
+          goods_type: result[i].goods_type, // 产品类型
+          price: result[i].price.toFixed(2), // 单价
+          month_ticket_status: result[i].month_ticket_status, // 开票状态1为当月开票0为非当月开票
+          goods_weight: result[i].goods_weight.toFixed(4), // 商品重量
+          brand_name: result[i].brand_name, // 品牌名称
+          depot_name: result[i].depot_name, // 仓库位置（depot_name为空时显示storehouse）
+          storehouse: result[i].storehouse, // 仓库位置（depot_name为空时显示storehouse）
+          create_time: result[i].create_time, // 交易时间
+          goodsTypeName: result[i].goodsTypeName // 商品类型名称
+        })
+    }
+    this.$apply() 
+  }
   components = {
-    botBar
+    botBar,
+    header
   };
 }
 </script>
 
 <style lang="stylus">
-
+@import '../../assets/style/index';
   
 </style>
