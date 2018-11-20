@@ -175,7 +175,7 @@ export default class enterpriseIden2 extends wepy.page {
       },
       'POST'
     );
-    console.log(result);
+    // console.log(result);
     this.exampData[index].pic = result.imgurl;
     this.$apply();
   }
@@ -211,9 +211,9 @@ export default class enterpriseIden2 extends wepy.page {
     }
     this.exampData = exampData;
     this.dataList = dataList;
-    console.log(dataList);
+    // console.log(dataList);
     this.$apply();
-    console.log(result);
+    // console.log(result);
   }
 }
 </script>
