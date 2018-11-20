@@ -24,8 +24,6 @@ export default class extends wepy.app {
       'pages/signSuccessstate/signSuccessstate',
       'pages/signSuccess/signSuccess',
       'pages/sign/sign',
-      'pages/enterpriseIden2/enterpriseIden2',
-      'pages/enterpriseIden1/enterpriseIden1',
       'pages/mallIndex/mallIndex',
     ],
     window: {

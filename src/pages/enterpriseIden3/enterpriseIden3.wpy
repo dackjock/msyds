@@ -1,7 +1,29 @@
 <template lang="wxml" minapp="wepy">
   <view class="container">
     <header title="企业认证"></header>
-    3
+    <view class="iden-header">
+      <block wx:for="{{progress}}" wx:key="">
+        <view class="{{index == 2 ? 'active' : ''}}">
+          <text class="num">{{index+1}}</text>
+          <text>{{item}}</text>
+        </view>
+        <text wx:if="{{index<2}}">&gt;</text>
+      </block>
+    </view>
+    <view class="iden-title">
+      <image src="../../assets/images/icon/icon-cwxx.png" />
+      <text>财务信息</text>
+    </view>
+    <form class="iden-cw">
+      <block wx:for="{{formList}}" wx:key="">
+        <view class="ic-item">
+          <text>{{item.title}}</text>
+          <input placeholder="请输入{{item.title}}"/>
+        </view>
+        <text wx:if="{{item.tips != ''}}" class="gt-tips">提示：{{item.tips}}</text>
+      </block>
+      <button class="page-btn" form-type="submit">下一步</button>
+    </form>
   </view>
 </template>
 
@@ -10,14 +32,53 @@ import wepy from 'wepy';
 import header from '@/components/header';
 
 export default class enterpriseIden3 extends wepy.page {
-
   components = {
     header
+  };
+  data = {
+    userInfo: [],
+    progress: ['填写资料', '上传加盖公章复印件', '补充财务信息'],
+    formList:[
+      {
+        title:'开户银行',
+        name:'bankName',
+        tips:'企业对公账号'
+      },
+      {
+        title:'开户账号',
+        name:'bankAccount',
+        tips:''
+      },
+      {
+        title:'企业纳税号',
+        name:'taxRegistrationCode',
+        tips:'后续开票所需'
+      },
+      {
+        title:'开票地址',
+        name:'kp_address',
+        tips:'开票所需地址'
+      },
+      {
+        title:'财务联系人',
+        name:'financialContact',
+        tips:'开票所需联系人'
+      },
+      {
+        title:'联系电话',
+        name:'telephone',
+        tips:'合同所需'
+      },
+      {
+        title:'传真号码',
+        name:'fax',
+        tips:'合同所需'
+      },
+    ]
   };
 }
 </script>
 
 <style lang="stylus">
-
-  
+@import '../../assets/style/enterpriseIden.styl';
 </style>
