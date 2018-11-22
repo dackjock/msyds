@@ -13,11 +13,6 @@ export default class extends wepy.app {
       'pages/aboutus/aboutus',
       'pages/news/news',
       'pages/login/login',
-      'pages/accountIndex/accountIndex',
-      'pages/buyGoods1/buyGoods1',
-      'pages/tradeIndex/tradeIndex',
-      'pages/platRule/platRule',
-      'pages/negotiate/negotiate',
       'pages/negotiate/negotiate',
       'pages/signSuccess/signSuccess',
       'pages/signSuccessstate/signSuccessstate',
@@ -30,6 +25,11 @@ export default class extends wepy.app {
       'pages/forgetPass/forgetPass',
       'pages/sign/sign',
       'pages/mallIndex/mallIndex'
+      'pages/accountIndex/accountIndex',
+      'pages/buyGoods1/buyGoods1',
+      'pages/tradeIndex/tradeIndex',
+      'pages/platRule/platRule',
+      'pages/negotiate/negotiate',
     ],
     window: {
       backgroundTextStyle: 'light',
