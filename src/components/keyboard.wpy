@@ -1,0 +1,121 @@
+<template lang="wxml" minapp="wepy">
+  <view class="keybx" catchtouchmove="true" wx:if="{{showfn =='true'}}">
+    <view class="k-bg" bindtap="closefn"></view>
+    <view class="k-cont">
+      <view class="k-top">
+        <view class="k-topl">价格</view>
+        <view class="flex-1 {{flagss == 'true' ? 'red' : ''}} {{flagts == 'true' ? 'lv' : ''}} ">{{sttype}}{{stnum}}</view>
+      </view>
+      <view class="k-contbx">
+        <view class="k-contbxl">
+          <view class="k-shui" @tap="changeshui(1)">升水</view>
+          <view class="k-shui" @tap="changeshui(2)">平水</view>
+          <view class="k-shui" @tap="changeshui(3)">贴水</view>
+          <view class="k-shui"></view>
+        </view>
+        <view class="k-contbxm flex-1">
+          <view class="k-contml">
+            <view class="k-num flex-1" @tap="selnum(1)">1</view>
+            <view class="k-num flex-1" @tap="selnum(2)">2</view>
+            <view class="k-num flex-1" @tap="selnum(3)">3</view>
+          </view>
+          <view class="k-contml">
+            <view class="k-num flex-1" @tap="selnum(4)">4</view>
+            <view class="k-num flex-1" @tap="selnum(5)">5</view>
+            <view class="k-num flex-1" @tap="selnum(6)">6</view>
+          </view>
+          <view class="k-contml">
+            <view class="k-num flex-1" @tap="selnum(7)">7</view>
+            <view class="k-num flex-1" @tap="selnum(8)">8</view>
+            <view class="k-num flex-1" @tap="selnum(9)">9</view>
+          </view>
+          <view class="k-contml">
+            <view class="k-num flex-1" @tap="selnum(0)">0</view>
+            <view class="k-num flex-1"></view>
+            <view class="k-num flex-1" bindtap="closefn">取消</view>
+          </view>
+        </view>
+        <view class="k-contbxr">
+          <view class="k-rbtn" bindtap="numdel">删除</view>
+          <view class="k-rbtn k-rbtnb" bindtap="surefn">确定</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+   
+<script>
+import wepy from 'wepy';
+export default class keyboard extends wepy.component {
+  props = {
+    showfn: {
+      type: String,
+      default: '',
+      twoWay: true
+    },
+    
+  };
+  data = {
+    sttype: '平水',
+    stnum: 0,
+    flagss:'false', //状态 升水
+    flagps:'true', //状态 平水
+    flagts:'false', //状态 贴水
+  };
+  onLoad() {
+   
+  }
+  methods = {
+    //取消
+    closefn() {
+      this.showfn = 'false'
+    },
+    //确定
+    surefn() {
+      this.showfn = 'false'
+    },
+    //升贴水
+    changeshui(num) {
+      if(num =='1'){
+        this.sttype = '升水'
+        this.stnum = 1
+        this.flagss = 'true'
+        this.flagps = 'false'
+        this.flagts = 'false'
+      }else if(num == '2'){
+        this.sttype = '平水'
+        this.stnum = 0
+        this.flagss = 'false'
+        this.flagps = 'true'
+        this.flagts = 'false'
+      }else if(num == '3'){
+        this.sttype = '贴水'
+        this.stnum = 1
+        this.flagss = 'false'
+        this.flagps = 'false'
+        this.flagts = 'true'
+      }
+    },
+    //数字
+    selnum(num) {
+      if(this.flagps =="false"){
+        this.stnum = this.stnum + num
+      }
+    },
+    //删除
+    numdel() {
+      let numlen = this.stnum.length
+      if(numlen>0){
+        this.stnum = this.stnum.substring(0,numlen-1)
+      }else{
+        this.stnum = 0
+      }
+    }
+  };
+}
+</script>
+
+<style lang='stylus'>
+@import '../assets/style/keyboard';
+  
+</style>

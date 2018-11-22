@@ -1,0 +1,62 @@
+<template lang="wxml" minapp="wepy">
+  <view class="p-bar">
+    <view class="p-bardot {{tap =='1'? 'active':''}} {{stepa? 'on':''}}">
+      <text>选择产品</text>
+    </view>
+    <view class="p-bardot {{tap =='2'? 'active':''}} {{stepb? 'on':''}}">
+      <text>提交报价</text>
+    </view>
+    <view class="p-bardot {{tap =='3'? 'active':''}} {{stepc? 'on':''}}">
+      <text>确认合同</text>
+    </view>
+    <view class="p-bardot {{tap =='4'? 'active':''}} {{stepd? 'on':''}}">
+      <text>完成支付</text>
+    </view>
+    <view class="p-bardot {{tap =='5'? 'active':''}} ">
+      <text>委托提货</text>
+    </view>
+  </view>
+</template>
+    
+<script>
+import wepy from 'wepy';
+export default class progressBar extends wepy.component {
+  props = {
+    tap: String,
+    
+  };
+  data = {
+    stepa: false,
+    stepb: false,
+    stepc: false,
+    stepd: false,
+    tap: ''
+  };
+  onLoad() {
+    if(this.tap ==2){
+      this.stepa = true
+    }else if(this.tap ==3){
+      this.stepa = true
+      this.stepb = true
+    }else if(this.tap ==4){
+      this.stepa = true
+      this.stepb = true
+      this.stepc = true
+    }else if(this.tap ==5){
+      this.stepa = true
+      this.stepb = true
+      this.stepc = true
+      this.stepd = true
+    }
+    this.$apply()
+  }
+  methods = {
+    
+  };
+}
+</script>
+
+<style lang='stylus'>
+@import '../assets/style/progressBar';
+  
+</style>

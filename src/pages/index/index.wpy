@@ -153,7 +153,7 @@
           </view>
           <view>
             <view class="mbbl-time">{{item.create_time}}</view>
-            <view class="mbbl-btn l-bgred" bindtap="byGotoBuy({{item.enableBuy}}, 1)">一口价</view>
+            <view class="mbbl-btn l-bgred" bindtap="byGotoBuy({{item}}, 1)">{{item.goods_type == 3?"一口价" : "购买"}}</view>
           </view>
         </view>
       </view>
@@ -394,7 +394,7 @@ export default class Index extends wepy.page {
     // 自营最新热门白银
     byGotoBuy(isbuy, idx) {
        if (this.userInfo !== '') { // 判断是否登录
-        if (this.userInfore.userType === 1) { // 个人用户
+        if (this.userInfo.userType === 1) { // 个人用户
           wx.showModal({
             title: '温馨提示',
             content: '当前需要升级企业用户，方可继续操作',
@@ -412,9 +412,14 @@ export default class Index extends wepy.page {
           if (this.isKai === 0) { // 闭市
             this.isOpend(this.isKai, this.closeName, this.openTime, this.closetime)
           } else { // 开市
-            if (isbuy === 1) { // 能买
-              // 白银
-              this.$parent.showTip('白银满足条件、能购买（未开发）')
+            if (idx === '1') { // 能买 // 白银
+              let enbuy = isbuy.enableBuy
+              if(enbuy === 1){
+                this.$parent.linkPage('../negotiate/negotiate',1)
+                
+              }
+              
+              
               
             } else if (isbuy === 'true') {
               if (idx === '2') { // 精矿
@@ -425,11 +430,11 @@ export default class Index extends wepy.page {
                
               }
             } else { // 不能买
-              if (this.userInfore.isMainLogin === 2) {
+              if (this.userInfo.isMainLogin === 2) {
                 // 企业用户
                 this.$parent.showTip('用户信用等级无法按照此方式购买')
                
-              } else if (this.userInfore.isMainLogin === 3) {
+              } else if (this.userInfo.isMainLogin === 3) {
                 this.$parent.showTip('当前用户权限等级限制，如需操作，请联系总账户！')
             
               }
@@ -478,7 +483,8 @@ export default class Index extends wepy.page {
       this.enterpriseId = this.userInfo.id
       this.userId = this.userInfo.userId
     }
-    console.log('this.userInfo',this.userInfo)
+    //console.log('this.userInfo',this.userInfo)
+    
   }
 
   //判断开闭市
@@ -595,7 +601,7 @@ export default class Index extends wepy.page {
       enterpriseId: this.enterpriseId,
       type: this.statue
     })
-    //console.log('白银', result);
+    console.log('白银', result);
     let that = this
     let bylist = result.list
     that.byItem = []

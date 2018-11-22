@@ -28,7 +28,7 @@ export default class signSuccess extends wepy.page {
   };
   
   methods = {
-    
+     
   };
   
   components = {

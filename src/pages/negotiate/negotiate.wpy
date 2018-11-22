@@ -1,29 +1,171 @@
 <template lang="wxml" minapp="wepy">
   <view class="container">
     <header title="提交议价" hasBack="true"></header>
-    <view>
-      
+    <progressbar tap="2"></progressbar>
+    <view class="n-timebx">
+      <view class="n-warni"></view>温馨提示：请在规定的时间<text class="n-time">3分钟</text>内完成报价
     </view>
+    <view class="n-table">
+      <view class="n-tr">
+        <view class="n-th">实时TD价格</view>
+        <view class="n-th f20"><text class="cf f30">3854</text>元/kg</view>
+        <view class="n-th">当前订单的单价</view>
+        <view class="n-th f20"><text class="f30 cf">3854</text>元/kg</view>
+      </view>
+      <view class="n-tt">
+        <view class="n-td">当前时间</view>
+        <view class="n-td flex-1 c6">2018-11-15 11:10:12</view>
+      </view>
+      <view class="n-tt">
+        <view class="n-td">供方</view>
+        <view class="n-td flex-1 c6">湖南马上银电商</view>
+      </view>
+      <view class="n-tt">
+        <view class="n-td">需方</view>
+        <view class="n-td flex-1 c6">湖南政和通公司</view>
+      </view>
+      <view class="n-tt">
+        <view class="n-td">品名</view>
+        <view class="n-td c6">白银aa</view>
+        <view class="n-td">规格</view>
+        <view class="n-td c6">国标1</view>
+      </view>
+      <view class="n-tt">
+        <view class="n-td">品牌</view>
+        <view class="n-td c6">政和通</view>
+        <view class="n-td">商品品质</view>
+        <view class="n-td c6">99.99%</view>
+      </view>
+      <view class="n-tt">
+        <view class="n-td">仓库</view>
+        <view class="n-td c6">上海-飞平</view>
+        <view class="n-td">商品类型</view>
+        <view class="n-td c6">整单</view>
+      </view>
+      <view class="n-tt">
+        <view class="n-td">数量(±5%)</view>
+        <view class="n-td flex-1 c6">219.3333KG</view>
+      </view>
+      <view class="n-tt">
+        <view class="n-td">结算方式</view>
+        <view class="n-td flex-1 c6">
+          <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
+            <view class="picker f22">
+              {{array[index]}}(最晚提货时间:2018-11-12) >
+            </view>
+          </picker>
+        </view>
+      </view>
+      <view class="n-tt">
+        <view class="n-td">选择点价权</view>
+        <view class="n-td flex-1 c6">
+          {{djq}}
+          <picker bindchange="bindPickerChangeb"  value="{{indexb}}" range="{{arrayb}}">
+            <view class="picker f22 seldjq">切换点价权></view>
+          </picker>
+        </view>
+      </view>
+      <view class="n-tt">
+        <view class="n-td">点价范围</view>
+        <view class="n-td flex-1 c6">
+          <input class="n-inpa" type="text" placeholder="请输入点价天数" />
+        </view>
+      </view>
+      <view class="n-tt">
+        <view class="n-td">升贴水</view>
+        <view class="n-td flex-1 c6"> 
+          <view class="n-ssbx">
+            <view class="lv n-ssbxs">-</view>
+            <view class="n-ssbxm flex-1" bindtap="ssclick">升水1</view>
+            <view class="red n-ssbxs">+</view>
+          </view>
+        </view>
+      </view>
+      <view class="n-tt">
+        <view class="n-td">延期点价费率</view>
+        <view class="n-td flex-1 c6">
+          <view class="n-ssbx">
+            <view class="lv n-ssbxs">-</view>
+            <view class="n-ssbxm flex-1">0.88</view>
+            <view class="red n-ssbxs">+</view>
+          </view>
+        </view>
+      </view>
+      <view class="n-tt">
+        <view class="n-td f18">结算总金额计算公式</view>
+        <view class="n-td flex-1 c6 f20">(当天点价的基准单价+升贴水+费率*自然日)*重量(KG)</view>
+      </view>
+      <view class="n-tt">
+        <view class="n-td">账期</view>
+        <view class="n-td flex-1 c6">
+          {{zhangqi}}
+          <picker bindchange="bindPickerChangec"  value="{{indexc}}" range="{{arrayc}}">
+            <view class="picker f22 seldjq">请选择账期></view>
+          </picker>
+        </view>
+      </view>
+      <view class="n-bt">
+        <checkbox value="" checked="" color="#666" />我已同意以上报价并遵守<navigator href="#">《马上银产业互联网交易总则》</navigator>
+      </view>
+    </view>
+    <view class="n-btnbx">
+      <view class="n-btnaa">提交议价</view>
+    </view>
+
+    <!-- 小键盘 -->
+    <keyboard :showfn.sync="showbx"></keyboard>
   </view>
 </template>
- 
+    
 <script>
 import wepy from 'wepy';
 import header from '@/components/header';
+import progressbar from '@/components/progressBar';
+import keyboard from '@/components/keyboard';
 
 export default class negotiate extends wepy.page {
   data = {
-    phonenum:'',
+    array: ['现款现货','点价权+延期补偿','预付款+多次提货','先货后款+账期升水补偿'],
+    arrayb: ['平台点价权','我方点价权'],
+    arrayc: ['2天','7天','1天'],
+    index: 0,
+    indexb: 0,
+    indexc: 0,
+    djq: '平台点价权',
+    zhangqi: '2天',
+    showbx: '',
   };
+  onLoad(e){
+    console.log('e',e)
+  }
   onShow() {
-    this.picPath = this.$parent.globalData.picPath;
+    this.userInfo = this.$parent.globalData.userInfo
+    console.log('this.userInfo',this.userInfo)
   };
-   
+  bindPickerChange(e) {
+    this.index = e.detail.value
+    this.$apply()
+  };
+  bindPickerChangeb(e) {
+    this.indexb = e.detail.value
+    this.djq = this.arrayb[this.indexb]
+    this.$apply()
+  }
+  bindPickerChangec(e) {
+    this.indexc = e.detail.value
+    this.zhangqi = this.arrayc[this.indexc]
+    this.$apply()
+  }
   methods = {
-    
+    ssclick() {
+      this.showbx = 'true'
+      this.$apply()
+    }
   };
   components = {
-    header
+    header,
+    progressbar,
+    keyboard,
   };
 }
 </script>
