@@ -80,7 +80,7 @@ export default class Login extends wepy.page {
     this.$parent.globalData.userInfo = result;
     console.log('*********** 登录成功 ***********');
     console.log('用户信息：',result)
-    this.$parent.linkPage('../enterpriseIden3/enterpriseIden3',1)
+    this.$parent.linkPage('../accountIndex/accountIndex',2)
   }
 }
 </script>

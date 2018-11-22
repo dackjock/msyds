@@ -1,8 +1,3 @@
-<style lang="stylus">
-@import './assets/style/app'
-
-</style>
-
 <script>
 import wepy from 'wepy';
 import 'wepy-async-function';
@@ -18,9 +13,14 @@ export default class extends wepy.app {
       'pages/aboutus/aboutus',
       'pages/news/news',
       'pages/login/login',
+      'pages/accountIndex/accountIndex',
+      'pages/buyGoods1/buyGoods1',
+      'pages/tradeIndex/tradeIndex',
       'pages/enterpriseIden1/enterpriseIden1',
       'pages/enterpriseIden2/enterpriseIden2',
       'pages/enterpriseIden3/enterpriseIden3',
+      'pages/enterpriseIden4/enterpriseIden4',
+      'pages/platRule/platRule',
       'pages/negotiate/negotiate',
       'pages/newDealjk/newDealjk',
       'pages/newDealby/newDealby',
@@ -29,7 +29,7 @@ export default class extends wepy.app {
       'pages/signSuccessstate/signSuccessstate',
       'pages/signSuccess/signSuccess',
       'pages/sign/sign',
-      'pages/mallIndex/mallIndex',
+      'pages/mallIndex/mallIndex'
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -40,9 +40,13 @@ export default class extends wepy.app {
   };
 
   globalData = {
-    picPath:'http://d7.cto.shovesoft.com/msywap/images/',
+    api: 'http://d7.cto.shovesoft.com/msyapp/',
+    picPath: 'http://d7.cto.shovesoft.com/msywap/images/',
     userInfo: '',
-    wxUser:''
+    wxUser: '',
+    temporary: {
+      goodsData: ''
+    }
   };
 
   constructor() {
@@ -53,7 +57,7 @@ export default class extends wepy.app {
 
   async onLaunch() {
     let code = await wepy.login();
-    code = code.code
+    code = code.code;
   }
 
   sleep(s) {
@@ -64,12 +68,12 @@ export default class extends wepy.app {
     });
   }
 
-  async queryData(...d){
-    return await request(...d)
+  async queryData(...d) {
+    return await request(...d);
   }
 
-  linkPage(url,type){
-    routerBefore(url,type,this.globalData.userInfo)
+  linkPage(url, type) {
+    routerBefore(url, type, this.globalData.userInfo);
   }
 
   showTip(msg) {
@@ -80,3 +84,6 @@ export default class extends wepy.app {
   }
 }
 </script>
+<style lang="stylus">
+@import './assets/style/app';
+</style>

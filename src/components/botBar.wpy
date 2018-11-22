@@ -21,7 +21,7 @@ export default class botBar extends wepy.component {
     navList: [
       {
         name: '首页',
-        link: ''
+        link: '../index/index'
       },
       {
         name: '资讯',
@@ -29,7 +29,7 @@ export default class botBar extends wepy.component {
       },
       {
         name: '商城',
-        link: '../mallIndex/mallIndex'
+        link: '../tradeIndex/tradeIndex'
       },
       {
         name: '订单',

@@ -1,0 +1,125 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="企业认证"></header>
+    <view class="iden-headtips">最后一步：紧急信息补充</view>
+    <form class="iden-cw" bindsubmit="submitInfo">
+      <block wx:for="{{formList}}" wx:key="">
+        <view class="ic-item">
+          <text>{{item.title}}</text>
+          <input name="{{item.name}}" value="{{item.value}}" placeholder="请输入{{item.title}}"/>
+        </view>
+        <text wx:if="{{item.tips != ''}}" class="gt-tips">提示：{{item.tips}}</text>
+      </block>
+      <view class="iden-title">
+        <image src="../../assets/images/icon/icon-cwxx.png" />
+        <text>信息确认</text>
+      </view>
+      <view class="iden-verify">
+        <text>验证码</text>
+        <input class="v-input" type="number" name="checkcode" placeholder="请输入验证码" />
+        <image wx:if="{{imgCode}}" src="{{imgCode}}" />
+        <button @tap.stop="changeImgcode">刷新</button>
+      </view>
+      <view class="iden-rule-head">请确认以上信息无误并阅读</view>
+      <view class="iden-rule">
+        <checkbox-group bindchange="checkboxChange">
+          <label>
+            <checkbox class="r-checkbox" checked="{{ruleChecked}}"/>我已确认以上信息无误，并同意
+          </label>
+        </checkbox-group>
+        <navigator class="r-link" url="../platRule/platRule">《马上银产业互联网交易总则》</navigator>
+      </view>
+      <button class="page-btn" form-type="submit">下一步</button>
+    </form>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class enterpriseIden4 extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    imgCode: '',
+    ruleChecked: true,
+    formList: [
+      {
+        title: '紧急联系人',
+        name: 'contactName',
+        tips: '如有重要事情未能联系上经办人，平台将会联系紧急联系人',
+        type: 'text',
+        value: ''
+      },
+      {
+        title: '紧急联系人手机号',
+        name: 'contactPhone',
+        tips: '',
+        type: 'number',
+        value: ''
+      }
+    ]
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.initPageData();
+    this.getImgCode();
+  }
+  methods = {
+    changeImgcode() {
+      console.log(1);
+      this.getImgCode();
+    },
+    async submitInfo(event) {
+      let formData = event.detail.value;
+      formData['id'] = this.userInfo.id;
+      formData['userId'] = this.userInfo.userId;
+      let result = await this.$parent.queryData(
+        '/app/appEnterpriseUrgent.do',
+        formData
+      );
+      console.log(result);
+      if (result != '') {
+        this.$parent.linkPage('../signSuccessstate/signSuccessstate', 1);
+      }
+    }
+  };
+  async getImgCode() {
+    let result =
+      this.$parent.globalData.api +
+      '/imageCode.do?app=app&enterpriseId=' +
+      this.userInfo.id +
+      '&pageId=pageId&d=' +
+      new Date();
+    this.imgCode = result;
+    this.$apply();
+  }
+  async initPageData() {
+    let formList = this.formList;
+    let result = await this.$parent.queryData(
+      'app/appEnterpriseUrgentInit.do',
+      {
+        id: this.userInfo.id,
+        userId: this.userInfo.userId
+      }
+    );
+    let enterprise = result.enterprise;
+    for (let key in enterprise) {
+      for (let k in formList) {
+        if (key == formList[k].name) {
+          formList[k].value = enterprise[key];
+        }
+      }
+    }
+    this.formList = formList;
+    this.$apply();
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/enterpriseIden.styl';
+</style>
+

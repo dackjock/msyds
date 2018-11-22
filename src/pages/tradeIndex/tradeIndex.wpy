@@ -1,0 +1,413 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container" bindtap="hidefix">
+    <header title="企业认证"></header>
+    <view class="trade-index">
+      <view class="trade-fix">
+        <scroll-view class="goods-type" scroll-x scroll-with-animation scroll-into-view="{{lookType[tabCurr.lookType].key}}">
+          <view wx:for="{{lookType}}" wx:key="" class="gt-item {{tabCurr.lookType == index ? 'active' : ''}}" id="{{item.key}}" @tap="changeLookType({{index}})">{{item.name}}</view>
+        </scroll-view>
+        <scroll-view wx:if="{{tabCurr.lookType != 3}}" class="search-type" scroll-x scroll-with-animation scroll-into-view="{{searchType[tabCurr.searchType].key}}">
+          <view wx:for="{{searchType}}" wx:key="" class="st-item {{tabCurr.searchType == index ? 'active' : ''}}" id="{{item.key}}" @tap.stop="changeSearchType({{index}})">{{tabCurr.searchList[index] === '' ? item.title : item.list[tabCurr.searchList[index]].name}}</view>
+        </scroll-view>
+        <scroll-view wx:if="{{tabCurr.lookType == 3}}" class="search-type" scroll-x scroll-with-animation scroll-into-view="{{searchOreType[tabCurr.searchOreType].key}}">
+          <view wx:for="{{searchOreType}}" wx:key="" class="st-item {{tabCurr.searchOreType == index ? 'active' : ''}}" id="{{item.key}}" @tap.stop="changeSearchOreType({{index}})">{{tabCurr.searchOreList[index] === '' ? item.title : item.list[tabCurr.searchOreList[index]].settingName}}</view>
+        </scroll-view>
+        <view wx:if="{{searchListFlag && tabCurr.lookType != 3}}" class="search-list">
+          <text @tap.stop="changeSearchList('')">全部</text>
+          <text wx:for="{{searchType[tabCurr.searchType].list}}" wx:key="" @tap.stop="changeSearchList({{index}})">{{item.name}}</text>
+        </view>
+        <view wx:if="{{searchListFlag && tabCurr.lookType == 3}}" class="search-list">
+          <text @tap.stop="changeSearchOreList('')">全部</text>
+          <text wx:for="{{searchOreType[tabCurr.searchOreType].list}}" wx:key="" @tap.stop="changeSearchOreList({{index}})">{{item.settingName}}</text>
+        </view>
+      </view>
+      <goodsItem :isOre.sync="isOre" :goodsList.sync="goodsList" :apiData.sync="apiData"></goodsItem>
+      <view class="price-type" @tap="changePriceType">{{apiData.type === 1 ? 'TD' : '期'}}</view>
+    </view>
+    <botBar curr="3"></botBar>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+import botBar from '@/components/botBar';
+import goodsItem from '@/components/goodsItem';
+
+export default class tradeIndex extends wepy.page {
+  config = {
+    enablePullDownRefresh: true,
+    backgroundTextStyle: 'dark'
+  };
+  components = {
+    header,
+    botBar,
+    goodsItem
+  };
+  data = {
+    userInfo: [],
+    isOre: false,
+    // 选中状态
+    tabCurr: {
+      lookType: 0,
+      searchType: 0,
+      searchOreType: 0,
+      searchList: [],
+      searchOreList: []
+    },
+    // 类型
+    lookType: [
+      {
+        id: 1,
+        name: '自营热门(白银)',
+        key: 'gt001'
+      },
+      {
+        id: 2,
+        name: '产能预售(白银)',
+        key: 'gt002'
+      },
+      {
+        id: 3,
+        name: '一口价',
+        key: 'gt003'
+      },
+      {
+        name: '精矿',
+        key: 'gt004'
+      }
+    ],
+    searchListFlag: false,
+    // 搜索条件
+    searchType: [
+      {
+        key: 'deliveryList',
+        reKey: 'dpId',
+        title: '区域',
+        list: []
+      },
+      {
+        key: 'depotList',
+        reKey: 'depotId',
+        title: '仓库',
+        list: []
+      },
+      {
+        key: 'brankList',
+        reKey: 'brandId',
+        title: '品牌',
+        list: []
+      },
+      {
+        key: 'monthTicketStatus',
+        reKey: 'monthTicketStatus',
+        title: '开票',
+        list: [
+          {
+            id: 0,
+            name: '非当月开票'
+          },
+          {
+            id: 1,
+            name: '当月开票'
+          }
+        ]
+      },
+      {
+        key: 'payMethodList',
+        reKey: 'payMethodId',
+        title: '结算',
+        list: []
+      },
+      {
+        key: 'goodsTypeList',
+        reKey: 'goodsTypeId',
+        title: '类型',
+        list: []
+      }
+    ],
+    searchOreType: [
+      {
+        key: 'goodsName',
+        reKey: 'nameId',
+        title: '产品名称',
+        list: []
+      },
+      {
+        key: 'type',
+        reKey: 'type',
+        title: '购销类型',
+        list: [
+          {
+            id: 1,
+            settingName: '销售'
+          },
+          {
+            id: 2,
+            settingName: '采购'
+          }
+        ]
+      },
+      {
+        key: 'contractType',
+        reKey: 'contractType',
+        title: '产品类型',
+        list: [
+          {
+            id: 1,
+            settingName: '整单'
+          },
+          {
+            id: 2,
+            settingName: '子单'
+          }
+        ]
+      },
+      {
+        key: 'priceDayList',
+        reKey: 'priceDayId',
+        title: '定价日',
+        list: []
+      },
+      {
+        key: 'packList',
+        reKey: 'packId',
+        title: '包装',
+        list: []
+      },
+      {
+        key: 'settlementList',
+        reKey: 'settlementTypeId',
+        title: '结算方式',
+        list: []
+      }
+    ],
+    apiData: {
+      pageNum: 1,
+      pageSize: 10,
+      depotId: '', //仓库编号
+      dpId: '', //提货点地址编号
+      brandId: '', //品牌编号
+      monthTicketStatus: '', //是否当月开票
+      goodsTypeId: '', //产品类型编号
+      lookType: 1, //商品类型
+      enterpriseId: '', //当前登录企业的id
+      payMethodId: '', //支付类型
+      type: 2 //期/先货类型
+    },
+    apiOreData: {
+      pageNum: 1,
+      pageSize: 10,
+      nameId: '', //产品名称
+      packId: '', //包装
+      priceDayId: '', //定价日期
+      settlementTypeId: '', //结算方式
+      type: '', //购销类型
+      contractType: '', //产品类型
+      enterpriseId: '' //当前登录企业的id
+    },
+    defaultApiData: {},
+    defaultApiOreData: {},
+    goodsList: []
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.apiData.enterpriseId = this.userInfo.id;
+    this.apiOreData.enterpriseId = this.userInfo.id;
+    this.defaultApiData = JSON.parse(JSON.stringify(this.apiData));
+    this.defaultApiOreData = JSON.parse(JSON.stringify(this.apiOreData));
+    this.getCondtionMap();
+    this.getGoodsList();
+    this.$apply();
+  }
+  methods = {
+    // 点击空白处关闭
+    hidefix() {
+      this.searchListFlag = false;
+    },
+    // 选择类型
+    changeLookType(index) {
+      this.tabCurr.lookType = index;
+      if (index === 3) {
+        this.getOreCondtionMap();
+        let apiOreData = this.apiOreData;
+        apiOreData = JSON.parse(JSON.stringify(this.defaultApiOreData));
+        this.apiOreData = apiOreData;
+        this.$apply();
+        this.getGoodsOreList();
+        return false;
+      }
+      this.getCondtionMap();
+      let apiData = this.apiData;
+      apiData = JSON.parse(JSON.stringify(this.defaultApiData));;
+      apiData.lookType = this.lookType[index].id;
+      this.apiData = apiData;
+      this.$apply();
+      this.getGoodsList();
+    },
+    // 选择搜索条件
+    changeSearchType(index) {
+      this.tabCurr.searchType = index;
+      this.searchListFlag = true;
+      this.$apply();
+    },
+    changeSearchOreType(index) {
+      this.tabCurr.searchOreType = index;
+      this.searchListFlag = true;
+      this.$apply();
+    },
+    // 改变对应搜索条件
+    changeSearchList(index) {
+      let tabCurr = this.tabCurr;
+      let apiData = this.apiData;
+      let searchType = this.searchType;
+      tabCurr.searchList[tabCurr.searchType] = index === '' ? '' : index;
+      apiData[searchType[tabCurr.searchType].reKey] =
+        index === '' ? '' : searchType[tabCurr.searchType].list[index].id;
+      // console.log(apiData)
+      this.tabCurr = tabCurr;
+      this.apiData = apiData;
+      this.searchListFlag = false;
+      this.$apply();
+      this.getGoodsList();
+    },
+    changeSearchOreList(index) {
+      let tabCurr = this.tabCurr;
+      let apiOreData = this.apiOreData;
+      let searchOreType = this.searchOreType;
+      tabCurr.searchOreList[tabCurr.searchOreType] = index === '' ? '' : index;
+      apiOreData[searchOreType[tabCurr.searchOreType].reKey] =
+        index === '' ? '' : searchOreType[tabCurr.searchOreType].list[index].id;
+      // console.log(apiOreData)
+      this.tabCurr = tabCurr;
+      this.apiOreData = apiOreData;
+      this.searchListFlag = false;
+      this.$apply();
+      this.getGoodsOreList();
+    },
+    // 改变期/现货类型
+    changePriceType() {
+      let apiData = this.apiData;
+      if (apiData.type === 1) {
+        apiData.type = 2;
+      } else {
+        apiData.type = 1;
+      }
+      this.apiData = apiData;
+      this.$apply();
+      this.getGoodsList();
+    }
+  };
+  async getCondtionMap() {
+    // 获取搜索条件列表
+    let result = await this.$parent.queryData('/msyApp/queryFrontGoodsInit.do');
+    let searchType = this.searchType;
+    let tabCurr = this.tabCurr;
+    for (let key in result) {
+      for (let k in searchType) {
+        if (key == searchType[k].key) {
+          searchType[k].list = result[key];
+        }
+      }
+    }
+    for (let k = 0; k < searchType.length; k++) {
+      tabCurr.searchList[k] = '';
+    }
+    // console.log(result);
+    this.searchType = searchType;
+    this.tabCurr = tabCurr;
+    this.$apply();
+  }
+  async getOreCondtionMap() {
+    // 获取精矿搜索条件列表
+    let result = await this.$parent.queryData(
+      '/msyApp/queryConcentrateInit.do'
+    );
+    let searchOreType = this.searchOreType;
+    let tabCurr = this.tabCurr;
+    for (let key in result) {
+      for (let k in searchOreType) {
+        if (key == searchOreType[k].key) {
+          searchOreType[k].list = result[key];
+        }
+      }
+    }
+    for (let k = 0; k < searchOreType.length; k++) {
+      tabCurr.searchOreList[k] = '';
+    }
+    console.log(searchOreType);
+    this.searchOreType = searchOreType;
+    this.tabCurr = tabCurr;
+    this.$apply();
+  }
+  async getGoodsList() {
+    let apiData = this.apiData;
+    apiData.pageNum = 1;
+    let result = await this.$parent.queryData(
+      '/msyApp/queryFrontGoodsList.do',
+      apiData
+    );
+    console.log(result);
+    this.isOre = false;
+    this.goodsList = result.list;
+    this.$apply();
+  }
+  async getGoodsOreList() {
+    let apiOreData = this.apiOreData;
+    apiOreData.pageNum = 1;
+    let result = await this.$parent.queryData(
+      '/msyApp/queryConcentratePage.do',
+      apiOreData
+    );
+    console.log(result);
+    this.isOre = true;
+    this.goodsList = result.pageBean.list;
+    this.$apply();
+  }
+  async onReachBottom() {
+    if(this.tabCurr.lookType != 3){
+      let apiData = this.apiData;
+      apiData.pageNum++;
+      let result = await this.$parent.queryData(
+        '/msyApp/queryFrontGoodsList.do',
+        apiData
+      );
+      console.log(result);
+      for (let key in result.list) {
+        this.goodsList.push(result.list[key]);
+      }
+      if (result.list.length <= 0) {
+        this.$parent.showTip('暂无更多数据');
+      }
+    }else{
+      let apiOreData = this.apiOreData;
+      apiOreData.pageNum++;
+      let result = await this.$parent.queryData(
+        '/msyApp/queryConcentratePage.do',
+        apiOreData
+      );
+      console.log(result);
+      for (let key in result.pageBean.list) {
+        this.goodsList.push(result.pageBean.list[key]);
+      }
+      if (result.pageBean.list.length <= 0) {
+        this.$parent.showTip('暂无更多数据');
+      }
+    }
+    this.$apply();
+  }
+  async onPullDownRefresh() {
+    if(this.tabCurr.lookType != 3){
+      await this.getGoodsList();
+    }else{
+      await this.getGoodsOreList();
+    }
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/tradeIndex';
+</style>

@@ -1,0 +1,70 @@
+@import './base'
+page
+  background: #eee
+  padding-top: 255rpx
+.trade-fix
+  position: fixed
+  top: 85rpx
+  left: 0
+  right: 0
+  background: #fff
+  border-bottom: 10rpx solid #eee
+  z-index: 2
+
+.goods-type
+  width: 750rpx
+  white-space:nowrap
+  border-bottom: 2rpx solid #e6e6e6
+  .gt-item
+    margin: 0 25rpx
+    line-height: 90rpx
+    font-size: 30rpx
+    display: inline-block
+    border-bottom: 3rpx solid transparent
+    &.active
+      color: $theme-color
+      border-bottom-color: $theme-color
+.search-type
+  width: 750rpx
+  white-space:nowrap
+  .st-item
+    display: inline-block
+    min-width: 25%
+    box-sizing: border-box
+    padding: 0 20rpx
+    text-align: center
+    line-height: 68rpx
+    font-size: 24rpx
+    &:after
+      content: ''
+      display: inline-block
+      width: 0
+      height: 0
+      border: 10rpx solid transparent
+      border-top-color: #999
+      vertical-align: middle
+      margin-top: 5rpx
+      margin-left: 8rpx
+    &.active:after
+      border-top-color: #666
+.search-list
+  display: flex
+  flex-flow: column
+  >text
+    line-height: 80rpx
+    text-align: center
+    border-bottom: 2rpx solid #eee
+    font-size: 24rpx
+.price-type
+  position: fixed
+  top: 560rpx
+  left: 0
+  width: 90rpx
+  line-height: 90rpx
+  border-radius: 100%
+  border: 2rpx solid $theme-color
+  color: $theme-color
+  font-size: 36rpx
+  text-align: center
+  background: #fff
+  z-index: 2
