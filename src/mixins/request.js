@@ -15,6 +15,7 @@ async function request(url, data = {}, method = 'GET') {
   wepy.showLoading({
     title: '加载中…'
   })
+  wepy.showNavigationBarLoading()
   // 补全接口地址
   if(url == '/upload'){
     url = uploadPath
@@ -45,6 +46,11 @@ async function request(url, data = {}, method = 'GET') {
   }).then((res) => {
     // console.log(res)
     wepy.hideLoading()
+    wepy.hideNavigationBarLoading()
+    if(url == api+'/imageCode.do'){
+      resultData = res
+      return res
+    }
     if (res.data.type > 0) {
       // 成功
       resultData = res.data.returnMap
@@ -56,6 +62,7 @@ async function request(url, data = {}, method = 'GET') {
         icon: 'none'
       })
     }
+    
   }).catch((err) => {
     // 异常
     wepy.showToast({

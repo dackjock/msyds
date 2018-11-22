@@ -1,0 +1,44 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="平台总则"></header>
+    <view class="richText">
+      <rich-text nodes="{{content}}"></rich-text>
+      <button class="page-btn" @tap.stop="backUp">返回</button>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class platRule extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    content: ''
+  };
+  onShow() {
+    this.getPlatRule();
+  }
+  methods = {
+    backUp() {
+      this.$parent.linkPage('', 3);
+    }
+  };
+  async getPlatRule() {
+    var result = await this.$parent.queryData('/app/generalInit.do');
+    this.content = result.content;
+    this.$apply();
+    console.log(result);
+  }
+}
+</script>
+
+<style lang="stylus">
+.richText {
+  font-size: 24rpx;
+  padding: 20rpx;
+}
+</style>

@@ -1,8 +1,3 @@
-<style lang="stylus">
-@import './assets/style/app'
-
-</style>
-
 <script>
 import wepy from 'wepy';
 import 'wepy-async-function';
@@ -12,6 +7,11 @@ import routerBefore from '_mixins/routerBefore.js';
 export default class extends wepy.app {
   config = {
     pages: [
+      'pages/helpcenter/helpcenter',
+      'pages/privacypolicy/privacypolicy',
+      'pages/userprotocol/userprotocol',
+      'pages/aboutus/aboutus',
+      'pages/news/news',
       'pages/login/login',
       'pages/negotiate/negotiate',
       'pages/signSuccess/signSuccess',
@@ -24,7 +24,12 @@ export default class extends wepy.app {
       'pages/index/index',
       'pages/forgetPass/forgetPass',
       'pages/sign/sign',
-      'pages/mallIndex/mallIndex',
+      'pages/mallIndex/mallIndex'
+      'pages/accountIndex/accountIndex',
+      'pages/buyGoods1/buyGoods1',
+      'pages/tradeIndex/tradeIndex',
+      'pages/platRule/platRule',
+      'pages/negotiate/negotiate',
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -35,9 +40,13 @@ export default class extends wepy.app {
   };
 
   globalData = {
-    picPath:'http://d7.cto.shovesoft.com/msywap/images/',
+    api: 'http://d7.cto.shovesoft.com/msyapp/',
+    picPath: 'http://d7.cto.shovesoft.com/msywap/images/',
     userInfo: '',
-    wxUser:''
+    wxUser: '',
+    temporary: {
+      goodsData: ''
+    }
   };
 
   constructor() {
@@ -48,7 +57,7 @@ export default class extends wepy.app {
 
   async onLaunch() {
     let code = await wepy.login();
-    code = code.code
+    code = code.code;
   }
 
   sleep(s) {
@@ -59,12 +68,12 @@ export default class extends wepy.app {
     });
   }
 
-  async queryData(...d){
-    return await request(...d)
+  async queryData(...d) {
+    return await request(...d);
   }
 
-  linkPage(url,type){
-    routerBefore(url,type,this.globalData.userInfo)
+  linkPage(url, type) {
+    routerBefore(url, type, this.globalData.userInfo);
   }
 
   showTip(msg) {
@@ -75,3 +84,6 @@ export default class extends wepy.app {
   }
 }
 </script>
+<style lang="stylus">
+@import './assets/style/app';
+</style>

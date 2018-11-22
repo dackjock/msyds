@@ -303,7 +303,7 @@
       <em wx:if="{{statue == 2}}">期</em>
     </view>
     <!-- 首页右侧显示 -->
-    <view class="rightTips {{rightTipsBoole ?'suo':''}}"  wx:if={{imgUrl}}>
+    <view class="rightTips {{rightTipsBoole ?'suo':''}}"  wx:if="{{imgUrl}}">
       <view class="right-page">
         <view>Ag(T+D)</view>
         <view class="rp-nr">

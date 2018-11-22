@@ -1,0 +1,103 @@
+<template lang="wxml" minapp="wepy">
+  <view wx:if="{{!isOre}}" class="goods-item" wx:for="{{goodsList}}" wx:key="">
+    <view class="b-a">
+      <text class="a-type">{{item.goods_type === 1 ? '整' : '散'}}</text>
+      <view class="a-min am1" wx:if="{{apiData.type === 1}}">
+        <text>TD</text>
+        <text class="{{item.main_price > 0 ? 'up' : 'down'}}">{{item.main_price}}</text>
+      </view>
+      <view class="a-min am2" wx:if="{{apiData.type === 2}}">
+        <text>沪银主力</text>
+        <text class="{{item.main_price > 0 ? 'up' : 'down'}}">{{item.main_price}}</text>
+      </view>
+      <view class="a-min" wx:if="{{apiData.type === 3}}">
+        <text>单价</text>
+        <text class="{{item.main_price > 0 ? 'up' : 'down'}}">{{item.main_price}}</text>
+      </view>
+    </view>
+    <view class="b-b">
+      <text >{{item.goods_name}}</text>
+      <text >{{item.goods_total_weight}}KG</text>
+    </view>
+    <view class="b-c">
+      <text >{{item.brandName}}</text>
+      <text >{{item.depotName}}</text>
+    </view>
+    <view class="b-d">
+      <text class="noti">{{item.month_ticket_status === 0 ? '非当月' : '当月票'}}</text>
+      <view class="share">
+        <image src="../assets/images/icon/icon-share.png" />
+        <text >转发</text>
+      </view>
+    </view>
+    <view class="b-e">
+      <text class="date">{{date.dateByYmd(item.create_time_stamp)}}</text>
+      <text class="buy" data-type="{{apiData.type}}" data-look-type="{{apiData.lookType}}" data-id="{{item.id}}" data-enable-buy="{{item.enableBuy}}" data-pay-method-id="{{item.payMethodIds}}" @tap="buyGoods">购买</text>
+    </view>
+  </view>
+  <view wx:if="{{isOre}}" class="goods-item" wx:for="{{goodsList}}" wx:key="">
+    <view class="b-a">
+      <text class="a-type">{{item.contract_type === 1 ? '整' : '子'}}</text>
+      <text class="goods-name">{{item.name}}</text>
+    </view>
+    <view class="c-a">
+      <view class="c-a-info">
+        <text >{{item.con_weight}}T</text>
+        <text >{{item.price_day_name}}</text>
+        <text class="noti">{{item.type === 1 ? '销售' : '采购'}}</text>
+      </view>
+      <view class="c-a-cont">
+        <block wx:for="{{item.specList}}" wx:key="" wx:for-item="spec">
+          {{spec.specName}}{{spec.specValue}}、
+        </block>
+      </view>
+    </view>
+    <view class="b-e">
+      <text class="date">{{date.dateStrYmd(item.create_time)}}</text>
+      <text class="buy">{{item.resultType}}</text>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import dateFormater from '../wxs/dateFormater.wxs';
+
+export default class goodsItem extends wepy.component {
+  props = {
+    isOre: {
+      type: Boolean,
+      twoWay: true
+    },
+    goodsList: {
+      type: Array,
+      twoWay: true
+    },
+    apiData: {
+      type: Object,
+      twoWay: true
+    }
+  };
+  wxs = {
+    date: dateFormater
+  };
+  methods = {
+    async buyGoods(event){
+      console.log(event.target.dataset)
+      let buyData = event.target.dataset;
+      buyData['enterpriseId'] = this.$parent.$parent.globalData.userInfo.id;
+      let result = await this.$parent.$parent.queryData("/msyApp/buyGoodsInit.do",buyData)
+      if(result != ''){
+        // 将查询参数存到临时容器中
+        this.$parent.$parent.globalData.temporary.goodsData = buyData;
+        this.$parent.$parent.linkPage('../buyGoods1/buyGoods1',1)
+      }
+      console.log(result)
+    }
+  };
+}
+</script>
+
+<style lang='stylus'>
+@import '../assets/style/goodsItem';
+</style>

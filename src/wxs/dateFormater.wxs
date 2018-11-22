@@ -1,0 +1,54 @@
+function dateByApm(date) {
+  var r = setDate(date);
+  return r.year + '年' + r.month + '月' + r.day + '日 ' + r.apm + ' ' + r.hour + ':' + r.minute + ':' + r.second
+}
+
+function dateByHms(date) {
+  var r = setDate(date);
+  return r.year + '-' + r.month + '-' + r.day + ' ' + r.hour + ':' + r.minute + ':' + r.second
+}
+
+function dateByYmd(date) {
+  var r = setDate(date);
+  return r.year + '-' + r.month + '-' + r.day
+}
+
+function dateStrYmd(date) {
+  return date.slice(0,10)
+}
+
+function zero(num) {
+  if (parseInt(num) < 10) {
+    num = '0' + num
+  }
+  return num
+}
+
+function setDate(date) {
+  var d = getDate(parseInt(date));
+  var r = {
+    year: d.getFullYear(),
+    month: zero(d.getMonth() + 1),
+    day: zero(d.getDate()),
+    hour: zero(d.getHours()),
+    minute: zero(d.getMinutes()),
+    second: zero(d.getSeconds()),
+    apm: d.getHours() < 12 ? '上午' : '下午'
+  }
+  return r;
+}
+
+module.exports = {
+  dateByApm: function(date){
+    return dateByApm(date)
+  },
+  dateByHms: function(date){
+    return dateByHms(date)
+  },
+  dateByYmd: function(date){
+    return dateByYmd(date)
+  },
+  dateStrYmd: function(date){
+    return dateStrYmd(date)
+  }
+}
