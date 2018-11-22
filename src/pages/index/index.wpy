@@ -419,8 +419,6 @@ export default class Index extends wepy.page {
                 
               }
               
-              
-              
             } else if (isbuy === 'true') {
               if (idx === '2') { // 精矿
               this.$parent.showTip('精矿满足条件、能购买（未开发）')

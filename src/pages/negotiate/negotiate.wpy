@@ -134,14 +134,26 @@ export default class negotiate extends wepy.page {
     djq: '平台点价权',
     zhangqi: '2天',
     showbx: '',
+    lookType: '',//商品类型
+    goodsid: '',//商品id
+    pricetype: '',//购买价格类型
+    enablebuy: '',//能否购买
   };
-  onLoad(e){
-    console.log('e',e)
-  }
+ 
   onShow() {
     this.userInfo = this.$parent.globalData.userInfo
-    console.log('this.userInfo',this.userInfo)
+    this.buyGoodsInit()
   };
+  //购买商品初始化
+  async buyGoodsInit() {
+    let result = await this.$parent.queryData('app/buyGoodsInit.do', {
+      lookType:1,
+      id:1,
+    })
+    console.log('购买商品初始化', result);
+   
+    this.$apply() 
+  }
   bindPickerChange(e) {
     this.index = e.detail.value
     this.$apply()
