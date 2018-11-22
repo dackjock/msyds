@@ -26,3 +26,14 @@ $theme-color = #d7092d
   font-size: 0
   height: 0
   line-height: 0
+
+ellp()
+  overflow hidden
+  text-overflow ellipsis
+  white-space nowrap
+
+ellps(line = 2)
+  display -webkit-box
+  -webkit-box-orient vertical
+  -webkit-line-clamp line
+  overflow hidden

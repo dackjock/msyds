@@ -1,0 +1,22 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="提交报价"></header>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class buyGoods1 extends wepy.page {
+
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+
+  
+</style>

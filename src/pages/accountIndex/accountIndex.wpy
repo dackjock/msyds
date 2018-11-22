@@ -1,0 +1,79 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <view class="account-header">
+      <image class="acc-logo" src="{{logo}}"/>
+      <view>
+        <view class="ci-top">
+          <image wx:if="{{level}}" src="../../assets/images/icon/{{level}}@2x.png" />
+          <text >{{userInfo.loginAccount}}</text>
+        </view>
+        <view class="ci-comp" wx:if="{{userInfo.status === 0}}">认证企业：审核中</view>
+        <view class="ci-comp">{{userInfo.enterpriseName}}</view>
+      </view>
+      <view class="ac-icon">
+        <image src="../../assets/images/icon/icon-set.png" />
+      </view>
+      <view class="ac-icon msg">
+        <image src="../../assets/images/icon/icon-msg.png" />
+        <text>99+</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+export default class accountIndex extends wepy.page {
+  components = {};
+  computed = {
+    level() {
+      let name = '';
+      let str = this.accountInfo.enterpriseLevelName;
+      if (str == 'A级') {
+        name = 'a';
+      } else if (str == 'B级') {
+        name = 'b';
+      } else if (str == 'C级') {
+        name = 'c';
+      } else if (str == 'D级') {
+        name = 'd';
+      } else {
+        name = '';
+      }
+      return name;
+    }
+  };
+  data = {
+    userInfo: [],
+    accountInfo: [],
+    logo:'../../assets/images/icon/icon-logo.png'
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.getAccIndexInfo();
+    this.$apply();
+  }
+  async getAccIndexInfo() {
+    let apiData = {
+      enterpriseId: this.userInfo.id,
+      isSystem: this.userInfo.isSystem,
+      userId: this.userInfo.userId
+    };
+    let result = await this.$parent.queryData(
+      '/msyApp/selectEnterpriseInfo.do',
+      apiData
+    );
+    this.accountInfo = result;
+    if(result.logo != ''){
+      this.logo = result.logo
+    }
+    this.$apply();
+    console.log(result);
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/accountIndex.styl';
+</style>
