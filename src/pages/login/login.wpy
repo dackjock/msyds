@@ -30,13 +30,13 @@ export default class Login extends wepy.page {
     header
   };
   onShow() {
+    console.log(this);
     this.picPath = this.$parent.globalData.picPath;
     this.preToLogin({
       detail: {
         value: {
-          userName: 'haha', //
-          //userName: 15527105253,
-          pwd: 123456
+          userName: "zwwd_01",
+          pwd: "a123456"
         }
       }
     });
@@ -82,11 +82,7 @@ export default class Login extends wepy.page {
     console.log('*********** 登录成功 ***********');
 
     console.log('用户信息：',result)
-    this.$parent.linkPage('../accountIndex/accountIndex',2)
-
-    //console.log(result)
-    //this.$parent.linkPage('../negotiate/negotiate',1)
-    //this.$parent.linkPage('../index/index',1)
+    this.$parent.linkPage('../order/order',1)
   }
 }
 </script>

@@ -1,0 +1,123 @@
+<template lang="wxml" minapp="wepy">
+    <view class="order_container">
+      <!-- 订单头部 -->
+      <view class="order_header">
+        <image  src="../../assets/images/icon/searcha.png" />
+           <view class="show_tab"> 
+             销售
+            <switch checked @change="switch1Change" color="#fff"/>
+            </view>
+         订单中心
+        
+          
+      </view>
+      <!-- 订单条件 -->
+      <view class="type_order" style="border-bottom:1px solid #eee">
+        <view class="cur"><text>白银</text></view>
+        <view ><text>精矿</text></view>
+      </view>
+       <view class="type_order">
+        <view class="cur"><text>全部</text></view>
+        <view ><text>未完成</text></view>
+        <view ><text>已完成</text></view>
+        <view ><text>已撤销</text></view>
+      </view>
+      <!-- 订单列表主体 -->
+      <view class="order_main">
+        <block  wx:for="{{listData}}"  wx:key="{{item.index}}">
+          <view class="order_item">
+            <view class="top">
+              {{item.enterprise_name}}
+              <view class="timer">{{item.create_time}}</view>
+            </view>
+
+            <view class="main_cont">
+              <view class="pro_name">
+                {{item.goods_name}}
+                <view class="status">整</view>
+              </view>
+
+              <view class="right_cont">
+                <view class="flex_box">
+                  <view class="w134">订单编号</view>
+                  <view class="flex_1">{{item.order_code}}</view>
+                </view>
+                <view class="flex_box">
+                  <view class="w134">总价</view>
+                  <view class="w186">{{item.total_price}}元</view>
+                  <view class="w85">数量</view>
+                  <view class="flex_1">{{item.goods_weight}}kg</view>
+                </view>
+                    <view class="flex_box">
+                  <view class="w134">单价</view>
+                  <view class="w186">{{item.price}}元</view>
+                  <view class="w85" style="line-height:1em;padding-top:6rpx;"> <text>结算\n方式</text></view>
+                  <view class="flex_1">现款现货</view>
+                </view>
+                <view class="flex_box">
+                  <view class="w134">当前状态</view>
+                 
+                  <view class="flex_1 f20">合同确认成功（等待供方签署合同）{{aPlus}}</view>
+                </view>
+                <view class="flex_box right">
+                <view class="btn_order">查看详情</view> 
+                </view>
+              </view>
+            </view>
+          </view>
+        </block>
+
+      </view>
+        <botBar curr='4'></botBar>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import botBar from '@/components/botBar';
+
+export default class Order extends wepy.page {
+  data = {
+    listData: [],
+    queryData: {
+      orderType: 1,
+      orderStatus: 0,
+      pageNum: 1
+    }
+  };
+  components = {
+    botBar
+  };
+  computed = {
+    aPlus() {
+      this.listData.map((v, i) => {
+        if(v.status===5){}
+      });
+      return '';
+    }
+  };
+  methods = {
+    switch1Change() {
+      console.log(1);
+    },
+    getList(_this, obj) {
+      return _this.$parent.queryData('msyApp/queryEnterpriseOrderList.do', {
+        enterpriseId: _this.$parent.globalData.userInfo.id,
+        orderType: obj.orderType,
+        userType: _this.$parent.globalData.userInfo.isSystem ? 1 : 2
+      });
+    }
+  };
+
+  async onShow() {
+    let res = await this.methods.getList(this, this.queryData);
+    this.listData = res.orderList;
+    console.log(this.listData);
+    this.$apply();
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/order';
+</style>
