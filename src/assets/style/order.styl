@@ -38,9 +38,11 @@ page
     padding: 10rpx
     color: #666
     font-size: 24rpx
+    padding-top: 275rpx
 .order_item
     background: #fff
     border: 1px solid #eee
+    margin-bottom: 9rpx
     .top
         padding: 0 15rpx 0 20rpx
         display: flex
@@ -100,7 +102,7 @@ page
                 .flex_1
                     flex: 1
                 .btn_order
-                    width: 135rpx;
+                    padding: 0 15rpx
                     height: 46rpx;
                     border-radius: 8px;
                     border: solid 1px #d7092d;
@@ -108,12 +110,26 @@ page
                     color: #d7092d
                     text-align: center
                     box-sizing: border-box
+                    &.red
+                        background-color: #d7092d
+                        color: #fff
+                    +.btn_order
+                        margin-left: 15rpx
+.type_order_con
+    position: fixed
+    top: 0
+    width:100%
+    box-shadow: 0 2rpx 6rpx 0 rgba(13, 17, 41, 0.2);
+
+
+
 .type_order
     display: flex
     height: 90rpx
     background: #fff
     line-height: 86rpx
     color: #666666
+ 
     .cur text
         border-bottom: 2px solid #d7092d
         width:50%
