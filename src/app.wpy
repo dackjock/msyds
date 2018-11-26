@@ -7,12 +7,13 @@ import routerBefore from '_mixins/routerBefore.js';
 export default class extends wepy.app {
   config = {
     pages: [
+      'pages/login/login',
+      'pages/capitalManagement/capitalManagement',
       'pages/helpcenter/helpcenter',
       'pages/privacypolicy/privacypolicy',
       'pages/userprotocol/userprotocol',
       'pages/aboutus/aboutus',
       'pages/news/news',
-      'pages/login/login',
       'pages/negotiate/negotiate',
       'pages/signSuccess/signSuccess',
       'pages/signSuccessstate/signSuccessstate',
@@ -24,12 +25,11 @@ export default class extends wepy.app {
       'pages/index/index',
       'pages/forgetPass/forgetPass',
       'pages/sign/sign',
-      'pages/mallIndex/mallIndex'
+      'pages/mallIndex/mallIndex',
       'pages/accountIndex/accountIndex',
       'pages/buyGoods1/buyGoods1',
       'pages/tradeIndex/tradeIndex',
       'pages/platRule/platRule',
-      'pages/negotiate/negotiate',
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -45,7 +45,9 @@ export default class extends wepy.app {
     userInfo: '',
     wxUser: '',
     temporary: {
-      goodsData: ''
+      goodsData: '',
+      goodsStatue:'',
+      contractId:''
     }
   };
 

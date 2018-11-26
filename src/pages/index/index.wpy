@@ -415,6 +415,8 @@ export default class Index extends wepy.page {
             if (idx === '1') { // 能买 // 白银
               let enbuy = isbuy.enableBuy
               if(enbuy === 1){
+                this.$parent.globalData.temporary.goodsData = isbuy;
+                this.$parent.globalData.temporary.goodsStatue = this.statue;
                 this.$parent.linkPage('../negotiate/negotiate',1)
                 
               }
@@ -599,7 +601,7 @@ export default class Index extends wepy.page {
       enterpriseId: this.enterpriseId,
       type: this.statue
     })
-    console.log('白银', result);
+    //console.log('白银', result);
     let that = this
     let bylist = result.list
     that.byItem = []
