@@ -7,17 +7,18 @@ import routerBefore from '_mixins/routerBefore.js';
 export default class extends wepy.app {
   config = {
     pages: [
+      'pages/login/login',
+      'pages/editAuthDevlop/editAuthDevlop',
+      'pages/authDevlop/authDevlop',
       'pages/helpcenter/helpcenter',
       'pages/privacypolicy/privacypolicy',
       'pages/userprotocol/userprotocol',
-      'pages/aboutus/aboutus',
+      'pages/aboutUs/aboutUs',
       'pages/news/news',
-      'pages/login/login',
       'pages/accountIndex/accountIndex',
       'pages/buyGoods1/buyGoods1',
       'pages/tradeIndex/tradeIndex',
       'pages/platRule/platRule',
-      'pages/negotiate/negotiate',
       'pages/negotiate/negotiate',
       'pages/signSuccess/signSuccess',
       'pages/signSuccessstate/signSuccessstate',
@@ -29,13 +30,17 @@ export default class extends wepy.app {
       'pages/index/index',
       'pages/forgetPass/forgetPass',
       'pages/sign/sign',
-      'pages/mallIndex/mallIndex'
+      'pages/mallIndex/mallIndex',
+      'pages/authManage/authManage',
+      'pages/authManager/authManager',
+      'pages/editAuthManager/editAuthManager',
     ],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#d7092d',
       navigationBarTitleText: '马上银',
-      navigationBarTextStyle: 'white'
+      navigationBarTextStyle: 'white',
+      backgroundTextStyle: 'dark'
     }
   };
 

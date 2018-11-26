@@ -1,0 +1,143 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container pd-bot">
+    <header title="管理员管理"></header>
+    <view class="manager-item" wx:for="{{managers}}" wx:key="">
+      <view >
+        <text >用户名：</text>
+        <text >{{item.loginAccount}}</text>
+      </view>
+      <view >
+        <text >上次登录时间：</text>
+        <text >{{item.lastLoginTime}}</text>
+      </view>
+      <view >
+        <text >部门：</text>
+        <text >{{item.deptName}}</text>
+      </view>
+      <view >
+        <text >上次登录IP：</text>
+        <text >{{item.lastLoginIp}}</text>
+      </view>
+      <view >
+        <text >角色：</text>
+        <text >{{item.name}}</text>
+      </view>
+      <view >
+        <text >真实姓名：</text>
+        <text >{{item.realName}}</text>
+      </view>
+      <view class="mi-bot">
+        <label >是否启用<switch color="#d7092d" data-id="{{item.id}}" bindchange="changeSwitch" checked="{{item.status === 1 ? true : false}}" /></label>
+        <view >
+          <text class="edit" @tap="editManager({{item.id}})">编辑</text>
+          <text @tap="delManager({{item.id}})">删除</text>
+        </view>
+      </view>
+    </view>
+    <button class="page-btn fix-bot" @tap.stop="editManager('')">新增管理员</button>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class authManager extends wepy.page {
+  config = {
+    enablePullDownRefresh: true
+  };
+  components = {
+    header
+  };
+  data = {
+    userInfo: [],
+    pageNum: 1,
+    managers: []
+  };
+  methods = {
+    editManager(id) {
+      this.$parent.linkPage('../editAuthManager/editAuthManager?id=' + id, 1);
+    },
+    delManager(id) {
+      let that = this;
+      wx.showModal({
+        title: '操作提示',
+        content: '是否删除当前管理员？',
+        confirmColor: '#d7092d',
+        success(res) {
+          console.log(res);
+          if (res.confirm) {
+            that.delAuthManager(id);
+            that.pageNum = 1;
+            that.managers = [];
+            that.$apply();
+            that.getManagerList();
+          }
+        }
+      });
+    },
+    async changeSwitch(event) {
+      let result = await this.$parent.queryData(
+        '/msyApp/appUpdateUserLoginRoleSatus.do',
+        {
+          userId: this.userInfo.userId,
+          ids: event.target.dataset.id,
+          enable: event.detail.value ? 1 : 0
+        }
+      );
+      // console.log(result)
+      if (result) {
+        this.$parent.showTip('操作成功');
+      }
+    }
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.getManagerList();
+  }
+  async getManagerList() {
+    let result = await this.$parent.queryData(
+      '/msyApp/appQueryUserLoginRoleList.do',
+      {
+        enterpriseId: this.userInfo.id,
+        userId: this.userInfo.userId,
+        pageNum: this.pageNum,
+        loginAccount: this.userInfo.loginAccount
+      }
+    );
+    if (result.list.length <= 0) {
+      this.$parent.showTip('暂无更多数据');
+    }
+    for (let k in result.list) {
+      this.managers.push(result.list[k]);
+    }
+    this.$apply();
+    console.log(result);
+  }
+  async delAuthManager(id) {
+    let result = await this.$parent.queryData(
+      'msyApp/appDeleteUserLoginRole.do',
+      {
+        userId: this.userInfo.userId,
+        ids: id
+      }
+    );
+  }
+  onReachBottom() {
+    this.pageNum++;
+    this.getManagerList();
+  }
+  async onPullDownRefresh() {
+    this.pageNum = 1;
+    this.managers = [];
+    await this.getManagerList();
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/authManage.styl';
+</style>
+

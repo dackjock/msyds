@@ -34,8 +34,8 @@ export default class Login extends wepy.page {
     this.preToLogin({
       detail: {
         value: {
-          userName: 'haha', //
-          //userName: 15527105253,
+          userName: 'haha',
+          // userName: 15527105253,
           pwd: 123456
         }
       }
@@ -81,7 +81,7 @@ export default class Login extends wepy.page {
     this.$parent.globalData.userInfo = result;
     console.log('*********** 登录成功 ***********');
     console.log('用户信息：',result)
-    this.$parent.linkPage('../accountIndex/accountIndex',2)
+    this.$parent.linkPage('../authManage/authManage',2)
   }
 }
 </script>
