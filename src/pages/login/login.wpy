@@ -80,6 +80,7 @@ export default class Login extends wepy.page {
     });
     this.$parent.globalData.userInfo = result;
     console.log('*********** 登录成功 ***********');
+
     console.log('用户信息：',result)
     this.$parent.linkPage('../authManage/authManage',2)
   }
