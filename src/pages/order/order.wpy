@@ -79,12 +79,12 @@
                 <view class="flex_box">
                   <view class="w134">当前状态</view>
                 
-                  <view class="flex_1 f20">{{item.status}}</view>
+                  <view class="flex_1 f20">{{item.orderStatusName}}</view>
                 </view>
                 <view class="flex_box right">
                   <view wx:if="{{item.orderConstraintName}}" class="btn_order {{item.orderConstraintName ==='查看结算'?'':'red'}}"   >{{item.orderConstraintName}}</view>
               
-                <view class="btn_order">查看详情</view> 
+                <navigator url="../orderDetail/orderDetail?id={{item.id}}&contract_id={{item.contract_id}}" class="btn_order">查看详情</navigator> 
                 </view>
               </view>
             </view>
@@ -177,7 +177,7 @@ export default class Order extends wepy.page {
   methods = {
     changeListType(val) {
       this.list_type = val;
-      console.log( this.list_type);
+     // console.log(this.list_type);
       this.$apply();
     },
     switch1Change(val) {
