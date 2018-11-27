@@ -5,6 +5,7 @@ let firewall = [
   '../enterpriseIden1/enterpriseIden1',
   '../enterpriseIden2/enterpriseIden2',
   '../enterpriseIden3/enterpriseIden3',
+  '../negotiate/negotiate',
 ]
 
 let actionType = 1

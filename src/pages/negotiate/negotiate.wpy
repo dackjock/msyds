@@ -3,99 +3,99 @@
     <header title="提交议价" hasBack="true"></header>
     <progressbar tap="2"></progressbar>
     <view class="n-timebx">
-      <view class="n-warni"></view>温馨提示：请在规定的时间<text class="n-time">3分钟</text>内完成报价
+      <view class="n-warni"></view>温馨提示：请在规定的时间<text class="n-time">{{heartTime}}s</text>内完成报价
     </view>
-    <view class="n-table">
+    <view class="n-table" >
       <view class="n-tr">
         <view class="n-th">实时TD价格</view>
-        <view class="n-th f20"><text class="cf f30">3854</text>元/kg</view>
+        <view class="n-th f20"><text class="cf f30">{{yjlist.userLoginBean.timePrice}}</text>元/kg</view>
         <view class="n-th">当前订单的单价</view>
-        <view class="n-th f20"><text class="f30 cf">3854</text>元/kg</view>
+        <view class="n-th f20"><text class="f30 cf">{{yjlist.goods_price}}</text>元/kg</view>
       </view>
       <view class="n-tt">
         <view class="n-td">当前时间</view>
-        <view class="n-td flex-1 c6">2018-11-15 11:10:12</view>
+        <view class="n-td flex-1 c6">{{nowtime}}</view>
       </view>
       <view class="n-tt">
         <view class="n-td">供方</view>
-        <view class="n-td flex-1 c6">湖南马上银电商</view>
+        <view class="n-td flex-1 c6">湖南马上银电商有限公司</view>
       </view>
       <view class="n-tt">
         <view class="n-td">需方</view>
-        <view class="n-td flex-1 c6">湖南政和通公司</view>
+        <view class="n-td flex-1 c6">{{yjlist.userLoginBean.enterpriseName}}</view>
       </view>
       <view class="n-tt">
         <view class="n-td">品名</view>
-        <view class="n-td c6">白银aa</view>
+        <view class="n-td c6">{{yjlist.goods_name}}</view>
         <view class="n-td">规格</view>
-        <view class="n-td c6">国标1</view>
+        <view class="n-td c6">{{yjlist.goods_spec}}</view>
       </view>
       <view class="n-tt">
         <view class="n-td">品牌</view>
-        <view class="n-td c6">政和通</view>
+        <view class="n-td c6">{{yjlist.brandName}}</view>
         <view class="n-td">商品品质</view>
-        <view class="n-td c6">99.99%</view>
+        <view class="n-td c6">{{yjlist.goods_attr}}</view>
       </view>
       <view class="n-tt">
         <view class="n-td">仓库</view>
-        <view class="n-td c6">上海-飞平</view>
+        <view class="n-td c6">{{yjlist.depotName}}</view>
         <view class="n-td">商品类型</view>
-        <view class="n-td c6">整单</view>
+        <view class="n-td c6">{{yjlist.goodsTypeName}}</view>
       </view>
       <view class="n-tt">
         <view class="n-td">数量(±5%)</view>
-        <view class="n-td flex-1 c6">219.3333KG</view>
+        <view class="n-td flex-1 c6">{{yjlist.goods_total_weight}}KG</view>
       </view>
       <view class="n-tt">
         <view class="n-td">结算方式</view>
         <view class="n-td flex-1 c6">
-          <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
+          <picker bindchange="bindPickerChange" value="{{index}}" range="{{arraysel}}">
             <view class="picker f22">
-              {{array[index]}}(最晚提货时间:2018-11-12) >
+              {{jstype}}(最晚提货时间:{{yjlist.last_time}}) >
             </view>
           </picker>
         </view>
       </view>
-      <view class="n-tt">
+      <view class="n-tt" wx:if="{{nowPayMethodId == 6 || nowPayMethodId == 7}}">
         <view class="n-td">选择点价权</view>
         <view class="n-td flex-1 c6">
           {{djq}}
-          <picker bindchange="bindPickerChangeb"  value="{{indexb}}" range="{{arrayb}}">
+          <picker bindchange="bindPickerChangeb"  value="{{indexb}}" range="{{arraybsel}}">
             <view class="picker f22 seldjq">切换点价权></view>
           </picker>
         </view>
       </view>
-      <view class="n-tt">
+      <view class="n-tt" wx:if="{{nowPayMethodId == 6 || nowPayMethodId == 7}}">
         <view class="n-td">点价范围</view>
         <view class="n-td flex-1 c6">
-          <input class="n-inpa" type="text" placeholder="请输入点价天数" />
+          <input class="n-inpa" type="text" bindinput="getdj" placeholder="请输入点价天数" />
         </view>
       </view>
       <view class="n-tt">
         <view class="n-td">升贴水</view>
         <view class="n-td flex-1 c6"> 
           <view class="n-ssbx">
-            <view class="lv n-ssbxs">-</view>
-            <view class="n-ssbxm flex-1" bindtap="ssclick">升水1</view>
-            <view class="red n-ssbxs">+</view>
+            <view class="lv n-ssbxs" bindtap="shuiCut">-</view>
+            <view class="n-ssbxm flex-1 {{shengysnum>0? 'red' :''}} {{shengysnum<0? 'lv' :''}}" bindtap="ssclick">{{shengtxt}}{{shengnum}}</view>
+            <view class="red n-ssbxs" bindtap="shuiAdd">+</view>
           </view>
         </view>
       </view>
-      <view class="n-tt">
+      <view class="n-tt" wx:if="{{nowPayMethodId == 6 || nowPayMethodId == 7}}">
         <view class="n-td">延期点价费率</view>
         <view class="n-td flex-1 c6">
           <view class="n-ssbx">
-            <view class="lv n-ssbxs">-</view>
-            <view class="n-ssbxm flex-1">0.88</view>
-            <view class="red n-ssbxs">+</view>
+            <view class="lv n-ssbxs" bindtap="rateCut">-</view>
+            <view class="n-ssbxm flex-1">{{piontPriceRate}}</view>
+            <view class="red n-ssbxs" bindtap="rateAdd">+</view>
           </view>
         </view>
       </view>
-      <view class="n-tt">
+      <view class="n-tt" wx:if="{{nowPayMethodId == 6 || nowPayMethodId == 7}}">
         <view class="n-td f18">结算总金额计算公式</view>
         <view class="n-td flex-1 c6 f20">(当天点价的基准单价+升贴水+费率*自然日)*重量(KG)</view>
       </view>
-      <view class="n-tt">
+      <view class="n-tt"  wx:if="{{nowPayMethodId == 1}}">
         <view class="n-td">账期</view>
         <view class="n-td flex-1 c6">
           {{zhangqi}}
@@ -105,15 +105,17 @@
         </view>
       </view>
       <view class="n-bt">
-        <checkbox value="" checked="" color="#666" />我已同意以上报价并遵守<navigator href="#">《马上银产业互联网交易总则》</navigator>
+        <checkbox-group bindchange="checkbxChange" data-checks="{{item.checks}}">
+          <checkbox value="" data-index="{{index}}" checked="{{item.checks}}"  color="#666" />我已同意以上报价并遵守<navigator href="#">《马上银产业互联网交易总则》</navigator>
+        </checkbox-group>
       </view>
     </view>
     <view class="n-btnbx">
-      <view class="n-btnaa">提交议价</view>
+      <view class="n-btnaa" bindtap="submitbtn">提交议价</view>
     </view>
 
     <!-- 小键盘 -->
-    <keyboard :showfn.sync="showbx"></keyboard>
+    <keyboard :showfn.sync="showbx" :stnum.sync="shuinumber" @changenum.user="shownewnum"></keyboard>
   </view>
 </template>
     
@@ -122,45 +124,292 @@ import wepy from 'wepy';
 import header from '@/components/header';
 import progressbar from '@/components/progressBar';
 import keyboard from '@/components/keyboard';
-
 export default class negotiate extends wepy.page {
   data = {
-    array: ['现款现货','点价权+延期补偿','预付款+多次提货','先货后款+账期升水补偿'],
-    arrayb: ['平台点价权','我方点价权'],
-    arrayc: ['2天','7天','1天'],
+    array: [],//结算方式
+    arraysel: [],//结算方式selct
+    arrayb: [
+      {id:1,name:'平台点价权'},
+      {id:2,name:'我方点价权'}
+    ],//点价权
+    arraybsel: ['平台点价权','我方点价权'],//点价权selct
+    arrayc: [],//账期
+    arraycid: [],//账期id
     index: 0,
     indexb: 0,
     indexc: 0,
-    djq: '平台点价权',
-    zhangqi: '2天',
+    jstype: '',//结算方式 值
+    nowPayMethodId: '',//结算方式 id
+    djq: '平台点价权',//点价权 值
+    djqid: '1',//点价权 id
+    zhangqiid: 1,//账期 id
+    zhangqi: '',//账期 值
     showbx: '',
+    goodsData: '',//商品data
+    goodsStatue:'',
+    yjlist: [],
+    nowtime:'',
+    shengtxt:'',//升贴水 文字
+    shengysnum:'',//升贴水 原始数字
+    shengnum:'',//升贴水 数字
+    minAgio:0,//最低升贴水
+    maxAgio:1,//最高升贴水
+    piontPriceRate:'',//延期点价费率
+    piontPriceRateMin:'',//平台约定费率最低值
+    piontPriceRateMax:'',//平台约定费率最高值
+    djrange:'',//点价范围
+    heartTime:'',//议价时间
+    shuinumber:'',//
+    shownewnum:'',
+    selected:'',//checkbox
+    item:{checks:false},
+    ctime: ''
   };
-  onLoad(e){
-    console.log('e',e)
-  }
   onShow() {
     this.userInfo = this.$parent.globalData.userInfo
-    console.log('this.userInfo',this.userInfo)
+    this.goodsData = this.$parent.globalData.temporary.goodsData
+    this.goodsStatue = this.$parent.globalData.temporary.goodsStatue
+    this.$parent.globalData.temporary.goodsData = ''
+    this.$parent.globalData.temporary.goodsStatue = ''
+    this.buyGoodsInit()
+    this.getInvDate()
+    this.queryGoodsLock()
   };
+  //购买商品初始化
+  async buyGoodsInit() {
+    let result = await this.$parent.queryData('msyApp/buyGoodsInit.do', {
+      lookType:this.goodsData.goods_type,
+      id:this.goodsData.id,
+      type:this.goodsStatue,
+      enterpriseId:this.userInfo.id,
+      enableBuy:this.goodsData.enableBuy,
+    })
+    console.log('购买商品初始化', result);
+    this.yjlist = result;
+    this.arraysel = []
+    this.arrayc = []
+    //结算方式数据
+    this.array = result.paymethodlist
+    this.jstype = result.payMethods
+    this.nowPayMethodId = result.nowPayMethodId
+    for(let i = 0;i<this.array.length;i++){
+      this.arraysel.push(this.array[i].name)
+    }
+    //账期 数据
+    let zqarr = result.paymentDaysList
+    for(let j = 0;j<zqarr.length;j++){
+      this.arrayc.push(zqarr[j].setting_name+'天')
+    }
+    for(let j = 0;j<zqarr.length;j++){
+      this.arraycid.push(zqarr[j].setting_name)
+    }
+    //升贴水 数据
+    this.shengysnum = result.main_price
+    this.shengnum = Math.abs(this.shengysnum)
+    this.changeTxt(this.shengysnum)
+    this.minAgio = result.minAgio
+    this.maxAgio = result.maxAgio
+    //延期点价费率 数据
+    this.piontPriceRate = result.piontPriceRateMax
+    this.piontPriceRateMin = result.piontPriceRateMin
+    this.piontPriceRateMax = result.piontPriceRateMax
+    this.$apply() 
+  };
+  //查询议价时间
+  async queryGoodsLock() {
+    let result = await this.$parent.queryData('msyApp/queryGoodsLock.do', {
+      enterpriseId:this.userInfo.id,
+      goodsId:this.goodsData.id,
+    })
+    //console.log('议价时间', result);
+    this.heartTime = result.heartTime
+    this.countTime()
+     this.$apply() 
+  }
+  //提交议价
+  async addEnterpriseOrder() {
+    let result = await this.$parent.queryData('msyApp/addEnterpriseOrder.do', {
+      lookType: this.goodsData.goods_type,//商品类型
+      goodsId:this.goodsData.id,//商品id
+      payMethodId: this.nowPayMethodId,//付款方式id
+      enterpriseId: this.userInfo.id,//企业id
+      userId: this.userInfo.userId,//用户id
+      goodsPrice: this.yjlist.goods_price,//实时价格
+      mainPrice: this.shengysnum,//升贴水（一口价购买不填）
+      weight: this.yjlist.goods_total_weight,//商品重量
+      priceType: this.goodsStatue,//单价类型
+      piontPriceRate: this.piontPriceRate,//延期点价费率
+      priceRange: this.djrange,//点价范围
+      priceRight: this.djqid,//点价方
+      days: this.zhangqiid,//账期天数
+    })
+    console.log('提交议价', result);
+    if(result.contractId){
+      this.$parent.globalData.temporary.contractId = result.contractId //合同id（订单是一口价购买的时候生成）
+      this.$parent.linkPage('../index/index',1) //应该跳转到合同管理页面
+    }else{
+      this.$parent.linkPage('../index/index',1) //应该跳转到订单列表页
+    }
+     this.$apply() 
+  }
+  getdj(e) {
+    this.djrange = e.detail.value
+    this.$apply()
+  }
+  checkbxChange(e){
+    this.item.checks= !this.item.checks
+    this.selected = e.target.dataset.checks?false : true
+    this.$apply()
+  }
+  //改变升贴水 文字
+  changeTxt(num) {
+    if(num>0){
+      this.shengtxt = '升水'
+    } else if(num = 0){
+      this.shengtxt = '平水'
+    }else{
+      this.shengtxt = '贴水'
+    }
+    this.$apply() 
+  }
+  countTime() {
+    let that = this;
+    that.ctime = setInterval(function(){
+      if(that.heartTime>0){
+        that.heartTime = that.heartTime-1
+      }else{
+        that.$parent.showTip('议价结束，请重新开始议价')
+        clearInterval(that.ctime)
+        setTimeout(function(){
+          that.$parent.linkPage('../index/index',1)
+        },1500)
+       
+      }
+    },1000)
+    
+    this.$apply() 
+  }
+  onUnload() {
+    var that =this;
+    //清除计时器 
+    clearInterval(that.ctime)
+  }
+  getInvDate(){
+    let that = this;
+    setInterval(function(){
+      that.getNowTime()
+    },1000)
+  }
+  getNowTime() {
+    let date = new Date()
+    let getYear = date.getFullYear()
+    let getMonth = date.getMonth() +1
+    getMonth = getMonth > 9 ? getMonth : '0' + getMonth
+    let day = date.getDate()
+    let hours = date.getHours()
+    let minute = date.getMinutes()
+    let second = date.getSeconds()
+    minute = minute > 9 ? minute : '0' + minute
+    second = second > 9 ? second : '0' + second
+    this.nowtime = getYear + '-' + getMonth + '-' + day + ' ' + hours + ':' + minute + ':' + second;
+    this.$apply()
+  }
+  
   bindPickerChange(e) {
     this.index = e.detail.value
+    this.jstype = this.array[this.index].name
+    this.nowPayMethodId = this.array[this.index].id
+    this.piontPriceRate = this.piontPriceRateMax
+    this.djrange = ''
+    if(this.nowPayMethodId == 6 || this.nowPayMethodId == 7){
+      this.djqid = 1
+    }else {
+      this.djqid = ''
+    }
+    this.zhangqi = ''
+    this.zhangqiid = ''
     this.$apply()
   };
   bindPickerChangeb(e) {
     this.indexb = e.detail.value
-    this.djq = this.arrayb[this.indexb]
+    this.djq = this.arrayb[this.indexb].name
+    this.djqid = this.arrayb[this.indexb].id
     this.$apply()
   }
   bindPickerChangec(e) {
     this.indexc = e.detail.value
     this.zhangqi = this.arrayc[this.indexc]
+    this.zhangqiid = this.arraycid[this.indexc]
     this.$apply()
   }
   methods = {
+    //点击 提交议价
+    submitbtn() {
+      if(!this.selected){
+        this.$parent.showTip('请确认《马上银电商平台服务协议》 ')
+        return false
+      }
+      this.addEnterpriseOrder()
+    },
+    //小键盘 关闭
+    shownewnum(newnum) {
+      let nNum = Number(newnum)
+      if(nNum > this.minAgio && nNum < this.maxAgio){
+        this.shengysnum = nNum
+        this.shengnum = Math.abs(this.shengysnum)
+        this.changeTxt(this.shengysnum)
+        this.showbx = 'false'
+      } else {
+        this.$parent.showTip('当前升贴水值为 '+ this.minAgio +'-'+ this.maxAgio)
+      }
+      this.$apply() 
+    },
+    //小键盘弹出
     ssclick() {
       this.showbx = 'true'
+      this.shuinumber = this.shengysnum
       this.$apply()
-    }
+    },
+    //升贴水 减
+    shuiCut() {
+      if(this.shengysnum>this.minAgio){
+        this.shengysnum =this.shengysnum - 1
+        this.shengnum = Math.abs(this.shengysnum)
+        this.changeTxt(this.shengysnum)
+      }else{
+        this.$parent.showTip('当前升贴水值为 '+ this.minAgio +'-'+ this.maxAgio)
+      }
+      this.$apply() 
+    },
+    //升贴水 加
+    shuiAdd() {
+      if(this.shengysnum<this.maxAgio){
+        this.shengysnum =this.shengysnum + 1
+        this.shengnum = Math.abs(this.shengysnum)
+        this.changeTxt(this.shengysnum)
+      }else{
+        this.$parent.showTip('当前升贴水值为 '+ this.minAgio +'-'+ this.maxAgio)
+      }
+      this.$apply() 
+    },
+    //延期点价费率 减
+    rateCut() {
+      if(this.piontPriceRate>this.piontPriceRateMin){
+        this.piontPriceRate =Number((this.piontPriceRate - 0.01)*100)/100
+      }else{
+        this.$parent.showTip('延期点价费率为 '+ this.piontPriceRateMin +'-'+ this.piontPriceRateMax)
+      }
+      this.$apply() 
+    },
+    //延期点价费率 加
+    rateAdd() {
+      if(this.piontPriceRate<this.piontPriceRateMax){
+        this.piontPriceRate =Math.round((this.piontPriceRate + 0.01)*100)/100
+      }else{
+        this.$parent.showTip('延期点价费率为 '+ this.piontPriceRateMin +'-'+ this.piontPriceRateMax)
+      }
+      this.$apply() 
+    },
   };
   components = {
     header,

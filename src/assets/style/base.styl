@@ -37,3 +37,18 @@ ellps(line = 2)
   -webkit-box-orient vertical
   -webkit-line-clamp line
   overflow hidden
+
+moreIcon(rt = 30rpx)
+  &:after
+    content: ''
+    position: absolute
+    top: 0
+    bottom: 0
+    right: rt
+    margin: auto
+    display: block
+    width: 15rpx
+    height: 15rpx
+    border-top: 2rpx solid #666
+    border-right: 2rpx solid #666
+    transform: rotate(45deg)

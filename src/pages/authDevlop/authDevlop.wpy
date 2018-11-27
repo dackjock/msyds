@@ -1,0 +1,100 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container pd-bot">
+    <header title="部门管理"></header>
+    <view class="devlop-item" wx:for="{{itemList}}" wx:key="">
+      <text class="t-1">{{index+1}}</text>
+      <text class="t-2">{{item.deptName}}</text>
+      <text class="t-3">{{item.name}}</text>
+      <view class="t-4">
+        <text @tap="editDevlop({{item.id}})">编辑</text>
+        <text @tap="delDevlop({{item.id}})">删除</text>
+      </view>
+    </view>
+    <button class="page-btn fix-bot" @tap.stop="editDevlop('')">新增部门</button>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class authDevlop extends wepy.page {
+  config = {
+    enablePullDownRefresh: true
+  };
+  components = {
+    header
+  };
+  data = {
+    itemList: [],
+    pageNum: 1
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.getAuthDevlop();
+  }
+  methods = {
+    delDevlop(id) {
+      let that = this;
+      wx.showModal({
+        title: '操作提示',
+        content: '是否删除当前角色？',
+        confirmColor: '#d7092d',
+        success(res) {
+          console.log(res);
+          if (res.confirm) {
+            that.delAuthDevlop(id);
+            that.pageNum = 1;
+            that.itemList = [];
+            that.$apply();
+            that.getAuthDevlop();
+          }
+        }
+      });
+    },
+    editDevlop(id) {
+      this.$parent.linkPage('../editAuthDevlop/editAuthDevlop?id=' + id, 1);
+    }
+  };
+  async getAuthDevlop() {
+    let result = await this.$parent.queryData(
+      '/msyApp/appQueryWebEnterpriseRoleList.do',
+      {
+        enterpriseId: this.userInfo.id,
+        pageNum: this.pageNum
+      }
+    );
+    if (result.list.length <= 0) {
+      this.$parent.showTip('暂无更多数据');
+    }
+    for (let k in result.list) {
+      this.itemList.push(result.list[k]);
+    }
+    this.$apply();
+    console.log(result);
+  }
+  async delAuthDevlop(id) {
+    let result = await this.$parent.queryData(
+      'msyApp/appDeleteWebEnterpriseRole.do',
+      {
+        ids: id
+      }
+    );
+  }
+  onReachBottom() {
+    this.pageNum++;
+    this.getAuthDevlop();
+  }
+  async onPullDownRefresh() {
+    this.pageNum = 1;
+    this.itemList = [];
+    await this.getAuthDevlop();
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/authManage.styl';
+</style>

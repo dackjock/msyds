@@ -1,6 +1,6 @@
 <template lang="wxml" minapp="wepy">
     <view class="xieyi2">
-        <header title="隐私声明"></heade>
+        <header title="隐私声明"></header>
 
         <view class="tc ftwe">湖南马上银电子商务有限公司隐私声明</view>
 
