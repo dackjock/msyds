@@ -51,7 +51,7 @@ async function request(url, data = {}, method = 'GET') {
       resultData = res
       return res
     }
-    if (res.data.type > 0 || res.data.flag > 0) {
+    if (res.data.type > 0 || res.data.flag == 1) {
       // 成功
       resultData = res.data.returnMap
     } else {

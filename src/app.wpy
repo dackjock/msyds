@@ -34,6 +34,7 @@ export default class extends wepy.app {
       'pages/authManage/authManage',
       'pages/authManager/authManager',
       'pages/editAuthManager/editAuthManager',
+      'pages/authApproval/authApproval',
     ],
     window: {
       backgroundTextStyle: 'light',
