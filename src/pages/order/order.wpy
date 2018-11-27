@@ -74,7 +74,7 @@
                   <view class="w134">单价</view>
                   <view class="w186">{{item.price}}元</view>
                   <view class="w85" style="line-height:1em;padding-top:6rpx;"> <text>结算\n方式</text></view>
-                  <view class="flex_1">{{item.payMethodName}}</view>
+                  <view class="flex_1 max120">{{item.payMethodName}}</view>
                 </view>
                 <view class="flex_box">
                   <view class="w134">当前状态</view>
@@ -225,7 +225,7 @@ export default class Order extends wepy.page {
         .queryData('msyApp/queryEnterpriseOrderList.do', {
           enterpriseId: _this.$parent.globalData.userInfo.id,
           orderType: obj.orderType,
-          userType: _this.$parent.globalData.userInfo.isSystem ? 1 : 2,
+          userType: _this.$parent.globalData.userInfo.isSystem ? 2 : 1,
           pageNum: obj.pageNum,
           orderStatus: obj.orderStatus
         })

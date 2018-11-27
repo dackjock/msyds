@@ -45,32 +45,51 @@
                 </view>
                 <image class="icon_you" mode="aspectFit" src="../../assets/images/icon/icon-you.png" />
             </view>
-            <view  class="info_item">
+            <view  class="info_item"  @tap="change_('changeMD')">
                 <view>
                     <image class="icon_t" mode="aspectFit" src="../../assets/images/icon/icon-detail.png" />
                     查看码单({{order_info.single_code_url_size}}个)
                 </view>
-                 <image class="icon_you" mode="aspectFit" src="../../assets/images/icon/icon-you.png" />
+                 <image class="icon_you {{changeMD?'rot':''}}" mode="aspectFit" src="../../assets/images/icon/icon-you.png" />
             </view>
-            <view  class="info_item">
+
+            <view class="order_madan" wx:if="{{order_info.single_code_url_list.length>0&&changeMD}}" >
+                <view  class="info_item"  wx:for="{{order_info.single_code_url_list}}" wx:key="index">
+                    <view>
+                     
+                        查看码单({{item.code}})
+                    </view>
+                    <image class="icon_you " mode="aspectFit" src="../../assets/images/icon/icon-you.png" />
+                 </view>
+            </view>
+            <view wx:if="{{order_info.contract_url}}"  class="info_item">
                 <view>
                     <image class="icon_t" mode="aspectFit" src="../../assets/images/icon/icon-yinz.png" />
                     查看合同
                 </view>
                 <image class="icon_you" mode="aspectFit" src="../../assets/images/icon/icon-you.png" />
             </view>
-            <view  class="info_item">
+            <view  class="info_item" @tap="change_('changeWTH')">
                 <view>
                     <image class="icon_t" mode="aspectFit" src="../../assets/images/icon/icon-detail.png" />
                     查看委托函({{order_info.proxy_url_size}}个)
                 </view>
-                <image class="icon_you" mode="aspectFit" src="../../assets/images/icon/icon-you.png" />
+                <image class="icon_you {{changeWTH?'rot':''}}" mode="aspectFit" src="../../assets/images/icon/icon-you.png" />
             </view>
+            <view class="order_madan" wx:if="{{order_info.proxy_url_list.length>0&&changeWTH}}" >
+            <view  class="info_item" wx:for="{{order_info.proxy_url_list}}" wx:key="index">
+                <view>
+                    
+                    查看委托函({{item.code}}) {{item.isTihuo?"[提货已完成]":""}}
+                </view>
+                <image class="icon_you" mode="aspectFit" src="../../assets/images/icon/icon-you.png" />
+                </view>
+        </view>
         </view>
         <view class="info">
              <view class="h1"><view class="span">订单明细</view>  <view class="more">更多</view></view>
         </view>
-        <view wx:for="{{order_log}}" wx:key="index" class="mingxi">{{item.createTime}} {{item.logContent}}</view>
+        <view wx:if="{{index<6}}" wx:for="{{order_log}}" wx:key="index" class="mingxi">{{item.createTime}} {{item.logContent}}</view>
       
        
        <navigator url="../order/order" open-type="redirect" class="black_btn">返回订单中心</navigator>
@@ -86,9 +105,16 @@ export default class orderDetail extends wepy.page {
   };
   data = {
     order_info: '',
-    order_log: ''
+    order_log: '',
+    changeMD: true,
+    changeWTH: true
   };
-  methods = {};
+  methods = {
+    change_(key) {
+      this[key] = !this[key];
+      this.$apply();
+    }
+  };
   async onLoad(options) {
     let res = await this.getOrder(options.id, options.contract_id);
     let log = await this.queryOrderLog(options.id, res.pageMap.goods_type);
