@@ -1,0 +1,155 @@
+@import './base'
+page
+  background: #eee
+.container
+  background: #eee
+.c-zjdtt
+  position: fixed
+  left 0
+  right: 0
+  top:85rpx
+  background-color: #ffffff
+  z-index 9
+  .c-top
+    height 80rpx
+    color: #666666
+    font-size: 24rpx
+    border-bottom: 2rpx solid #eeeeee
+    display: flex
+    align-items: center
+    justify-content: space-between
+    position relative
+    .c-topsm
+      width 50%
+      text-align: center
+      position: relative
+      .c-sjxi
+        width 22rpx
+        height 12rpx
+        display: inline-block
+        vertical-align: middle
+        background: url($picPath + "icon/xiala.png") no-repeat
+        background-size: 100%
+        margin-left: 10rpx
+    .c-topline
+      &:after
+        content: ''
+        display: block
+        width: 2rpx
+        height: 55rpx
+        background-color: #eeeeee
+        position: absolute
+        right: 1rpx
+        top: -4rpx
+    .c-topsj
+      background-color: #ffffff
+      position: fixed
+      left 0
+      right 0
+      top: 167rpx
+      z-index 10
+      border-bottom: 2rpx solid #eeeeee
+      box-shadow: 0 6rpx 10rpx rgba(0,0,0,0.1)
+      text-align:center
+      .c-topsjbx
+        display: flex
+        justify-content: space-between
+        .c-topsjbxl
+          width 50%
+          text-align: center
+          margin-top: 30rpx
+          font-size: 24rpx
+          color: #999999
+          .c-topsjbxlsa
+            width 250rpx
+            height 60rpx
+            line-height: 60rpx
+            border-radius: 10rpx
+            background-color: #eeeeee
+            font-size: 30rpx
+            color:#666666
+            margin: 15rpx auto 0
+      .c-topsjbtn
+        width 298rpx
+        height 60rpx
+        line-height: 60rpx
+        background-color: $theme-color
+        color: #ffffff
+        font-size: 30rpx
+        display: inline-block
+        border-radius: 30rpx
+        margin: 20rpx auto 20rpx
+        text-align: center
+      .c-topzj
+        padding: 20rpx 30rpx 0
+        margin-left: -20rpx
+        .c-topzja
+          float: left 
+          width: 148rpx
+          height: 58rpx
+          line-height: 58rpx
+          font-size: 30rpx
+          color: $theme-color
+          border: 2rpx solid $theme-color
+          border-radius: 10rpx
+          text-align: center
+          margin: 0 0 20rpx 20rpx
+          &.on
+            color: #ffffff
+            background-color: $theme-color
+  .c-detail
+    margin-bottom: 10px
+    .c-dttop
+      text-align: center
+      margin: 20rpx 0 40rpx
+      font-size: 24rpx
+      color: #666666
+      .c-dttoptxt
+        font-size: 36rpx
+        color: $theme-color
+    .c-dtcon
+      display: flex
+      justify-content: space-between
+      align-items: center
+      .c-dtcona
+        width 50%
+        color: #999999
+        font-size: 24rpx
+        text-align: center
+        padding-bottom: 20rpx
+        .c-dtconan
+          font-size: 44rpx
+          .c-dtconany
+            font-size: 24rpx
+        .c-dtconatx
+          color: #999999
+.c-zjlistbx
+  margin-top:360rpx
+  .c-zjlist
+    padding: 0 10rpx
+    margin-bottom: 20rpx
+    .c-zjlistt
+      color: #999999
+      font-size: 24rpx
+      margin-bottom: 10rpx
+    .c-zjlibx
+      background-color: #ffffff
+      padding: 20rpx
+      border-radius: 8rpx
+      .c-zjlibxa
+        display: flex
+        align-items: center
+        justify-content: space-between
+        font-size: 30rpx
+        color:#666666
+        margin-bottom: 10rpx
+      .c-zjlibxb
+        display: flex
+        align-items: center
+        justify-content: space-between
+        font-size: 18rpx
+        color:#999999
+.red
+  color: $theme-color
+.lv
+  color: #80c269

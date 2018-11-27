@@ -10,15 +10,12 @@ export default class extends wepy.app {
       'pages/login/login',
       'pages/editAuthDevlop/editAuthDevlop',
       'pages/authDevlop/authDevlop',
+      'pages/capitalManagement/capitalManagement',
       'pages/helpcenter/helpcenter',
       'pages/privacypolicy/privacypolicy',
       'pages/userprotocol/userprotocol',
       'pages/aboutUs/aboutUs',
       'pages/news/news',
-      'pages/accountIndex/accountIndex',
-      'pages/buyGoods1/buyGoods1',
-      'pages/tradeIndex/tradeIndex',
-      'pages/platRule/platRule',
       'pages/negotiate/negotiate',
       'pages/signSuccess/signSuccess',
       'pages/signSuccessstate/signSuccessstate',
@@ -35,6 +32,10 @@ export default class extends wepy.app {
       'pages/authManager/authManager',
       'pages/editAuthManager/editAuthManager',
       'pages/authApproval/authApproval',
+      'pages/accountIndex/accountIndex',
+      'pages/buyGoods1/buyGoods1',
+      'pages/tradeIndex/tradeIndex',
+      'pages/platRule/platRule',
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -51,7 +52,9 @@ export default class extends wepy.app {
     userInfo: '',
     wxUser: '',
     temporary: {
-      goodsData: ''
+      goodsData: '',
+      goodsStatue:'',
+      contractId:''
     }
   };
 
