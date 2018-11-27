@@ -30,13 +30,16 @@ export default class Login extends wepy.page {
     header
   };
   onShow() {
+    console.log(this);
     this.picPath = this.$parent.globalData.picPath;
     this.preToLogin({
       detail: {
         value: {
-          userName: 'haha',
-          // userName: 15527105253,
-          pwd: 123456
+          // userName: 'haha',
+          // // userName: 15527105253,
+          // pwd: 123456
+          userName: "zwwd_01",
+          pwd: "a123456"
         }
       }
     });

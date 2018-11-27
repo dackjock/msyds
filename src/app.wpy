@@ -11,6 +11,7 @@ export default class extends wepy.app {
       'pages/editAuthDevlop/editAuthDevlop',
       'pages/authDevlop/authDevlop',
       'pages/capitalManagement/capitalManagement',
+      'pages/order/order',
       'pages/helpcenter/helpcenter',
       'pages/privacypolicy/privacypolicy',
       'pages/userprotocol/userprotocol',
@@ -36,6 +37,7 @@ export default class extends wepy.app {
       'pages/buyGoods1/buyGoods1',
       'pages/tradeIndex/tradeIndex',
       'pages/platRule/platRule',
+      'pages/mallIndex/mallIndex'
     ],
     window: {
       backgroundTextStyle: 'light',

@@ -2,10 +2,10 @@
     <view>
         <view class="abus_head">
             <view class="abus1">
-                <image src="../../assets/images/icon/goback.png"/>
+                <image src="../../assets/images/icon/goback.png" />
             </view>
             <view class="abus2">
-                <image src="../../assets/images/me_img.png"/>
+                <image src="../../assets/images/me_img.png" />
                 <text>马上银 1.0.0</text>
             </view>
         </view>
@@ -20,7 +20,7 @@
         <view class="abus3">
             <text class="abus3_left">用户许可协议</text>
             <view class="abus3_right">
-                <image src="../../assets/images/icon/jiantou.png"/>
+                <image src="../../assets/images/icon/jiantou.png" />
             </view>
         </view>
 
@@ -68,9 +68,9 @@ import wepy from 'wepy';
 import botBar from '@/components/botBar';
 
 export default class aboutUs extends wepy.page {
-  components = {
-    botBar
-  };
+    components = {
+        botBar
+    };
 }
 </script>
 

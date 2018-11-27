@@ -58,7 +58,7 @@ async function request(url, data = {}, method = 'GET') {
       // 失败
       // console.log(res)
       wepy.showToast({
-        title: res.data.msg,
+        title: res.data.msg||"请求失败",
         icon: 'none'
       })
       resultData = false
