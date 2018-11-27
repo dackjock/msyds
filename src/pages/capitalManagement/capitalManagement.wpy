@@ -47,7 +47,7 @@
       </view>
     </view>
     <view class="c-zjlistbx">
-      <view class="c-zjlist" wx:for="{{moneyLogList}}" wx:key="{{item.index}}">
+      <view class="c-zjlist" wx:for="{{moneyLogList}}" wx:key="{{item.index}}" @tap="toDetail({{item.id}})">
         <view class="c-zjlistt">{{item.createTime}}</view>
         <view class="c-zjlibx">
           <view class="c-zjlibxa">
@@ -72,7 +72,7 @@
 import wepy from 'wepy';
 import header from '@/components/header';
 
-export default class Sign extends wepy.page {
+export default class capitalManagement extends wepy.page {
   data = {
     userInfo:'',
     stardate:'',
@@ -122,7 +122,7 @@ export default class Sign extends wepy.page {
       basicSettingId: basicSettingId,//项款用途id
       pageNum: pageNum,//分页页数
     })
-    console.log('列表', result);
+    //console.log('列表', result);
 
     if(result.moneyLogList.length>0){
       this.flage= true
@@ -161,6 +161,11 @@ export default class Sign extends wepy.page {
     }
   }
   methods = {
+    //点击跳转详情页
+    toDetail(id) {
+      this.$parent.globalData.temporary.goodsData = id
+      this.$parent.linkPage('../capitalDetail/capitalDetail',1)
+    },
     //日期选择弹框
      showdatabx() {
        this.showdata = !this.showdata
