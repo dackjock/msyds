@@ -1,0 +1,258 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="部门管理"></header>
+    <form class="edit-devlop" bindsubmit="subForm">
+      <view class="ed-item">
+        <text >添加部门</text>
+        <input name="deptName" placeholder="请输入部门名称" value="{{roleData.deptName || ''}}"/>
+      </view>
+      <view class="ed-item">
+        <text >职位</text>
+        <input name="roleName" placeholder="请输入职位" value="{{roleData.name || ''}}"/>
+      </view>
+      <view class="ed-item">
+        <text >选择权限</text>
+        <text class="more" @tap="openfixShow">请选择</text>
+      </view>
+      <view class="fix-admin {{fixShow ? 'active' : ''}}">
+        <checkbox-group name="rightIds" class="fix-main">
+          <view wx:for="{{menuList}}" wx:key="">
+            <view class="fm-head" @tap="showChild({{item.id}})">
+              <checkbox color="#d7092d" checked="{{item.checked}}" value="{{item.id}}" @tap="checkALLItem({{item.id}})"/>
+              <text>{{item.name}}</text>
+            </view>
+            <view class="fm-body {{item.id == showChildId ? 'active' : ''}}">
+              <label wx:for="{{item.children}}" wx:key="" wx:for-item="child" class="{{child.checked ? 'active' : ''}}" @tap.stop="checkItem({{child.id}})"><checkbox value="{{child.id}}" checked="{{child.checked}}" />{{child.name}}</label>
+            </view>
+          </view>
+          <view class="fix-btn">
+            <text @tap.stop="closeFixShow">确定</text>
+            <text @tap.stop="cancelSelect">取消</text>
+          </view>
+        </checkbox-group>
+      </view>
+      <button form-type="submit" class="page-btn fix-bot">保存</button>
+    </form>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class editAuthDevlop extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    roleId: '',
+    userInfo: [],
+    fixShow: false,
+    resultList: [],
+    roleData: [],
+    menuList: [],
+    currArr: [],
+    showChildId: '',
+    tempCurr: []
+  };
+  onLoad(e) {
+    // this.roleId = 1;
+    this.roleId = e.id;
+  }
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    if (this.roleId != '') {
+      this.getDevlopInfo();
+    } else {
+      this.getDevlopInfoInit();
+    }
+  }
+  methods = {
+    // 显示权限弹窗
+    openfixShow() {
+      this.fixShow = true;
+      this.tempCurr = Object.assign([], this.currArr);
+      this.$apply();
+    },
+    // 关闭权限弹窗
+    closeFixShow() {
+      this.fixShow = false;
+      this.$apply();
+    },
+    // 取消更改
+    cancelSelect() {
+      this.currArr = Object.assign([], this.tempCurr);
+      this.fixShow = false;
+      this.$apply();
+      this.filterList();
+    },
+    // 展开/收起子菜单，id：父id
+    showChild(id) {
+      this.showChildId = id;
+      this.$apply();
+    },
+    // 选中/取消子菜单，id：子id
+    checkItem(id) {
+      let _right = this.currArr;
+      id = id.toString();
+      if (_right.indexOf(id) >= 0) {
+        _right.splice(_right.indexOf(id), 1);
+      } else {
+        _right.push(id);
+      }
+      this.currArr = _right;
+      this.$apply();
+      this.filterList();
+    },
+    checkALLItem(id) {
+      let _menu = this.menuList;
+      let _right = this.currArr;
+      id = String(id);
+      if (_right.indexOf(id) >= 0) {
+        // 当一级栏目被选中时
+        _right.splice(_right.indexOf(id), 1);
+        for (let k in _menu) {
+          if (_menu[k].id == id) {
+            // 查找对应一级栏目下的二级菜单
+            for (let m in _menu[k].children) {
+              let cId = String(_menu[k].children[m].id);
+              if (_right.indexOf(cId) >= 0) {
+                _right.splice(_right.indexOf(cId), 1);
+              }
+            }
+          }
+        }
+      } else {
+        // 当一级栏目未被选中时
+        _right.push(id);
+        for (let k in _menu) {
+          if (_menu[k].id == id) {
+            // 查找对应一级栏目下的二级菜单
+            for (let m in _menu[k].children) {
+              let cId = String(_menu[k].children[m].id);
+              if (_right.indexOf(cId) < 0) {
+                _right.push(cId);
+              }
+            }
+          }
+        }
+      }
+      this.currArr = _right;
+      this.$apply();
+      this.filterList();
+    },
+    async subForm(event) {
+      let formData = event.detail.value;
+      let url;
+      if (this.roleId != '') {
+        formData['roleId'] = this.roleId;
+        url = '/msyApp/appUpdateEnterpriseRole.do';
+      } else {
+        url = '/msyApp/appInsertEnterpriseRole.do';
+      }
+      formData['enterpriseId'] = this.userInfo.id;
+      formData['rightIds'] = formData['rightIds'].toString();
+      let result = await this.$parent.queryData(url, formData);
+      if (result) {
+        this.$parent.showTip('操作成功');
+        await this.$parent.sleep(2);
+        this.$parent.linkPage('', 3);
+      }
+      console.log(result);
+    }
+  };
+  // 新增时初始化
+  async getDevlopInfoInit() {
+    let currArr = this.currArr;
+    let resultList = this.resultList;
+    let result = await this.$parent.queryData(
+      '/msyApp/appInsertEnterpriseRoleInit.do',
+      {
+        roleId: this.roleId
+      }
+    );
+    console.log(result);
+    this.resultList = result.list;
+    this.$apply();
+    this.filterList();
+  }
+  // 修改时初始化
+  async getDevlopInfo() {
+    let currArr = this.currArr;
+    let resultList = this.resultList;
+    let result = await this.$parent.queryData(
+      '/msyApp/appUpdateEnterpriseRoleInit.do',
+      {
+        roleId: this.roleId
+      }
+    );
+    console.log(result);
+    this.resultList = result.list;
+    this.currArr = result.rightStr
+      .substr(0, result.rightStr.length - 1)
+      .split(',');
+    this.roleData = result.role;
+    this.$apply();
+    this.filterList();
+  }
+  // 对菜单数据进行格式化
+  async filterList() {
+    let _list = this.resultList; //全部元素数组
+    let _right = this.currArr; // 选中的元素数组
+    let _menu = [];
+    // console.log('curr', _right);
+    // 先将所有元素的checked变为false
+    for (let j in _list) {
+      _list[j]['checked'] = false;
+    }
+    // 将选中的元素checked变为true
+    for (let val of _right) {
+      for (let j in _list) {
+        if (val == _list[j].id) {
+          _list[j]['checked'] = true;
+        }
+      }
+    }
+    // 创建一级对象
+    for (let i in _list) {
+      if (_list[i].parentId === 0) {
+        _menu.push(_list[i]);
+      }
+    }
+    // 创建二级对象
+    for (let i in _menu) {
+      let count = 0; //计数
+      _menu[i].children = []; //奖一级对象的子集置空
+      let mid = _menu[i].id.toString(); //将id从number转为string
+      // 将子元素oush到对应的一级对象中，并且如果子元素的checked为false时，计数count+1
+      for (let j in _list) {
+        if (_list[j].parentId == mid) {
+          _menu[i].children.push(_list[j]);
+          count = _list[j].checked ? count : ++count;
+        }
+      }
+      // 判断是否选中父元素
+      if (count == _menu[i].children.length) {
+        // 当所有子元素全部为未选中时，取消父元素的选中，并删除选中数组中的父id
+        _menu[i].checked = false;
+        if (_right.indexOf(mid) >= 0) {
+          _right.splice(_right.indexOf(mid), 1);
+        }
+      } else {
+        // 当有任意子元素为选中时，父元素改为选中，并往选中数组中添加父id
+        _menu[i].checked = true;
+        if (_right.indexOf(mid) < 0) {
+          _right.push(mid);
+        }
+      }
+    }
+    // 更新视图
+    this.menuList = _menu;
+    await this.$apply();
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/authManage.styl';
+</style>

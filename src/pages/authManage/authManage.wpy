@@ -1,0 +1,48 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="权限管理"></header>
+    <view class="auth-menu" wx:for="{{menuList}}" wx:key="" @tap="linkTo({{item.link}})">
+      <image src="../../assets/images/icon/auth-icon{{item.icon}}.png" />
+      <text >{{item.title}}</text>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class authManage extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    menuList: [
+      {
+        title: '部门管理',
+        icon: 1,
+        link: '../authDevlop/authDevlop'
+      },
+      {
+        title: '管理员',
+        icon: 2,
+        link: '../authManager/authManager'
+      },
+      {
+        title: '审批流程',
+        icon: 3,
+        link: '../authDevlop/authDevlop'
+      }
+    ]
+  };
+  methods = {
+    linkTo(url) {
+      this.$parent.linkPage(url, 1);
+    }
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/authManage.styl';
+</style>

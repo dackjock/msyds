@@ -1,0 +1,23 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container pd-bot">
+    <header title="审批流程管理"></header>
+    
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class authApproval extends wepy.page {
+
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+
+  
+</style>

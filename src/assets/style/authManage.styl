@@ -1,0 +1,186 @@
+@import './base'
+page
+  background: #eee
+
+.container.pd-bot
+  box-sizing: border-box
+  padding-bottom: 120rpx
+.auth-menu
+  position: relative
+  display: flex
+  align-items: center
+  padding: 30rpx
+  background: #fff
+  border-bottom: 2rpx solid #eee
+  moreIcon()
+  >image
+    width: 45rpx
+    height: 45rpx
+    margin-right: 20rpx
+.devlop-item
+  display: flex
+  justify-content: space-between
+  align-items: center
+  background: #fff
+  border-bottom: 2rpx solid #eee
+  height: 90rpx
+  text-align: center
+  .t-1
+    flex: 0 0 100rpx
+  .t-2,.t-3
+    flex: 0 0 225rpx
+    padding: 0 20rpx
+    box-sizing: border-box
+  .t-4
+    flex: 0 0 200rpx
+    >text:first-child
+      color: $theme-color
+      margin-right: 30rpx
+.edit-devlop
+  .ed-item
+    position: relative
+    display: flex
+    justify-content: space-between
+    align-items: center
+    background: #fff
+    border-bottom: 2rpx solid #eee
+    padding: 0 30rpx
+    height: 90rpx
+    >input
+      text-align: right
+    .more
+      padding-right: 30rpx
+      moreIcon()
+.fix-admin
+  visibility: hidden
+  position: fixed
+  left: 0
+  top: 0
+  right: 0
+  bottom: 0
+  z-index: -9
+  background: rgba(0,0,0,0)
+  transition: .5s
+  transition-property: background,zIndex
+  checkbox
+    transform: scale(.6)
+  .fix-main
+    position: relative
+    width: 600rpx
+    height: 100%
+    overflow: auto
+    margin-left: 750rpx
+    background: #fff
+    padding-bottom: 120rpx
+    box-sizing: border-box
+    transition: .5s
+    transition-property: margin-left
+  &.active
+    visibility: visible
+    z-index: 9
+    background: rgba(0,0,0,.5)
+    .fix-main
+      margin-left: 150rpx
+  .fm-head
+    position: relative
+    display: flex
+    align-items: center
+    padding: 0 30rpx 0 20rpx
+    height: 90rpx
+    border-bottom: 2rpx solid #eee
+    moreIcon()
+    >text
+      flex: 1 0 auto
+      line-height: 90rpx
+  .fm-body
+    padding: 20rpx 30rpx 0 60rpx
+    display: flex
+    flex-flow: row wrap
+    align-items: center
+    display: none
+    &.active
+      display: flex
+    >label
+      position: relative
+      line-height: 60rpx
+      padding: 0 15rpx
+      border-radius: 10rpx
+      background: #eee
+      margin: 0 20rpx 20rpx 0
+      font-size: 24rpx
+      >checkbox
+        position: absolute
+        transform: scale(0)
+      &.active
+        background: $theme-color
+        color: #fff
+  .fix-btn
+    position: absolute
+    bottom: 20rpx
+    left: 0
+    right: 0
+    display: flex
+    justify-content: space-around
+    >text
+      flex: 0 0 200rpx
+      text-align: center
+      line-height: 80rpx
+      background: $theme-color
+      color: #fff
+      border-radius: 10rpx
+.page-btn.fix-bot
+  position: fixed
+  bottom: 20rpx
+  left: 0
+  right: 0
+  margin: auto
+
+.manager-item
+  margin: 20rpx 30rpx 0
+  background: #fff
+  border-radius: 10rpx
+  padding: 0 20rpx
+  display: flex
+  flex-flow: row wrap
+  font-size: 20rpx
+  line-height: 50rpx
+  >view:nth-child(odd)
+    flex: 0 0 40%
+  >view:nth-child(even)
+    flex: 0 0 60%
+  >view>text:first-child
+      color: #999
+  >view.mi-bot
+    flex: 0 0 100%
+    display: flex
+    justify-content: space-between
+    align-items: center
+    border-top: 2rpx solid #eee
+    line-height: 60rpx
+    switch
+      transform: scale(.5)
+    .edit
+      color: $theme-color
+      margin-right: 30rpx
+.edit-manager
+  .em-item
+    display: flex
+    justify-content: space-between
+    align-items: center
+    padding: 0 30rpx
+    height: 90rpx
+    font-size: 24rpx
+    background: #fff
+    border-top: 2rpx solid #eee
+    >input
+      flex: 1 0 350rpx
+      text-align: right
+    >picker
+      position: relative
+      padding-right: 30rpx
+      moreIcon(0)
+    >switch
+      transform: scale(.5)
+      margin-right:-30rpx;
+
+    

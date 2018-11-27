@@ -8,11 +8,13 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/login/login',
+      'pages/editAuthDevlop/editAuthDevlop',
+      'pages/authDevlop/authDevlop',
       'pages/capitalManagement/capitalManagement',
       'pages/helpcenter/helpcenter',
       'pages/privacypolicy/privacypolicy',
       'pages/userprotocol/userprotocol',
-      'pages/aboutus/aboutus',
+      'pages/aboutUs/aboutUs',
       'pages/news/news',
       'pages/negotiate/negotiate',
       'pages/signSuccess/signSuccess',
@@ -26,6 +28,10 @@ export default class extends wepy.app {
       'pages/forgetPass/forgetPass',
       'pages/sign/sign',
       'pages/mallIndex/mallIndex',
+      'pages/authManage/authManage',
+      'pages/authManager/authManager',
+      'pages/editAuthManager/editAuthManager',
+      'pages/authApproval/authApproval',
       'pages/accountIndex/accountIndex',
       'pages/buyGoods1/buyGoods1',
       'pages/tradeIndex/tradeIndex',
@@ -35,7 +41,8 @@ export default class extends wepy.app {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#d7092d',
       navigationBarTitleText: '马上银',
-      navigationBarTextStyle: 'white'
+      navigationBarTextStyle: 'white',
+      backgroundTextStyle: 'dark'
     }
   };
 
