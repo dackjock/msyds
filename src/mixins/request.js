@@ -17,9 +17,9 @@ async function request(url, data = {}, method = 'GET') {
   })
   wepy.showNavigationBarLoading()
   // 补全接口地址
-  if(url == '/upload'){
+  if (url == '/upload') {
     url = uploadPath
-  }else{
+  } else {
     url = api + url
   }
   // 对数据对象进行key值排序
@@ -47,11 +47,11 @@ async function request(url, data = {}, method = 'GET') {
     // console.log(res)
     wepy.hideLoading()
     wepy.hideNavigationBarLoading()
-    if(url == api+'/imageCode.do'){
+    if (url == api + '/imageCode.do') {
       resultData = res
       return res
     }
-    if (res.data.type > 0) {
+    if (res.data.type > 0 || res.data.flag == 1) {
       // 成功
       resultData = res.data.returnMap
     } else {
@@ -61,8 +61,9 @@ async function request(url, data = {}, method = 'GET') {
         title: res.data.msg||"请求失败",
         icon: 'none'
       })
+      resultData = false
     }
-    
+
   }).catch((err) => {
     // 异常
     wepy.showToast({

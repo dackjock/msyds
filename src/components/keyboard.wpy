@@ -4,7 +4,10 @@
     <view class="k-cont">
       <view class="k-top">
         <view class="k-topl">价格</view>
-        <view class="flex-1 {{flagss == 'true' ? 'red' : ''}} {{flagts == 'true' ? 'lv' : ''}} ">{{sttype}}{{stnum}}</view>
+        <!-- <view class="flex-1 {{flagss == 'true' ? 'red' : ''}} {{flagts == 'true' ? 'lv' : ''}} ">{{sttype}}{{stnum}}</view> -->
+        <view class="flex-1 red" wx:if="{{stnum*1>0}}">升水{{stnum}}</view>
+        <view class="flex-1 " wx:if="{{stnum*1==0}}">平水{{stnum}}</view>
+        <view class="flex-1 lv" wx:if="{{stnum*1<0}}">贴水{{0-stnum}}</view>
       </view>
       <view class="k-contbx">
         <view class="k-contbxl">
@@ -53,18 +56,22 @@ export default class keyboard extends wepy.component {
       default: '',
       twoWay: true
     },
-    
+    stnum: {
+      type: Number,
+      default: '',
+      twoWay: true
+    },
   };
   data = {
     sttype: '平水',
     stnum: 0,
-    flagss:'false', //状态 升水
-    flagps:'true', //状态 平水
-    flagts:'false', //状态 贴水
+    flagps: true,
   };
   onLoad() {
-   
+    
   }
+  
+ 
   methods = {
     //取消
     closefn() {
@@ -72,33 +79,28 @@ export default class keyboard extends wepy.component {
     },
     //确定
     surefn() {
-      this.showfn = 'false'
+      this.$emit('changenum',this.stnum)
+      this.$apply();
     },
     //升贴水
     changeshui(num) {
       if(num =='1'){
         this.sttype = '升水'
         this.stnum = 1
-        this.flagss = 'true'
-        this.flagps = 'false'
-        this.flagts = 'false'
+        this.flagps= true
       }else if(num == '2'){
         this.sttype = '平水'
         this.stnum = 0
-        this.flagss = 'false'
-        this.flagps = 'true'
-        this.flagts = 'false'
+        this.flagps= false
       }else if(num == '3'){
         this.sttype = '贴水'
-        this.stnum = 1
-        this.flagss = 'false'
-        this.flagps = 'false'
-        this.flagts = 'true'
+        this.stnum = -1
+        this.flagps= true
       }
     },
     //数字
     selnum(num) {
-      if(this.flagps =="false"){
+      if(this.flagps){
         this.stnum = this.stnum + num
       }
     },

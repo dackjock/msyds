@@ -1,0 +1,206 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="资金明细"></header>
+    <view class="c-zjdtt">
+      <view class="c-top">
+        <view class="c-topsm c-topline" bindtap="showdatabx">{{datarange}}<i class="c-sjxi"></i></view>
+        <view class="c-topsm" bindtap="showzjbx">资金流向<i class="c-sjxi"></i></view>
+        <view class="c-topsj" wx:if="{{showdata}}">
+          <view class="c-topsjbx">
+            <view class="c-topsjbxl">
+              <view>开始时间</view>
+              <picker mode="date" value="{{stardate}}" start="" end="" bindchange="bindDateChange">
+                <view class="c-topsjbxlsa">
+                  {{stardate}}
+                </view>
+              </picker>
+            </view>
+            <view class="c-topsjbxl">
+              <view>结束时间</view>
+              <picker mode="date" value="{{enddate}}" start="{{stardate}}" end="" bindchange="bindDateChangeb">
+                <view class="c-topsjbxlsa">
+                  {{enddate}}
+                </view>
+              </picker>
+            </view>
+          </view>
+          <view class="c-topsjbtn" bindtap="seldata">确定</view>
+        </view>
+        <view class="c-topsj" wx:if="{{showzj}}">
+          <view class="c-topzj clearfix">
+            <view class="c-topzja {{curid == item.id ? 'on' : ''}}" wx:for="{{zjarr}}" wx:key="{{item.index}}" @tap="selzj({{item.id}})">{{item.name}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="c-detail">
+        <view class="c-dttop">筛选结果：<text class="c-dttoptxt">{{totalMap.realCount}}</text>条</view>
+        <view class="c-dtcon">
+          <view class="c-dtcona">
+            <view class="c-dtconan red">{{totalMap.incomeMoneyAmount}}<text class="c-dtconany">元</text></view>
+            <view class="c-dtconatx">总收入金额</view>
+          </view>
+          <view class="c-dtcona">
+            <view class="c-dtconan lv">{{totalMap.payMoneyAmount}}<text class="c-dtconany">元</text></view>
+            <view class="c-dtconatx">总支出金额</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="c-zjlistbx">
+      <view class="c-zjlist" wx:for="{{moneyLogList}}" wx:key="{{item.index}}">
+        <view class="c-zjlistt">{{item.createTime}}</view>
+        <view class="c-zjlibx">
+          <view class="c-zjlibxa">
+            <view>{{item.settingName}}</view>
+            <view class="red" wx:if="{{item.incomeMoney}}">+{{item.incomeMoney}}元</view>
+            <view class="lv" wx:if="{{item.payMoney}}">-{{item.payMoney}}元</view>
+          </view>
+          <view class="c-zjlibxb">
+            <view>{{item.createTime}}</view>
+            <view wx:if="{{item.payType == 1}}">平安银行支付</view>
+            <view wx:if="{{item.payType == 2}}">微信</view>
+            <view wx:if="{{item.payType == 3}}">支付宝</view>
+            <view wx:if="{{item.payType == 4}}">线下支付</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class Sign extends wepy.page {
+  data = {
+    userInfo:'',
+    stardate:'',
+    enddate:'',
+    showdata: false,
+    showzj: false,
+    zjarr: [],//资金流向 款项用途
+    zjkxid:'',//资金流向 款项用途id
+    curid:'',//
+    pageNum: 1,//分页页数
+    startTime: '',
+    endTime: '',
+    type: '',
+    basicSettingId: '',
+    totalMap: [],
+    moneyLogList: [],
+    flage: false,
+    datarange:'近三个月',
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.getNowDay()
+    this.queryMoneylogListInit()
+    this.moneyLogList = []
+    this.queryMoneylogList(this.startTime,this.endTime,this.type,this.basicSettingId,this.pageNum)
+  };
+  //资金流水列表初始化
+  async queryMoneylogListInit() {
+    let result = await this.$parent.queryData('msyApp/queryMoneylogListInit.do', {
+      
+    })
+    //console.log('初始化', result);
+    this.zjarr.push({
+      id: '',
+      name: '全部'
+    });
+    this.zjarr = this.zjarr.concat(result.list);
+     this.$apply() 
+  };
+  //资金流水列表
+  async queryMoneylogList(startTime,endTime,type,basicSettingId,pageNum) {
+    let result = await this.$parent.queryData('msyApp/queryMoneylogList.do', {
+      enterpriseId:this.userInfo.id,
+      startTime: startTime,//开始时间
+      endTime: endTime,//结束时间
+      type: type,//资金流向：1收入2支出
+      basicSettingId: basicSettingId,//项款用途id
+      pageNum: pageNum,//分页页数
+    })
+    console.log('列表', result);
+
+    if(result.moneyLogList.length>0){
+      this.flage= true
+      this.moneyLogList = this.moneyLogList.concat(result.moneyLogList)
+    } else{
+      console.log('无更多数据')
+      this.flage= false
+    }
+
+    this.totalMap = result.totalMap
+    //this.moneyLogList = result.moneyLogList
+    console.log('moneyLogList', this.moneyLogList);
+    this.$apply() 
+  };
+  bindDateChange(e) {
+    this.stardate = e.detail.value
+  };
+  bindDateChangeb(e) {
+    this.enddate = e.detail.value
+  };
+  getNowDay() {
+    let date = new Date()
+    let getYear = date.getFullYear()
+    let getMonth = date.getMonth() +1
+    getMonth = getMonth > 9 ? getMonth : '0' + getMonth
+    let day = date.getDate()
+    this.stardate = getYear + '-' + getMonth + '-' + day;
+    this.enddate = getYear + '-' + getMonth + '-' + day;
+    this.$apply()
+  };
+  onReachBottom() {
+    let that = this;
+    if (that.flage) {
+        that.pageNum +=1
+        that.queryMoneylogList(that.startTime,that.endTime,that.type,that.basicSettingId,that.pageNum)
+    }
+  }
+  methods = {
+    //日期选择弹框
+     showdatabx() {
+       this.showdata = !this.showdata
+       this.showzj = false
+     },
+     //资金流向弹框
+     showzjbx() {
+       this.showzj = !this.showzj
+       this.showdata = false
+     },
+     //资金流向 选择
+     selzj(id) {
+       this.zjkxid = id
+       this.curid = id
+       this.basicSettingId = id
+       this.pageNum = 1
+       this.moneyLogList = []
+       this.queryMoneylogList(this.startTime,this.endTime,this.type,this.basicSettingId,this.pageNum)
+       this.showzj = false
+     },
+     //选择日期 确定
+     seldata() {
+       console.log(this.stardate)
+       this.startTime = this.stardate
+       this.endTime = this.enddate
+       this.datarange = this.stardate + '-' + this.enddate
+       this.pageNum = 1
+       this.moneyLogList = []
+       this.queryMoneylogList(this.startTime,this.endTime,this.type,this.basicSettingId,this.pageNum)
+       this.showdata = false
+     }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/capitalManagement';
+  
+</style>

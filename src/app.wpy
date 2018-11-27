@@ -12,12 +12,18 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/login/login',
+      'pages/editAuthDevlop/editAuthDevlop',
+      'pages/authDevlop/authDevlop',
+      'pages/capitalManagement/capitalManagement',
       'pages/order/order',
       'pages/helpcenter/helpcenter',
       'pages/privacypolicy/privacypolicy',
       'pages/userprotocol/userprotocol',
       'pages/aboutUs/aboutUs',
       'pages/news/news',
+      'pages/negotiate/negotiate',
+      'pages/signSuccess/signSuccess',
+      'pages/signSuccessstate/signSuccessstate',
       'pages/enterpriseIden1/enterpriseIden1',
       'pages/enterpriseIden2/enterpriseIden2',
       'pages/enterpriseIden3/enterpriseIden3',
@@ -26,13 +32,23 @@ export default class extends wepy.app {
       'pages/index/index',
       'pages/forgetPass/forgetPass',
       'pages/sign/sign',
+      'pages/mallIndex/mallIndex',
+      'pages/authManage/authManage',
+      'pages/authManager/authManager',
+      'pages/editAuthManager/editAuthManager',
+      'pages/authApproval/authApproval',
+      'pages/accountIndex/accountIndex',
+      'pages/buyGoods1/buyGoods1',
+      'pages/tradeIndex/tradeIndex',
+      'pages/platRule/platRule',
       'pages/mallIndex/mallIndex'
     ],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#d7092d',
       navigationBarTitleText: '马上银',
-      navigationBarTextStyle: 'white'
+      navigationBarTextStyle: 'white',
+      backgroundTextStyle: 'dark'
     }
   };
 
@@ -42,7 +58,9 @@ export default class extends wepy.app {
     userInfo: '',
     wxUser: '',
     temporary: {
-      goodsData: ''
+      goodsData: '',
+      goodsStatue:'',
+      contractId:''
     }
   };
 
