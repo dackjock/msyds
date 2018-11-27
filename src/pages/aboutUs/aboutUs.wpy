@@ -2,10 +2,10 @@
     <view>
         <view class="abus_head">
             <view class="abus1">
-                <image src="../../assets/images/icon/goback.png">
+                <image src="../../assets/images/icon/goback.png"/>
             </view>
             <view class="abus2">
-                <image src="../../assets/images/me_img.png">
+                <image src="../../assets/images/me_img.png"/>
                 <text>马上银 1.0.0</text>
             </view>
         </view>
@@ -13,49 +13,49 @@
         <view class="abus3">
             <text class="abus3_left">官方网站</text>
             <view class="abus3_right">
-                <image src="../../assets/images/icon/jiantou.png">
+                <image src="../../assets/images/icon/jiantou.png"/>
             </view>
         </view>
 
         <view class="abus3">
             <text class="abus3_left">用户许可协议</text>
             <view class="abus3_right">
-                <image src="../../assets/images/icon/jiantou.png">
+                <image src="../../assets/images/icon/jiantou.png"/>
             </view>
         </view>
 
         <view class="abus3">
             <text class="abus3_left">隐私政策</text>
             <view class="abus3_right">
-                <image src="../../assets/images/icon/jiantou.png">
+                <image src="../../assets/images/icon/jiantou.png"/>
             </view>
         </view>
 
         <view class="abus3">
             <text class="abus3_left">帮助中心</text>
             <view class="abus3_right">
-                <image src="../../assets/images/icon/jiantou.png">
+                <image src="../../assets/images/icon/jiantou.png"/>
             </view>
         </view>
 
         <view class="abus3">
             <text class="abus3_left">招贤纳士</text>
             <view class="abus3_right">
-                <image src="../../assets/images/icon/jiantou.png">
+                <image src="../../assets/images/icon/jiantou.png"/>
             </view>
         </view>
 
         <view class="abus3">
             <text class="abus3_left">企业介绍</text>
             <view class="abus3_right">
-                <image src="../../assets/images/icon/jiantou.png">
+                <image src="../../assets/images/icon/jiantou.png"/>
             </view>
         </view>
 
         <view class="abus3">
             <text class="abus3_left">关于我们</text>
             <view class="abus3_right">
-                <image src="../../assets/images/icon/jiantou.png">
+                <image src="../../assets/images/icon/jiantou.png"/>
             </view>
         </view>
 
@@ -64,20 +64,21 @@
 </template>
 
 <script>
-import wepy from "wepy";
+import wepy from 'wepy';
 import botBar from '@/components/botBar';
 
-export default class aboutus extends wepy.page {
-    components = {
-        botBar
-    };
+export default class aboutUs extends wepy.page {
+  components = {
+    botBar
+  };
 }
 </script>
 
 <style lang="stylus">
-@import '../../assets/style/aboutus'
-page{
-    background:#EEEEEE
+@import '../../assets/style/aboutus';
+
+page {
+    background: #EEEEEE;
 }
 </style>
 

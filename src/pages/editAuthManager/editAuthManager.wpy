@@ -1,0 +1,145 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container pd-bot">
+    <header title="编辑管理员"></header>
+    <form class="edit-manager" bindsubmit="subForm">
+      <view class="em-item">
+        <text >填写用户名</text>
+        <input placeholder="请输入用户名" name="login_account" value="{{userLogin.loginAccount || ''}}" />
+      </view>
+      <view class="em-item">
+        <text >手机号码</text>
+        <input placeholder="请输入手机号码" name="telephone" value="{{userLogin.phone || ''}}"/>
+      </view>
+      <view class="em-item">
+        <text >密码</text>
+        <input placeholder="请输入6~20位密码，不能全数字" name="pwd" password="{{true}}" value="{{pwd}}"/>
+      </view>
+      <view class="em-item">
+        <text >确认密码</text>
+        <input placeholder="请再次输入密码" name="pwd2" password="{{true}}" value="{{pwd}}"/>
+      </view>
+      <view class="em-item">
+        <text >真实姓名</text>
+        <input placeholder="请输入中文汉字姓名" name="realName" value="{{member.realName || ''}}" />
+      </view>
+      <view class="em-item">
+        <text >电子邮箱</text>
+        <input placeholder="请输入您的电子邮箱" name="email" value="{{userLogin.email || ''}}" />
+      </view>
+      <view class="em-item">
+        <text >角色选择</text>
+        <picker mode="selector" range="{{rangList}}" value="{{rangIndex}}" range-key="name" bindchange="changeRang">
+          <view >{{rangList[rangIndex].name}}</view>
+        </picker>
+      </view>
+      <view class="em-item">
+        <text >是否启用</text>
+        <switch color="#d7092d" name="status" checked="{{userLogin.status === 1 ? true : false}}" />
+      </view>
+      <button form-type="submit" class="page-btn fix-bot">保存</button>
+    </form>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class editAuthManager extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    userId: '',
+    userInfo: [],
+    member: [],
+    userLogin: [],
+    pwd: '000000',
+    enterpriseRole: [],
+    rangList: [],
+    rangIndex: 0
+  };
+  methods = {
+    changeRang(event) {
+      console.log(event.detail.value);
+      this.rangIndex = event.detail.value;
+      this.$apply();
+    },
+    async subForm(event) {
+      console.log(event);
+      let formData = event.detail.value;
+      formData['loginAccount'] = this.userInfo.loginAccount;
+      formData['userLoginId'] = this.userId;
+      formData['ids'] = this.rangList[this.rangIndex].id;
+      formData['x'] = this.userId == '' ? 0 : 1;
+      formData['memberId'] = this.userInfo.memberId;
+      if (formData.x === 1) {
+        if (formData.pwd === '000000' && formData.pwd2 === '000000') {
+          formData['password'] = '';
+        } else if (formData.pwd != formData.pwd2) {
+          this.$parent.showTip('两次密码不一致');
+          return false;
+        } else {
+          formData['password'] = formData.pwd;
+        }
+      } else {
+        if (formData.pwd != formData.pwd2) {
+          this.$parent.showTip('两次密码不一致');
+          return false;
+        } else {
+          formData['password'] = formData.pwd;
+        }
+      }
+      delete formData.pwd;
+      delete formData.pwd2;
+      let result = await this.$parent.queryData(
+        '/msyApp/appUserLoginRoleAddOrUpdate.do',
+        formData
+      );
+      if (result) {
+        this.$parent.showTip('操作成功');
+        await this.$parent.sleep(2);
+        this.$parent.linkPage('', 3);
+      }
+      console.log(result);
+      console.log(formData);
+    }
+  };
+  onLoad(e) {
+    this.userId = e.id;
+    if (e.id == '') {
+      this.pwd = '';
+    }
+  }
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.getManagerInfo();
+  }
+  async getManagerInfo() {
+    let result = await this.$parent.queryData(
+      '/msyApp/appUserLoginRoleAddOrUpdateInit.do',
+      {
+        enterpriseId: this.userInfo.id,
+        userId: this.userId
+      }
+    );
+    if (result.enterpriseRole) {
+      for (let k = 0; k < result.list.length; k++) {
+        if (result.list[k].id == result.enterpriseRole.id) {
+          this.rangIndex = k;
+        }
+      }
+      this.member = result.Member;
+      this.userLogin = result.UserLogin;
+      this.enterpriseRole = result.enterpriseRole;
+    }
+    this.rangList = result.list;
+    this.$apply();
+    console.log(result);
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/authManage.styl';
+</style>

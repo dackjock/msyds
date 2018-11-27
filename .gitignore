@@ -4,3 +4,4 @@ dist
 login
 app.wpy
 .wepycache
+_wepylogs

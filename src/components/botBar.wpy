@@ -37,7 +37,7 @@ export default class botBar extends wepy.component {
       },
       {
         name: '我的',
-        link: ''
+        link: '../accountIndex/accountIndex'
       }
     ]
   };

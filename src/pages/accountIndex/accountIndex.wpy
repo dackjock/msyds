@@ -7,7 +7,7 @@
           <image wx:if="{{level}}" src="../../assets/images/icon/{{level}}@2x.png" />
           <text >{{userInfo.loginAccount}}</text>
         </view>
-        <view class="ci-comp" wx:if="{{userInfo.status === 0}}">认证企业：审核中</view>
+        <view class="ci-comp" wx:if="{{accountInfo.status === 0}}">认证企业：审核中</view>
         <view class="ci-comp">{{userInfo.enterpriseName}}</view>
       </view>
       <view class="ac-icon">
@@ -15,17 +15,44 @@
       </view>
       <view class="ac-icon msg">
         <image src="../../assets/images/icon/icon-msg.png" />
-        <text>99+</text>
+        <text wx:if="{{accountInfo.newMessageCounts > 0}}">{{accountInfo.newMessageCounts > 99 ? '99+' : accountInfo.newMessageCounts}}</text>
       </view>
     </view>
+    <view class="acc-order">
+      <view class="ao-title">我的订单</view>
+      <view class="ao-items">
+        <view >
+          <text >{{accountInfo.unfinishedOrdersCounts}}</text>
+          <text >未完成</text>
+        </view>
+        <view >
+          <text >{{accountInfo.completedOrderCounts}}</text>
+          <text >已完成</text>
+        </view>
+        <view >
+          <text >{{accountInfo.cancelledOrderscounts}}</text>
+          <text >已撤销</text>
+        </view>
+      </view>
+    </view>
+    <view class="menu-list">
+      <view class="m-item" wx:for="{{menuList}}" wx:key="" wx:if="{{item.show}}" @tap="linkTo({{item.link}})">
+        <text class="m-title">{{item.title}}</text>
+        <text wx:if="{{item.text}}">{{item.text}}</text>
+      </view>
+    </view>
+    <botBar curr="5"></botBar>
   </view>
 </template>
 
 <script>
 import wepy from 'wepy';
+import botBar from '@/components/botBar';
 
 export default class accountIndex extends wepy.page {
-  components = {};
+  components = {
+    botBar
+  };
   computed = {
     level() {
       let name = '';
@@ -47,12 +74,114 @@ export default class accountIndex extends wepy.page {
   data = {
     userInfo: [],
     accountInfo: [],
-    logo:'../../assets/images/icon/icon-logo.png'
+    logo: '../../assets/images/icon/icon-logo.png',
+    menuList: [
+      {
+        key: 19,
+        title: '我的供求信息',
+        link: ''
+      },
+      {
+        key: 1,
+        title: '企业认证',
+        link: ''
+      },
+      {
+        key: 2,
+        title: '合同管理',
+        link: ''
+      },
+      {
+        key: 3,
+        title: '议价管理',
+        link: ''
+      },
+      {
+        key: 4,
+        title: '提货人管理',
+        link: ''
+      },
+      {
+        key: 5,
+        title: '司机管理',
+        link: ''
+      },
+      {
+        key: 6,
+        title: '收件人管理',
+        link: ''
+      },
+      {
+        key: 7,
+        title: '发票管理',
+        link: ''
+      },
+      {
+        key: 17,
+        title: '发票审核管理',
+        link: ''
+      },
+      {
+        key: 16,
+        title: '发票快递管理',
+        link: ''
+      },
+      {
+        key: 8,
+        title: '权限管理',
+        link: '../authManage/authManage'
+      },
+      {
+        key: 11,
+        title: '财务凭证管理',
+        link: ''
+      },
+      {
+        key: 12,
+        title: '点价审核管理',
+        link: ''
+      },
+      {
+        key: 13,
+        title: '平安支付管理',
+        link: ''
+      },
+      {
+        key: 9,
+        title: '仓储管理',
+        link: ''
+      },
+      {
+        key: 15,
+        title: '挂单列表',
+        link: ''
+      },
+      {
+        key: 10,
+        title: '我要挂单',
+        link: ''
+      },
+      {
+        key: 14,
+        title: '资金明细',
+        link: ''
+      },
+      {
+        key: 18,
+        title: '采购大厅',
+        link: ''
+      }
+    ]
   };
   onShow() {
     this.userInfo = this.$parent.globalData.userInfo;
     this.getAccIndexInfo();
     this.$apply();
+  }
+  methods={
+    linkTo(url){
+      this.$parent.linkPage(url,1)
+    }
   }
   async getAccIndexInfo() {
     let apiData = {
@@ -65,9 +194,23 @@ export default class accountIndex extends wepy.page {
       apiData
     );
     this.accountInfo = result;
-    if(result.logo != ''){
-      this.logo = result.logo
+    if (result.logo != '') {
+      this.logo = result.logo;
     }
+    let menuList = this.menuList;
+    let showLines = result.showLines;
+    for (let key in showLines) {
+      for (let k in menuList) {
+        if (menuList[k].key == showLines[key]) {
+          menuList[k]['show'] = true;
+        }
+        if (menuList[k].key === 1) {
+          menuList[k]['text'] = result.status === 1 ? '已认证' : '审核中';
+        }
+      }
+    }
+    this.menuList = menuList;
+    console.log(menuList);
     this.$apply();
     console.log(result);
   }
