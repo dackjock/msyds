@@ -8,6 +8,7 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/login/login',
+      'pages/capitalDetail/capitalDetail',
       'pages/capitalManagement/capitalManagement',
       'pages/helpcenter/helpcenter',
       'pages/privacypolicy/privacypolicy',
