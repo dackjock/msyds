@@ -11,9 +11,18 @@ import {
 
 const api = 'http://d7.cto.shovesoft.com/msyapp/'
 const uploadPath = 'http://d7.cto.shovesoft.com/msy_upload/file_upload/mobileImageUpload.do'
-async function request(url, data = {}, method = 'GET') {
+
+/**
+ * 
+ * @param {*} url 接口地址
+ * @param {*} data 附加数据
+ * @param {*} resultType 是否直接返回结果
+ * @param {*} method 请求方式
+ */
+async function request(url, data = {}, resultType = false, method = 'GET') {
   wepy.showLoading({
-    title: '加载中…'
+    title: '加载中…',
+    mask: true
   })
   wepy.showNavigationBarLoading()
   // 补全接口地址
@@ -51,6 +60,10 @@ async function request(url, data = {}, method = 'GET') {
       resultData = res
       return res
     }
+    if (resultType) {
+      resultData = res
+      return res
+    }
     if (res.data.type > 0 || res.data.flag == 1) {
       // 成功
       resultData = res.data.returnMap
@@ -58,7 +71,7 @@ async function request(url, data = {}, method = 'GET') {
       // 失败
       // console.log(res)
       wepy.showToast({
-        title: res.data.msg,
+        title: res.data.msg || "请求失败",
         icon: 'none'
       })
       resultData = false

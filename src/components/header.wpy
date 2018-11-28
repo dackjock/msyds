@@ -25,7 +25,10 @@ import wepy from 'wepy';
 export default class header extends wepy.component {
   props = {
     hasBack: String,
-    title: String,
+    title: {
+      type: String,
+      twoWay: true
+    },
     searchbx: String,
     tofirstpage: String,
     edit: String,
@@ -33,9 +36,7 @@ export default class header extends wepy.component {
   data = {
     editFg:false
   };
-  onLoad() {
-    
-  }
+  onLoad() {}
   methods = {
     navBack() {
       wepy.navigateBack();
@@ -51,5 +52,4 @@ export default class header extends wepy.component {
 
 <style lang='stylus'>
 @import '../assets/style/header';
-  
 </style>

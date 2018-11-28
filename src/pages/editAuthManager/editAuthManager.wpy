@@ -1,6 +1,6 @@
 <template lang="wxml" minapp="wepy">
   <view class="container pd-bot">
-    <header title="编辑管理员"></header>
+    <header :title.sync="title"></header>
     <form class="edit-manager" bindsubmit="subForm">
       <view class="em-item">
         <text >填写用户名</text>
@@ -50,6 +50,7 @@ export default class editAuthManager extends wepy.page {
     header
   };
   data = {
+    title:'编辑管理员',
     userId: '',
     userInfo: [],
     member: [],
@@ -73,6 +74,7 @@ export default class editAuthManager extends wepy.page {
       formData['ids'] = this.rangList[this.rangIndex].id;
       formData['x'] = this.userId == '' ? 0 : 1;
       formData['memberId'] = this.userInfo.memberId;
+      formData['status'] = formData['status'] ? 1 : 0;
       if (formData.x === 1) {
         if (formData.pwd === '000000' && formData.pwd2 === '000000') {
           formData['password'] = '';
@@ -109,6 +111,7 @@ export default class editAuthManager extends wepy.page {
     this.userId = e.id;
     if (e.id == '') {
       this.pwd = '';
+      this.title = '新增管理员'
     }
   }
   onShow() {
