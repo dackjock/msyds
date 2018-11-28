@@ -112,14 +112,13 @@ export default class orderDetail extends wepy.page {
     changeWTH: true
   };
   methods = {
+
     change_(key) {
       this[key] = !this[key];
       this.$apply();
     },
     goback() {
-      wx.redirectTo({
-        url: '../order/order'
-      });
+      wx.navigateBack();
     },
     renderErweima(id) {
       this.$parent.linkPage(

@@ -1,0 +1,20 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <view class="search_bar">
+        
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+export default class Index extends wepy.page {
+
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/orderSearch';
+  
+</style>

@@ -31,9 +31,7 @@ export default class orderDetail2 extends wepy.page {
   };
   methods = {
     goback() {
-      wx.redirectTo({
-        url: '../orderDetail/orderDetail'
-      });
+        wx.navigateBack();
     },
     async changeStaus(type) {
       this.type=type;

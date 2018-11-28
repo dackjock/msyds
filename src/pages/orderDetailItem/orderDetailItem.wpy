@@ -100,9 +100,7 @@ export default class Index extends wepy.page {
       });
     },
     goback() {
-      wx.redirectTo({
-        url: '../orderDetail/orderDetail'
-      });
+      wx.navigateBack();
     }
   };
   onShareAppMessage() {
