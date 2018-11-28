@@ -2,4 +2,6 @@ node_modules
 dist
 .DS_Store
 login
+app.wpy
 _wepylogs
+.wepycache

@@ -31,7 +31,7 @@ export default class authManage extends wepy.page {
       {
         title: '审批流程',
         icon: 3,
-        link: '../authDevlop/authDevlop'
+        link: '../authApproval/authApproval'
       }
     ]
   };

@@ -1,6 +1,6 @@
 <template lang="wxml" minapp="wepy">
   <view class="container">
-    <header title="部门管理"></header>
+    <header :title.sync="title"></header>
     <form class="edit-devlop" bindsubmit="subForm">
       <view class="ed-item">
         <text >添加部门</text>
@@ -45,6 +45,7 @@ export default class editAuthDevlop extends wepy.page {
     header
   };
   data = {
+    title:'编辑部门',
     roleId: '',
     userInfo: [],
     fixShow: false,
@@ -58,6 +59,9 @@ export default class editAuthDevlop extends wepy.page {
   onLoad(e) {
     // this.roleId = 1;
     this.roleId = e.id;
+    if(e.id == ''){
+      this.title = '新增部门'
+    }
   }
   onShow() {
     this.userInfo = this.$parent.globalData.userInfo;

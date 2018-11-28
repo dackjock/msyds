@@ -2,9 +2,12 @@
 page
   background: #eee
 
-.container.pd-bot
+.container
   box-sizing: border-box
-  padding-bottom: 120rpx
+  &.pd-bot
+    padding-bottom: 120rpx
+  &.pd-top
+    padding-top: 90rpx
 .auth-menu
   position: relative
   display: flex
@@ -162,6 +165,26 @@ page
     .edit
       color: $theme-color
       margin-right: 30rpx
+.approval-item
+  margin: 20rpx 30rpx 0
+  background: #fff
+  border-radius: 10rpx
+  padding: 0 20rpx
+  font-size: 20rpx
+  line-height: 50rpx
+  >view>text:first-child
+      color: #999
+  >view.mi-bot
+    display: flex
+    justify-content: space-between
+    align-items: center
+    border-top: 2rpx solid #eee
+    line-height: 60rpx
+    switch
+      transform: scale(.5)
+    .edit
+      color: $theme-color
+      margin-right: 30rpx
 .edit-manager
   .em-item
     display: flex
@@ -182,5 +205,38 @@ page
     >switch
       transform: scale(.5)
       margin-right:-30rpx;
-
-    
+.approval-status
+  position: fixed
+  left: 0
+  right: 0
+  top: 85rpx
+  height: 90rpx
+  display: flex
+  justify-content: flex-end
+  align-items: center
+  background: #fff
+  >label
+    line-height: 60rpx
+    switch
+      transform: scale(.5)
+.approval-line
+  display: flex
+  justify-content: space-between
+  align-items: center
+  height: 90rpx
+  padding: 0 30rpx
+  font-size: 24rpx
+  background: #fff
+  border-top: 2rpx solid #eee
+  .type-picker
+    position: relative
+    padding-right: 30rpx
+    moreIcon(0)
+  .pl-picker
+    display: flex
+    align-items: center
+    >picker
+      padding: 1rpx 20rpx
+      border: 2rpx solid #eee
+      border-radius: 10rpx
+      margin-right: 30rpx
