@@ -42,6 +42,9 @@ import header from '@/components/header';
 import dealscreen from '@/components/dealScreen';
 
 export default class newDealby extends wepy.page {
+  config = {
+    "enablePullDownRefresh": true
+  };
   data = {
     cjbyItem: [], // 最新成交信息（白银）
     pageNum: 1,
@@ -53,13 +56,13 @@ export default class newDealby extends wepy.page {
     flage: false,
     showbx: '',
     showcon: '',
-    
+    fresh: false,
   };
   onShow() {
     this.cjbyItem = []
     this.queryPayEnterpriseOrder(this.pageNum,this.pageSize,this.depotId,this.brandId,this.monthTicketStatus,this.goodsTypeId)
   };
-  async queryPayEnterpriseOrder(pageNum,pageSize,depotId,brandId,monthTicketStatus,goodsTypeId) {
+  async queryPayEnterpriseOrder(pageNum,pageSize,depotId,brandId,monthTicketStatus,goodsTypeId,fresh) {
     let result = await this.$parent.queryData('app/queryPayEnterpriseOrder.do', {
       pageNum:pageNum,
       pageSize:pageSize,
@@ -69,6 +72,10 @@ export default class newDealby extends wepy.page {
       goodsTypeId:goodsTypeId
     })
     console.log('最新成交 白银', result);
+    if(fresh){
+      this.cjbyItem = []
+      this.fresh = false
+    }
     let that = this
     let list = []
     if(that.pageNum<=result.pages){
@@ -87,6 +94,13 @@ export default class newDealby extends wepy.page {
     
     this.$apply() 
   }
+  onPullDownRefresh() {
+    this.pageNum = 1
+    this.fresh = true
+    this.queryPayEnterpriseOrder(this.pageNum,this.pageSize,this.depotId,this.brandId,this.monthTicketStatus,this.goodsTypeId,this.fresh)
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
+  };
   onReachBottom() {
       let that = this;
       if (that.flage) {

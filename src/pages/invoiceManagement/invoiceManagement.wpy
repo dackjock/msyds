@@ -1,0 +1,33 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="发票管理"></header>
+    
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class invoiceManagement extends wepy.page {
+  data = {
+    picPath:'',
+  };
+  onShow() {
+    
+  };
+ 
+  methods = {
+    
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/invoiceManagement';
+  
+</style>

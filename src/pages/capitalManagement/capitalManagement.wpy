@@ -73,6 +73,9 @@ import wepy from 'wepy';
 import header from '@/components/header';
 
 export default class capitalManagement extends wepy.page {
+  config = {
+    "enablePullDownRefresh": true
+  };
   data = {
     userInfo:'',
     stardate:'',
@@ -90,6 +93,7 @@ export default class capitalManagement extends wepy.page {
     totalMap: [],
     moneyLogList: [],
     flage: false,
+    fresh: false,
     datarange:'近三个月',
   };
   onShow() {
@@ -114,7 +118,7 @@ export default class capitalManagement extends wepy.page {
      this.$apply() 
   };
   //资金流水列表
-  async queryMoneylogList(startTime,endTime,type,basicSettingId,pageNum) {
+  async queryMoneylogList(startTime,endTime,type,basicSettingId,pageNum,fresh) {
     let result = await this.$parent.queryData('msyApp/queryMoneylogList.do', {
       enterpriseId:this.userInfo.id,
       startTime: startTime,//开始时间
@@ -124,7 +128,10 @@ export default class capitalManagement extends wepy.page {
       pageNum: pageNum,//分页页数
     })
     //console.log('列表', result);
-
+    if(fresh){
+      this.moneyLogList = []
+      this.fresh = false
+    }
     if(result.moneyLogList.length>0){
       this.flage= true
       this.moneyLogList = this.moneyLogList.concat(result.moneyLogList)
@@ -153,6 +160,13 @@ export default class capitalManagement extends wepy.page {
     this.stardate = getYear + '-' + getMonth + '-' + day;
     this.enddate = getYear + '-' + getMonth + '-' + day;
     this.$apply()
+  };
+  onPullDownRefresh() {
+    this.pageNum = 1
+    this.fresh = true
+    this.queryMoneylogList(this.startTime,this.endTime,this.type,this.basicSettingId,this.pageNum,this.fresh)
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
   };
   onReachBottom() {
     let that = this;

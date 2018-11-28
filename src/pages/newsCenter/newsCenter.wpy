@@ -16,8 +16,8 @@
         <view class="n-cttabx {{readid == 1? 'cur' : ''}}" @tap="newsrd(1)">已读</view>
       </view>
       <view class="n-scroll">
-        <scroll-view class="scroll-view_x" scroll-into-view="{{scrollid}}" scroll-x style="width:auto;overflow:hidden;">
-          <view class="n-cttbx {{classifyType == 0? 'cur' : ''}}" id="{{classType[0].id}}" @tap="typetap({{classType[0].type}},{{classType[0].id}})">全部消息</view>
+        <scroll-view class="scroll-view_x n-scrollbx" scroll-into-view="{{scrollid}}" scroll-x >
+          <view class="n-cttbx {{classifyType === 0? 'cur' : ''}}" id="{{classType[0].id}}" @tap="typetap({{classType[0].type}},{{classType[0].id}})">全部消息</view>
           <view class="n-cttbx {{classifyType == 2? 'cur' : ''}}" id="{{classType[1].id}}" @tap="typetap({{classType[1].type}},{{classType[1].id}})">修改密码</view>
           <view class="n-cttbx {{classifyType == 4? 'cur' : ''}}" id="{{classType[2].id}}" @tap="typetap({{classType[2].type}},{{classType[2].id}})">合同签订成功</view>
           <view class="n-cttbx {{classifyType == 6? 'cur' : ''}}" id="{{classType[3].id}}" @tap="typetap({{classType[3].type}},{{classType[3].id}})">二次结算</view>
@@ -53,6 +53,7 @@
         </checkbox-group>
       </view>
     </view>
+    <view class="n-nodata" wx:if="{{dataleng}}">暂无更多数据！</view>
   </view>
 </template>
 
@@ -61,6 +62,9 @@ import wepy from 'wepy';
 import header from '@/components/header';
 
 export default class newsCenter extends wepy.page {
+  config = {
+        "enablePullDownRefresh": true
+    };
   data = {
     userInfo:'',
     readid: 0,
@@ -88,6 +92,8 @@ export default class newsCenter extends wepy.page {
     delfage: false,
     radio_checked: false,
     delarr: [],
+    dataleng: false,
+    fresh: false,
   };
   onShow() {
     this.userInfo = this.$parent.globalData.userInfo
@@ -95,7 +101,7 @@ export default class newsCenter extends wepy.page {
     this.appQueryMessageList(this.enable,this.classifyType,this.pageNum)
   };
   //消息列表
-  async appQueryMessageList(enable,classifyType,pageNum) {
+  async appQueryMessageList(enable,classifyType,pageNum,fresh) {
     let result = await this.$parent.queryData('msyApp/appQueryMessageList.do', {
       userId: this.userInfo.userId,
       enable:enable, //0新消息，1已读消息
@@ -103,6 +109,10 @@ export default class newsCenter extends wepy.page {
       pageNum:pageNum
     })
     //console.log('消息', result);
+    if(fresh){
+      this.newsList = []
+      this.fresh = false
+    }
     if(result.list.length>0){
       this.flage= true
       this.ynewsList = result.list.map(function(obj,index){
@@ -117,7 +127,11 @@ export default class newsCenter extends wepy.page {
       this.flage= false
     }
     this.newNewsCount = result.newNewsCount
-    
+    if(this.newsList.length>0){
+      this.dataleng = false
+    }else{
+      this.dataleng = true
+    }
     console.log('消息', this.newsList);
     this.$apply() 
   };
@@ -126,8 +140,25 @@ export default class newsCenter extends wepy.page {
     let result = await this.$parent.queryData('msyApp/appDeleteMessageDetail.do', {
       userId: this.userInfo.userId,
       ids: id,
-    })
+    },true)
     console.log('删除', result);
+    if(result.data.type == 1){
+      this.$parent.showTip('删除成功。')
+      this.radio_checked =false
+      this.newsList = []
+      this.pageNum = 1
+      await this.$parent.sleep(1)
+      this.appQueryMessageList(this.enable,this.classifyType,this.pageNum)
+    }else{
+      this.$parent.showTip('操作失败')
+    }
+  };
+  onPullDownRefresh() {
+    this.pageNum = 1
+    this.fresh = true
+    this.appQueryMessageList(this.enable,this.classifyType,this.pageNum,this.fresh)
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
   };
   onReachBottom() {
     let that = this;
@@ -172,10 +203,9 @@ export default class newsCenter extends wepy.page {
         this.selid = id
         this.newsList[i].selfage = !fg
         this.$apply()
-        console.log(id,fg,i)
-        console.log(this.newsList)
       }else{
-
+        this.$parent.globalData.temporary.contractId = id
+        this.$parent.linkPage('../newsDetail/newsDetail',1)
       }
     },
     //切换 全部 新消息 已读
@@ -203,6 +233,7 @@ export default class newsCenter extends wepy.page {
         for(let j = 0;j<this.newsList.length;j++){
           this.newsList[j].selfage = false
         }
+        this.radio_checked =false
       }
       this.$apply()
     }

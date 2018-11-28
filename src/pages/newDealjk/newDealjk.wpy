@@ -46,7 +46,10 @@ import wepy from 'wepy';
 import header from '@/components/header';
 import dealScreenjk from '@/components/dealScreenjk';
 
-export default class newDealby extends wepy.page {
+export default class newDealjk extends wepy.page {
+  config = {
+    "enablePullDownRefresh": true
+  };
   data = {
     cjjkItem: [], // 最新成交信息（精矿）
     pageNum: 1,
@@ -56,13 +59,13 @@ export default class newDealby extends wepy.page {
     flage: false,
     showbx: '',
     showcon: '',
-    
+    fresh: false,
   };
   onShow() {
     this.cjjkItem = []
     this.queryDealConcentratePage(this.pageNum,this.contractType,this.nameId,this.settlementTypeId)
   };
-  async queryDealConcentratePage(pageNum,contractType,nameId,settlementTypeId) {
+  async queryDealConcentratePage(pageNum,contractType,nameId,settlementTypeId,fresh) {
     let result = await this.$parent.queryData('msyApp/queryDealConcentratePage.do', {
       pageNum:pageNum,
       contractType:contractType,
@@ -70,6 +73,10 @@ export default class newDealby extends wepy.page {
       settlementTypeId:settlementTypeId,
     })
     console.log('最新成交 精矿', result);
+    if(fresh){
+      this.cjjkItem = []
+      this.fresh = false
+    }
     let resultjk = result.pageBean
     let that = this
     let list = []
@@ -88,6 +95,13 @@ export default class newDealby extends wepy.page {
     }
     this.$apply() 
   }
+  onPullDownRefresh() {
+    this.pageNum = 1
+    this.fresh = true
+    this.queryDealConcentratePage(this.pageNum,this.contractType,this.nameId,this.settlementTypeId,this.fresh)
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
+  };
   onReachBottom() {
     let that = this;
     if (that.flage) {
