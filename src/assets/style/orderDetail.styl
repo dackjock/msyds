@@ -58,6 +58,7 @@ page
         height: 90rpx;
         align-items: center;
         border-bottom: 1px solid #eee;
+        flex-wrap: wrap;
         .icon_t
             width: 30rpx;
             height 30rpx;
@@ -101,3 +102,59 @@ page
         border-radius: 20rpx;
         +.info_item
             margin-top: 10rpx;
+
+.header
+    height: 85rpx;
+    line-height: 85rpx;
+    text-align: center;
+    position: relative ;
+    background-color: #d7092d;
+    color: #fff;
+    .goback
+        position: absolute;
+        top: 25rpx;
+        left: 30rpx;
+        width 20rpx;
+        height 35rpx;
+
+.btn_group
+    width 100%;
+    margin-top: 15rpx;
+    .btn
+        height: 40rpx;
+        line-height: 40rpx;
+        background-color: #d7092d;
+        color: #fff;
+        padding: 0 15rpx;
+        border-radius: 6rpx;
+        display: inline-block;
+        +.btn
+            margin-left: 15rpx;
+
+
+.type_order_con
+    position: fixed
+    top: 0
+    width:100%
+    box-shadow: 0 2rpx 6rpx 0 rgba(13, 17, 41, 0.2);
+
+
+
+.type_order
+    display: flex
+    height: 90rpx
+    background: #fff
+    line-height: 86rpx
+    color: #666666
+    &.jk
+        .cur text
+            width: auto
+    .cur text
+        border-bottom: 2px solid #d7092d
+        width:70%
+        display:inline-block
+        color: #d7092d
+
+    view 
+        flex: 1
+        text-align: center

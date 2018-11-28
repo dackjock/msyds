@@ -17,6 +17,7 @@ export default class extends wepy.app {
       'pages/capitalManagement/capitalManagement',
       'pages/order/order',
       'pages/orderDetail/orderDetail',
+      'pages/orderDetail2/orderDetail2',
       'pages/helpcenter/helpcenter',
       'pages/privacypolicy/privacypolicy',
       'pages/userprotocol/userprotocol',

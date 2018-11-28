@@ -8,7 +8,7 @@
         <image  src="../../assets/images/icon/searcha.png" />
            <view class="show_tab"> 
              {{order_type}}
-            <switch @change="switch1Change" color="#fff"/>
+            <switch checked="{{true}}" @change="switch1Change" color="#fff"/>
             </view>
          订单中心
         
@@ -153,7 +153,7 @@ export default class Order extends wepy.page {
   data = {
     listData: [],
     queryData: {
-      orderType: 2,
+      orderType: 1,
       orderStatus: 0,
       pageNum: 1
     },
@@ -181,7 +181,7 @@ export default class Order extends wepy.page {
       this.$apply();
     },
     switch1Change(val) {
-      this.order_type = val.detail.value ? '销售' : '采购';
+      this.order_type = val.detail.value ? '采购' : '销售';
       this.queryData_jingkuang.type = val.detail.value ? 1 : 2;
       this.queryData.orderType = val.detail.value ? 1 : 2;
       this.onPullDownRefresh();

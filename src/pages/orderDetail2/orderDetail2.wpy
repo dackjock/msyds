@@ -1,0 +1,60 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+      <view class="header"> <image @tap='goback' class="goback" mode="aspectFit" src="../../assets/images/icon/goback.png" />  订单明细</view>
+
+      <view class="type_order">
+          <view  @tap="changeStaus(-1)" class="{{type==-1?'cur':''}}"><text>所有明细</text></view>
+          <view  @tap="changeStaus(0)" class="{{type==0?'cur':''}}"><text>议价</text></view>
+          <view  @tap="changeStaus(1)" class="{{type==1?'cur':''}}"><text>合同</text></view>
+          <view  @tap="changeStaus(2)" class="{{type==2?'cur':''}}"><text>支付</text></view>
+      </view>
+
+
+      <view class="MX_cont">
+          <view  wx:for="{{logList.list}}" wx:key="index" class="mingxi">
+            {{item.createTime}} {{item.logContent}}
+
+            <view style="float:right" wx:if="{{item.type==1&&type==1}}">查看合同</view>
+          </view>
+      </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+export default class orderDetail2 extends wepy.page {
+  data = {
+    logList: [],
+    id: '',
+    type: -1
+  };
+  methods = {
+    goback() {
+      wx.redirectTo({
+        url: '../orderDetail/orderDetail'
+      });
+    },
+    async changeStaus(type) {
+      this.type=type;
+      this.logList = await this.queryOrderLog(this.id, type);
+      this.$apply();
+    }
+  };
+  async onLoad(options) {
+    this.id = options.id;
+    this.logList = await this.queryOrderLog(options.id, -1);
+    this.$apply();
+  }
+  queryOrderLog(id, type) {
+    return this.$parent.queryData('msyApp/queryOrderLog.do', {
+      orderId: id,
+      type: type
+    });
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/orderDetail';
+</style>
