@@ -105,6 +105,7 @@ export default class capitalManagement extends wepy.page {
       
     })
     //console.log('初始化', result);
+    this.zjarr = []
     this.zjarr.push({
       id: '',
       name: '全部'

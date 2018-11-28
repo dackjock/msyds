@@ -12,21 +12,26 @@
     <!-- 右侧按钮容器 -->
     <view class="h-right">
       <navigator wx:if="{{tofirstpage == 'true'}}" url="../../pages/index/index">返回首页</navigator>
+      <view class="h-editbx" wx:if="{{edit == 'true'}}" bindtap="edittap">
+        <view wx:if="{{!editFg}}">编辑<view class="h-editi"></view></view>
+        <view wx:if="{{editFg}}">取消</view>
+        </view>
     </view>
   </view>
 </template>
 
 <script>
 import wepy from 'wepy';
-export default class botBar extends wepy.component {
+export default class header extends wepy.component {
   props = {
     hasBack: String,
     title: String,
     searchbx: String,
     tofirstpage: String,
+    edit: String,
   };
   data = {
-    //hasBack:true
+    editFg:false
   };
   onLoad() {
     
@@ -34,6 +39,11 @@ export default class botBar extends wepy.component {
   methods = {
     navBack() {
       wepy.navigateBack();
+    },
+    edittap() {
+      this.editFg = !this.editFg
+      this.$emit('editfn',this.editFg)
+      this.$apply()
     }
   };
 }
