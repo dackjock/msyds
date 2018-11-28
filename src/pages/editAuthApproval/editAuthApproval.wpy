@@ -1,0 +1,115 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header :title.sync="title"></header>
+    <form >
+      <view class="approval-line">
+        <text >审批类型：</text>
+        <picker class="type-picker" mode="selector" range="{{typeList}}" range-key="name" value="{{typeCurr}}">
+          <view>{{typeList[typeCurr].name}}</view>
+        </picker>
+      </view>
+      <view class="approval-line" wx:for="{{flowList}}" wx:key="">
+        <text >流程1</text>
+        <view class="pl-picker">
+          <picker wx:for="{{item}}" wx:key="" wx:for-item="child" wx:for-index="idx" mode="selector" range="{{memberList}}" range-key="name_str" value="{{flowList[index][idx]}}">
+            <view >{{memberList[flowList[index][idx]].real_name || '请选择'}}</view>
+          </picker>
+          <text >清空</text>
+        </view>
+      </view>
+    </form>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class editAuthApproval extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    title: '编辑审批流程',
+    userInfo: [],
+    approvalId: '',
+    typeList: [],
+    typeCurr: 0,
+    memberList: [],
+    flowList:[[0,'']]
+  };
+  onLoad(e) {
+    this.approvalId = e.id;
+    if (e.id == '') {
+      this.title = '新增审批流程';
+    }
+  }
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.queryTypeList();
+    this.queryMember();
+    this.updataInit();
+  }
+  // 获取类型列表
+  async queryTypeList() {
+    let result = await this.$parent.queryData(
+      '/msyApp/queryContractTypeList.do'
+    );
+    if (result) {
+      this.typeList = result.typeList;
+      this.typeCurr = 0;
+      this.$apply();
+    }
+    console.log(result);
+  }
+  // 获取角色列表
+  async queryMember() {
+    let result = await this.$parent.queryData('/msyApp/appQueryMemberPage.do', {
+      memberId: this.userInfo.memberId
+    });
+    let memberList = result.list;
+    for (let k in memberList) {
+      memberList[k]['name_str'] =
+        memberList[k].real_name +
+        '+' +
+        memberList[k].role_name +
+        '+' +
+        memberList[k].dept_name;
+    }
+    this.memberList = memberList;
+    this.$apply();
+    console.log(result);
+  }
+  // 修改初始化
+  async updataInit() {
+    let result = await this.$parent.queryData(
+      '/msyApp/appUpdateApprovalProcessInit.do',
+      {
+        approvalId: this.approvalId,
+        userId: this.userInfo.userId
+      }
+    );
+    let members = this.memberList;
+    let flowList = this.flowList;
+    let userList = result.approvalUserList;
+    for(let k in userList){
+      for(let j = 0;j<userList[k].userList.length;j++){
+        for(let i = 0; i < members.length;i++){
+          if (userList[k].userList[j].user_id == members[i].id && flowList[userList[k].level-1][j] == '') {
+            flowList[userList[k].level-1][j] = i
+          }else{
+            flowList[userList[k].level-1][j] = ''
+          }
+        }
+      }
+    }
+    this.flowList = flowList
+    this.$apply()
+    console.log(result);
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/authManage.styl';
+</style>

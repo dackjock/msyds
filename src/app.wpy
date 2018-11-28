@@ -37,7 +37,7 @@ export default class extends wepy.app {
       'pages/buyGoods1/buyGoods1',
       'pages/tradeIndex/tradeIndex',
       'pages/platRule/platRule',
-      'pages/mallIndex/mallIndex'
+      'pages/editAuthApproval/editAuthApproval',
     ],
     window: {
       backgroundTextStyle: 'light',
