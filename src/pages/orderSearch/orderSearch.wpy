@@ -1,7 +1,7 @@
 <template lang="wxml" minapp="wepy">
   <view class="container">
     <view class="search_bar">
-        <image mode="aspectFit" class="goback" src="../../assets/images/icon/goback.png" />
+        <image @tap="goback" mode="aspectFit" class="goback" src="../../assets/images/icon/goback.png" />
         <view @tap="showPanel" class="input_box">
             <input type="text"  disabled="{{true}}" placeholder="请输入地区、品名、价格、仓库等搜索" placeholder-style="color:#fff;font-size:24rpx;" />
             <image class="searcha" mode="aspectFit" src="../../assets/images/icon/searcha.png" />
@@ -180,9 +180,12 @@ export default class orderSearch extends wepy.page {
     list_type: 3,
     listData: [],
     pageNum: 1,
-    queryData:{},
+    queryData: {}
   };
   methods = {
+    goback() {
+      wx.navigateBack();
+    },
     change(key, val) {
       this[key] = val;
       this.$apply();
@@ -202,9 +205,9 @@ export default class orderSearch extends wepy.page {
     async showSearch() {
       this.listData = [];
       this.pageNum = 1;
-      let _this=this;
+      let _this = this;
       if (this.orderType == 1) {
-        this.list_type=0;
+        this.list_type = 0;
         this.queryData = {
           orderType: this.orderstatus == 1 ? 2 : 1,
           pageNum: this.pageNum,
@@ -217,8 +220,8 @@ export default class orderSearch extends wepy.page {
         let res = await this.getList(this.queryData);
         this.listData = res.orderList;
       } else {
-         this.list_type=1;
-          this.queryData  = {
+        this.list_type = 1;
+        this.queryData = {
           enterpriseId: _this.$parent.globalData.userInfo.id,
           type: this.orderstatus,
           userId: _this.$parent.globalData.userInfo.userId,
@@ -250,7 +253,7 @@ export default class orderSearch extends wepy.page {
       this.$apply();
     }
   };
- async onReachBottom(event) {
+  async onReachBottom(event) {
     //请求更多数据
     console.log('onReachBottom', event);
     let res;
@@ -259,7 +262,7 @@ export default class orderSearch extends wepy.page {
     });
 
     wepy.showNavigationBarLoading();
-      this.queryData.pageNum = this.queryData.pageNum + 1;
+    this.queryData.pageNum = this.queryData.pageNum + 1;
     if (this.list_type === 0) {
       res = await this.getList(this.queryData);
       this.listData.push(...res.orderList);
@@ -293,7 +296,7 @@ export default class orderSearch extends wepy.page {
     } else if (this.orderType == 3) {
       obj.orderType = 2;
     }
-    return _this.$parent.queryData('msyApp/queryConcentrateApplyPage.do',obj);
+    return _this.$parent.queryData('msyApp/queryConcentrateApplyPage.do', obj);
   }
 }
 </script>
