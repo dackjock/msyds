@@ -1,0 +1,137 @@
+page 
+    background-color: #f4f4f4;
+.search_bar
+    display: flex;
+    height: 72rpx;
+    align-items: center;
+    padding: 0 25rpx;
+    background-color: #d7092d;
+    position: fixed;
+    top: 0;
+    left:0;
+    right:0;
+    .goback
+        height:32rpx;
+        width:30rpx;
+        margin-right: 30rpx;
+    .input_box
+        flex: 1;
+        position: relative;
+        input 
+            width: 100%;
+            height 100%;
+            background: #c10828;
+            border-radius: 40rpx;
+            padding-left: 55rpx;
+            box-sizing: border-box;
+        .searcha
+            position: absolute;
+            height :30rpx;
+            width :30rpx;
+            left:15rpx;
+            top: 14rpx;
+.lishi
+    height: 60rpx;
+    line-height: 60rpx;
+    padding: 0 30rpx;
+    color: #333;
+    font-size: 24rpx;
+    margin-top: 72rpx;
+
+    .info
+        color: #999;
+        display: inline-block;
+
+
+.select_panel
+    &.show .layer_gary
+        display: block;
+     &.show .layer_main
+        transform: translateX(0);
+    .layer_gary
+        position: fixed;
+        top: 0;
+        right 0;
+        left 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        z-index :20;
+        display: none;
+    .layer_main
+        position: fixed;
+        color: #333;
+        width:70%;
+        top:0;
+        bottom: 0;
+        z-index 21;
+        right: 0;
+        background-color: #fff;
+        transform: translateX(100%);
+        transition: all .3s
+        .h3
+            height: 50rpx;
+            line-height: 50rpx;
+            padding: 0 25rpx;
+            font-size: 24rpx;
+        .flex_box
+            display: flex;
+            padding: 0 30rpx;
+            padding-bottom: 15rpx;
+            border-bottom: 1px solid #eee;
+            .item_span
+                width: 128rpx;
+                height : 45rpx;
+                line-height: 45rpx;
+                text-align: center;
+                border: 1px solid #ddd;
+                border-radius: 10rpx;
+                font-size: 24rpx;
+                margin-right: 25rpx;
+                &.cur
+                    background-color: #d7092d;
+                    color: #fff;
+        .input_box
+            padding: 0 25rpx 15rpx 25rpx;
+            border-bottom: 1px solid #eee;
+            input 
+                width 100%;
+                height:60rpx;
+                padding: 0 20rpx;
+                background-color: #eee;
+                box-sizing: border-box;
+                border-radius: 8rpx;
+            .input_inline
+                width: 200rpx;
+                display: inline-block;
+                vertical-align: middle;
+                position relative;
+                input 
+                    font-size: 24rpx;
+                .rli
+                    position: absolute;
+                    right: 10rpx;
+                    top: 15rpx;
+                    height 30rpx;
+                    width : 30rpx;
+            .space_code
+                margin: 0 20rpx;
+                display: inline-block;
+                vertical-align: middle;
+.btn_group_s
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0
+    .btn
+        width 50%;
+        text-align: center;
+        height: 60rpx;
+        line-height: 60rpx;
+        background: #666;
+        color: #fff;
+        font-size: 24rpx;
+        &.red
+            background-color: #d7092d;
+
+    

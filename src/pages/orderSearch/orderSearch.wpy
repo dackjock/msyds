@@ -1,20 +1,304 @@
 <template lang="wxml" minapp="wepy">
   <view class="container">
     <view class="search_bar">
-        
+        <image mode="aspectFit" class="goback" src="../../assets/images/icon/goback.png" />
+        <view @tap="showPanel" class="input_box">
+            <input type="text"  disabled="{{true}}" placeholder="请输入地区、品名、价格、仓库等搜索" placeholder-style="color:#fff;font-size:24rpx;" />
+            <image class="searcha" mode="aspectFit" src="../../assets/images/icon/searcha.png" />
+        </view>
     </view>
+
+    <view class="lishi">
+      历史搜索：<view class="info">白银、金贵、订单编号WWW9527</view>
+    </view>
+
+
+
+
+
+    <!-- 筛选面板 -->
+    <view class="select_panel {{show?'show':''}}">
+      <view class="layer_gary " @tap="close"></view>
+      <view class="layer_main">
+          <view class="h3" >订单类型</view>
+          <view class="flex_box">
+            <view class="item_span {{orderType==1?'cur':''}}" @tap="change('orderType',1)">白银</view>
+            <view class="item_span {{orderType==2?'cur':''}}" @tap="change('orderType',2)">精矿整单</view>
+            <view class="item_span {{orderType==3?'cur':''}}" @tap="change('orderType',3)">精矿子单</view>
+          </view>
+          <view class="h3">订单状态</view>
+          <view class="flex_box">
+            <view class="item_span  {{orderstatus==2?'cur':''}}"  @tap="change('orderstatus',2)">采购</view>
+            <view class="item_span  {{orderstatus==1?'cur':''}}"  @tap="change('orderstatus',1)">销售</view>
+          </view>
+          <view class="h3">合同编号</view>
+          <view class="input_box">
+            <input type="text"  value="{{contractCode}}"  @input="changeContractCode" placeholder="请输入合同编号"  placeholder-style="color:#999;font-size:24rpx;" />
+          </view>
+            <view class="h3">日期</view>
+          <view class="input_box">
+            <picker mode="date" value="{{date}}"  class="input_inline"  @change="startChange">
+               <input type="text" disabled="{{true}}" placeholder="开始时间" value="{{startTime}}"  placeholder-style="font-size:24rpx;" />  
+               <image class="rli" src="../../assets/images/icon/rili.png" mode="aspectFit" />
+            </picker>
+            <view class="space_code">~</view>
+            <picker mode="date" value="{{date}}"  class="input_inline" @change="endChange">
+              <input type="text" disabled="{{true}}"  placeholder="结束时间" value="{{endTime}}"   placeholder-style="font-size:24rpx;"/>  
+              <image class="rli" src="../../assets/images/icon/rili.png" mode="aspectFit"  />
+            </picker>
+
+          
+          </view>
+          <view class="h3">订单编号/商品名称</view>
+          <view class="input_box">
+            <input type="text" value="{{keys}}"  @input="changeKeyWord"  placeholder="请输入快商品名称或订单编号" placeholder-style="color:#999;font-size:24rpx;" />
+          </view>
+
+          <view class="btn_group_s">
+            <view @tap="reset" class="btn">重置</view>
+            <view @tap="showSearch" class="btn red">完成</view>
+          </view>
+
+      </view>
+    </view>
+
+
+
+
+
+
+
+
+      <!-- 白银订单列表主体 -->
+   
+      <view wx:if="{{list_type==0}}" class="order_main" style="padding-top:0;">
+        <block  wx:for="{{listData}}"  wx:key="{{item.index}}">
+          <view class="order_item">
+            <view class="top">
+              {{item.enterprise_name}}
+              <view class="timer">{{item.create_time}}</view>
+            </view>
+
+            <view class="main_cont">
+              <view class="pro_name">
+                {{item.goods_name}}
+                <view class="status">整</view>
+              </view>
+
+              <view class="right_cont">
+                <view class="flex_box">
+                  <view class="w134">订单编号</view>
+                  <view class="flex_1">{{item.order_code}}</view>
+                </view>
+                <view class="flex_box">
+                  <view class="w134">总价</view>
+                  <view class="w186">{{item.total_price}}元</view>
+                  <view class="w85">数量</view>
+                  <view class="flex_1">{{item.goods_weight}}kg</view>
+                </view>
+                    <view class="flex_box">
+                  <view class="w134">单价</view>
+                  <view class="w186">{{item.price}}元</view>
+                  <view class="w85" style="line-height:1em;padding-top:6rpx;"> <text>结算\n方式</text></view>
+                  <view class="flex_1 max120">{{item.payMethodName}}</view>
+                </view>
+                <view class="flex_box">
+                  <view class="w134">当前状态</view>
+                
+                  <view class="flex_1 f20">{{item.orderStatusName}}</view>
+                </view>
+                <view class="flex_box right">
+                  <view wx:if="{{item.orderConstraintName}}" class="btn_order {{item.orderConstraintName ==='查看结算'?'':'red'}}"   >{{item.orderConstraintName}}</view>
+              
+                <navigator url="../orderDetail/orderDetail?id={{item.id}}&contract_id={{item.contract_id}}" class="btn_order">查看详情</navigator> 
+                </view>
+              </view>
+            </view>
+          </view>
+        </block>
+
+      </view>
+      
+        <!-- 精矿订单列表主体 -->
+      <view  wx:if="{{list_type==1}}" class="order_main" style="padding-top:0;">
+        <block  wx:for="{{listData}}"  wx:key="{{item.index}}">
+          <view class="order_item">
+            <view class="top">
+              {{item.enterprise_name}}
+              <view class="timer">{{item.create_time}}</view>
+            </view>
+
+            <view class="main_cont">
+              <view class="pro_name">
+                {{item.name}}
+              </view>
+
+              <view class="right_cont">
+                <view class="flex_box">
+                  <view class="w134">订单编号</view>
+                  <view class="flex_1">{{item.apply_code}}</view>
+                </view>
+                <view class="flex_box">
+                  <view class="w134">数量</view>
+                  <view class="w186" style="color:#666">{{item.con_weight}}T</view>
+                 <view class="w85" style="line-height:1em;padding-top:6rpx;"> <text>结算\n方式</text></view>
+                  <view class="flex_1">{{item.settlement_type_name}}</view>
+                </view>
+                <view class="flex_box">
+                  <view class="w134">当前状态</view>
+                
+                  <view class="flex_1 f20">{{item.statusName}}</view>
+                </view>
+                <view class="flex_box right">
+                  <view wx:if="{{item.orderConstraintName}}" class="btn_order {{item.orderConstraintName ==='查看结算'?'':'red'}}"   >{{item.orderConstraintName}}</view>
+              
+                <view wx:if="{{item.anniuNameTwo}}" class="btn_order red">{{item.anniuNameTwo}}</view> 
+                <view wx:if="{{item.anniuName}}" class="btn_order">{{item.anniuName}}</view> 
+                
+                </view>
+              </view>
+            </view>
+          </view>
+        </block>
+
+      </view>
   </view>
 </template>
 
 <script>
 import wepy from 'wepy';
 
-export default class Index extends wepy.page {
+export default class orderSearch extends wepy.page {
+  data = {
+    orderType: 1,
+    orderstatus: 2,
+    contractCode: '',
+    startTime: '',
+    endTime: '',
+    keys: '',
+    show: true,
+    list_type: 3,
+    listData: [],
+    pageNum: 1,
+    queryData:{},
+  };
+  methods = {
+    change(key, val) {
+      this[key] = val;
+      this.$apply();
+    },
+    changeContractCode(e) {
+      this.contractCode = e.detail.value;
+    },
+    changeKeyWord(e) {
+      this.keys = e.detail.value;
+    },
+    startChange(e) {
+      this.startTime = e.detail.value;
+    },
+    endChange(e) {
+      this.endTime = e.detail.value;
+    },
+    async showSearch() {
+      this.listData = [];
+      this.pageNum = 1;
+      let _this=this;
+      if (this.orderType == 1) {
+        this.list_type=0;
+        this.queryData = {
+          orderType: this.orderstatus == 1 ? 2 : 1,
+          pageNum: this.pageNum,
+          startTime: this.startTime,
+          endTime: this.endTime,
+          enterpriseId: _this.$parent.globalData.userInfo.id,
+          userType: _this.$parent.globalData.userInfo.isSystem ? 2 : 1,
+          keyword: this.keys
+        };
+        let res = await this.getList(this.queryData);
+        this.listData = res.orderList;
+      } else {
+         this.list_type=1;
+          this.queryData  = {
+          enterpriseId: _this.$parent.globalData.userInfo.id,
+          type: this.orderstatus,
+          userId: _this.$parent.globalData.userInfo.userId,
+          pageNum: this.pageNum,
+          startTime: this.startTime,
+          endTime: this.endTime,
+          keys: this.keys
+        };
+        let res = await this.getList_jinkuang(this.queryData);
+        this.listData = res.pageBean.list;
+      }
 
+      this.show = false;
+      this.$apply();
+    },
+    close() {
+      this.show = false;
+    },
+    showPanel() {
+      this.show = true;
+    },
+    reset() {
+      this.orderType = 1;
+      this.orderstatus = 2;
+      this.contractCode = '';
+      this.startTime = '';
+      this.endTime = '';
+      this.keys = '';
+      this.$apply();
+    }
+  };
+ async onReachBottom(event) {
+    //请求更多数据
+    console.log('onReachBottom', event);
+    let res;
+    wepy.showLoading({
+      title: '加载中…'
+    });
+
+    wepy.showNavigationBarLoading();
+      this.queryData.pageNum = this.queryData.pageNum + 1;
+    if (this.list_type === 0) {
+      res = await this.getList(this.queryData);
+      this.listData.push(...res.orderList);
+    } else {
+      res = await this.getList_jinkuang(this.queryData);
+      this.listData.push(...res.pageBean.list);
+    }
+    this.$apply();
+    wepy.hideNavigationBarLoading();
+    let _list = res.orderList || res.pageBean.list;
+    if (_list.length <= 0) {
+      wepy.showToast({
+        title: '没有更多了',
+        icon: 'none'
+      });
+    } else {
+      wepy.showToast({
+        title: '加载成功',
+        icon: 'none'
+      });
+    }
+  }
+  getList(obj) {
+    let _this = this;
+    return _this.$parent.queryData('msyApp/queryEnterpriseOrderList.do', obj);
+  }
+  getList_jinkuang(obj) {
+    let _this = this;
+    if (this.orderType == 2) {
+      obj.orderType = 1;
+    } else if (this.orderType == 3) {
+      obj.orderType = 2;
+    }
+    return _this.$parent.queryData('msyApp/queryConcentrateApplyPage.do',obj);
+  }
 }
 </script>
 
 <style lang="stylus">
 @import '../../assets/style/orderSearch';
-  
+@import '../../assets/style/order';
 </style>

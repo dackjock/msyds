@@ -5,7 +5,7 @@
       <view class="type_order_con">
              <!-- 订单头部 -->
       <view class="order_header">
-        <image  src="../../assets/images/icon/searcha.png" />
+        <image @tap="goSearch" src="../../assets/images/icon/searcha.png" />
            <view class="show_tab"> 
              {{order_type}}
             <switch checked="{{true}}" @change="switch1Change" color="#fff"/>
@@ -175,6 +175,12 @@ export default class Order extends wepy.page {
   };
 
   methods = {
+    goSearch(){
+         this.$parent.linkPage(
+        '../orderSearch/orderSearch',
+        1
+      );
+    },
     changeListType(val) {
       this.list_type = val;
      // console.log(this.list_type);
@@ -183,7 +189,7 @@ export default class Order extends wepy.page {
     switch1Change(val) {
       this.order_type = val.detail.value ? '采购' : '销售';
       this.queryData_jingkuang.type = val.detail.value ? 1 : 2;
-      this.queryData.orderType = val.detail.value ? 1 : 2;
+      this.queryData.orderType = val.detail.value ? 1: 2;
       this.onPullDownRefresh();
     },
     change() {

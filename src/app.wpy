@@ -18,6 +18,8 @@ export default class extends wepy.app {
       'pages/order/order',
       'pages/orderDetail/orderDetail',
       'pages/orderDetail2/orderDetail2',
+      'pages/orderSearch/orderSearch',
+      'pages/orderDetailItem/orderDetailItem',
       'pages/helpcenter/helpcenter',
       'pages/privacypolicy/privacypolicy',
       'pages/userprotocol/userprotocol',
@@ -42,7 +44,6 @@ export default class extends wepy.app {
       'pages/buyGoods1/buyGoods1',
       'pages/tradeIndex/tradeIndex',
       'pages/platRule/platRule',
-      'pages/orderDetailItem/orderDetailItem',
       'pages/mallIndex/mallIndex'
     ],
     window: {
