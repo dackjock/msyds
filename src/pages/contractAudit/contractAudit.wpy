@@ -1,0 +1,133 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="审核合同"></header>
+    <view class="httit">购销合同编号：{{contain.contract_code}}</view>
+    <rich-text class="htcon" nodes="{{contain.content}}"></rich-text>
+    <view class="htbtbig">
+      <view class="htbna"><image class="htbnai" src="../../assets/images/icon/c-edithi.png" />购销合同确认</view>
+      <view class="htxx">
+        <view class="htxxbx">
+          <view class="htxxbxa">需方</view>
+          <view class="htxxbxa" wx:if="{{contain.status == 0}}">待审核</view>
+          <view class="htxxbxa" wx:if="{{contain.status == 1}}">审核不通过</view>
+          <view class="htxxbxa" wx:if="{{contain.status == 2}}">审核通过</view>
+          <view class="htxxbxa" wx:if="{{contain.status == 3}}">已签章</view>
+          <view class="htxxbxb">{{contain.enterpriseName}}</view>
+        </view>
+        <view class="htxxbx">
+          <view class="htxxbxa">供方</view>
+          <view class="htxxbxa" wx:if="{{contain.supplier_status == 0}}">待审核</view>
+          <view class="htxxbxa" wx:if="{{contain.supplier_status == 1}}">审核不通过</view>
+          <view class="htxxbxa" wx:if="{{contain.supplier_status == 2}}">审核通过</view>
+          <view class="htxxbxa" wx:if="{{contain.supplier_status == 3}}">已签章</view>
+          <view class="htxxbxb">{{contain.supplierEnterpriseName}}</view>
+        </view>
+      </view>
+      <view class="htbtnbx">
+        <view class="htbtna" @tap="httap(0)">拒绝</view>
+        <view class="htbtnb" @tap="httap(1)">点击确认</view>
+        </view>
+    </view>
+    <view class="tipbig" wx:if="{{showtip}}">
+      <view class="tipbx">
+        <view class="tiptit">请填写拒绝原因</view>
+        <view><textarea class="tiptxt" bindblur="bindTextAreaBlur" placeholder="" /></view>
+        <view class="tipwx">温馨提示：收到反馈后，马上银会在1个工作日内处理。</view>
+        <view class="tipbtnbx">
+          <view class="tipbtna" bindtap="tipyes">确定</view>
+          <view class="tipbtna tipbtnb" bindtap="tipno">取消</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class contractAudit extends wepy.page {
+  data = {
+    userInfo:'',
+    htcon: '',
+    userType: '',
+    contain: [],
+    showtip: false,
+    txt:'',
+    htstate: '',
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.htcon = this.$parent.globalData.temporary.goodsData
+    this.$parent.globalData.temporary.goodsData = ''
+    this.userType = this.$parent.globalData.temporary.goodsStatue
+    this.$parent.globalData.temporary.goodsStatue = ''
+    this.addFrontPTContractInit()
+  };
+  //查看合同
+  async addFrontPTContractInit() {
+    let result = await this.$parent.queryData('msyApp/addFrontPTContractInit.do', {
+      tp: 1,
+      userType: this.userType,
+      contractId: this.htcon.id,
+      orderType: this.htcon.orderType,
+      contractStatus: this.htcon.status,
+      supplierStatus: this.htcon.supplierStatus,
+      isReview: this.htcon.isReview,
+      isReviewUser: this.htcon.isReviewUser,
+      enterpriseId:this.userInfo.id,
+    },true)
+    this.contain = result.data.returnMap.pageMap
+    //console.log('ht', this.contain);
+    this.$apply()
+  };
+  //审核合同
+  async reviewContractStatus() {
+    let result = await this.$parent.queryData('msyApp/reviewContractStatus.do', {
+      id: this.htcon.id,
+      status: this.htstate,
+      orderType: this.htcon.orderType,
+      userId: this.userInfo.userId,
+      enterpriseId:this.userInfo.id,
+      reason: this.txt,
+    },true)
+    //console.log('sh', result);
+    if(result.data.type>0){
+      this.$parent.showTip('操作成功！')
+      await this.$parent.sleep(1)
+      this.$parent.linkPage('../contract/contract',2)
+    }else{
+      this.$parent.showTip(result.data.msg)
+    }
+  };
+  bindTextAreaBlur(e) {
+    this.txt = e
+  };
+  methods = {
+    httap(sta) {
+      this.htstate = sta
+      if(sta == 1){
+        this.reviewContractStatus()
+      }else if(sta == 0){
+        this.showtip = true
+      }
+    },
+    tipno() {
+      this.showtip = false
+      this.txt = ''
+    },
+    tipyes() {
+      this.reviewContractStatus()
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/contractAudit';
+  
+</style>

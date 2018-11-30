@@ -69,48 +69,48 @@
           <view class="clearfix mb10">
             <view class="fwb left c6">审批流程：</view>
             <view class="left c-htlilc">{{item.process_name}}</view>
-            <view class="right c-htbtna">查看合同</view>
+            <view class="right c-htbtna" @tap="checkht({{item}})">查看合同</view>
           </view>
           <view class="clearfix">
             <view wx:if="{{item.process_name !== '/'}}">
               <view  wx:if="{{(isSystem==1 && item.orderType==3 && item.status==0 && item.isReview==0 && item.isReviewUser==0) || (isSystem==1 && item.orderType==3 && item.status==0 && item.isReview>0)}}">
-                <view class="red left">发起审核提醒</view>
+                <view class="red left" @tap="shtip(item.id)">发起审核提醒</view>
               </view>
               <view wx:if="{{(isSystem==0 && item.orderType==3 && item.supplierStatus==0 && item.isReview==0 && item.isReviewUser==0) || (isSystem==0 && item.orderType==3 && item.supplierStatus==0 && item.isReview>0)}}">
-               <view class="red left">发起审核提醒</view>
+               <view class="red left" @tap="shtip(item.id)">发起审核提醒</view>
               </view>
               <view wx:if="{{(isSystem==1 && item.orderType!==3 && item.supplierStatus==0 && item.isReview==0 && item.isReviewUser==0) || (isSystem==1 && item.orderType!==3 && item.supplierStatus==0 && item.isReview>0)}}">
-                <view class="red left">发起审核提醒</view>
+                <view class="red left" @tap="shtip(item.id)">发起审核提醒</view>
               </view>
               <view wx:if="{{(isSystem==0 && item.orderType!==3 && item.status==0 && item.isReview==0 && item.isReviewUser==0) || (isSystem==0 && item.orderType!==3 && item.status==0 && item.isReview>0)}}">
-                <view class="red left">发起审核提醒</view>
+                <view class="red left" @tap="shtip(item.id)">发起审核提醒</view>
               </view>
             </view>
 
             <view  wx:if="{{isSystem==0 && item.orderType!==3 && item.orderStatus==5 && item.id!==null && item.supplierStatus==3 && item.status==2 }}">
-              <view class="right c-htbtnb">需方签署合同</view>
+              <view class="right c-htbtnb" @tap="initqian({{item.id}},1)">需方签署合同</view>
             </view>
             <view  wx:if="{{isSystem==1 && item.orderType!==3 && item.orderStatus==5 && item.id!==null && item.supplierStatus==2 }}">
-              <view class="right c-htbtnb">供方签署合同</view>
+              <view class="right c-htbtnb" @tap="initqian({{item.id}},2)">供方签署合同</view>
             </view>
             <view  wx:if="{{isSystem==1 && item.orderType==3 && item.id!==null && item.status==2 && item.supplierStatus==3 }}">
-              <view class="right c-htbtnb">需方签署合同</view>
+              <view class="right c-htbtnb" @tap="initqian({{item.id}},2)">需方签署合同</view>
             </view>
             <view  wx:if="{{isSystem==0 && item.orderType==3 && item.id!==null && item.supplierStatus==2 }}">
-              <view class="right c-htbtnb">供方签署合同</view>
+              <view class="right c-htbtnb" @tap="initqian({{item.id}},1)">供方签署合同</view>
             </view>
 
             <view  wx:if="{{isSystem==1 && item.orderType==3 && item.status==0 && item.isReview==0 && item.isReviewUser>0}}">
-                <view class="right c-htbtnb">审核合同</view>
+                <view class="right c-htbtnb" @tap="htAudit({{item}})">审核合同</view>
             </view>
             <view  wx:if="{{isSystem==0 && item.orderType==3 && item.supplierStatus==0 && item.isReview==0 && item.isReviewUser>0}}">
-              <view class="right c-htbtnb">审核合同</view>
+              <view class="right c-htbtnb" @tap="htAudit({{item}})">审核合同</view>
             </view>
             <view  wx:if="{{isSystem==1 && item.orderType!==3 && item.supplierStatus==0 && item.isReview==0 && item.isReviewUser>0}}">
-              <view class="right c-htbtnb">审核合同</view>
+              <view class="right c-htbtnb" @tap="htAudit({{item}})">审核合同</view>
             </view>
             <view  wx:if="{{isSystem==0 && item.orderType!==3 && item.status==0 && item.isReview==0 && item.isReviewUser>0}}">
-              <view class="right c-htbtnb">审核合同</view>
+              <view class="right c-htbtnb" @tap="htAudit({{item}})">审核合同</view>
             </view>         
           </view>
         </view>
@@ -128,17 +128,17 @@
           <view class="clearfix mb10">
             <view class="fwb left c6">审批流程：</view>
             <view class="left c-htlilc">{{item.process_name}}</view>
-            <view class="right c-htbtna">查看合同</view>
+            <view class="right c-htbtna" @tap="checkht({{item}})">查看合同</view>
           </view>
           <view class="clearfix">
             <view wx:if="{{item.anniuType === 3}}">
-              <view class="right c-htbtnb">{{item.anniuName}}</view>
+              <view class="right c-htbtnb" @tap="htAudit({{item}})">{{item.anniuName}}</view>
             </view>
             <view wx:if="{{item.anniuType === 4 || item.anniuType === 7}}">
-              <view class="right c-htbtnb">{{item.anniuName}}</view>
+              <view class="right c-htbtnb" @tap="initqian({{item.id}},1)">{{item.anniuName}}</view>
             </view>
             <view wx:if="{{item.anniuType === 5 || item.anniuType === 8}}">
-              <view class="right c-htbtnb">{{item.anniuName}}</view>
+              <view class="right c-htbtnb" @tap="initqian({{item.id}},2)">{{item.anniuName}}</view>
             </view>
           </view>
         </view>
@@ -174,30 +174,30 @@
           <view class="clearfix mb10">
             <view class="fwb left c6">审批流程：</view>
             <view class="left c-htlilc">{{item.process_name}}</view>
-            <view class="right c-htbtna">查看合同</view>
+            <view class="right c-htbtna" @tap="checkht({{item}})">查看合同</view>
           </view>
           <view class="clearfix">
             <view wx:if="{{item.process_name !== '/'}}">
               <view class="red left" wx:if="{{(isSystem==1 && item.orderType==5 && item.status==0 && item.isReview==0 && item.isReviewUser==0) || (isSystem==1 && item.orderType==5 && item.status==0 && item.isReview>0)}}">
-                <text >发起审核提醒</text>
+                <text @tap="shtip(item.id)">发起审核提醒</text>
               </view>
               <view class="red left" wx:if="{{(isSystem==0 && item.orderType==5 && item.supplierStatus==0 && item.isReview==0 && item.isReviewUser==0) || (isSystem==0 && item.orderType==5 && item.supplierStatus==0 && item.isReview>0)}}">
-                <text >发起审核提醒</text>
+                <text @tap="shtip(item.id)">发起审核提醒</text>
               </view>
             </view>
 
             <view wx:if="{{isSystem==0 && item.orderType === 5 && item.id!==null && item.supplierStatus==3 && item.status==2 }}">
-              <view class="right c-htbtnb" >需方签署合同</view>
+              <view class="right c-htbtnb" @tap="initqian({{item.id}},1)">需方签署合同</view>
             </view>
             <view wx:if="{{isSystem==1 && item.orderType === 5 && item.id!==null && item.supplierStatus==2 }}">
-              <view class="right c-htbtnb" >供方签署合同</view>
+              <view class="right c-htbtnb" @tap="initqian({{item.id}},2)">供方签署合同</view>
             </view>
 
             <view  wx:if="{{isSystem==1 && item.orderType ==5 && item.supplierStatus==0 && item.isReview==0 && item.isReviewUser>0}}">
-              <view class="right c-htbtnb" >审核合同</view>
+              <view class="right c-htbtnb" @tap="htAudit({{item}})">审核合同</view>
             </view>
             <view  wx:if="{{isSystem==0 && item.orderType ==5 && item.status==0 && item.isReview==0 && item.isReviewUser>0}}">
-              <view class="right c-htbtnb" >审核合同</view>
+              <view class="right c-htbtnb" @tap="htAudit({{item}})">审核合同</view>
             </view>
           </view>
         </view>
@@ -324,6 +324,28 @@ export default class contract extends wepy.page {
     console.log('供应链合同', this.gylList);
     this.$apply()
   };
+  //审核提醒
+  async pushCheckControctMessage(contractId) {
+    let result = await this.$parent.queryData('msyApp/pushCheckControctMessage.do', {
+      contractId:contractId,
+      enterpriseId:this.userInfo.id,
+      userId: this.userInfo.userId,
+    },true)
+    //console.log('提醒', result);
+    let msg = result.data.msg
+    this.$parent.showTip(msg)
+  };
+   //签署合同
+  async querySignatureOnline(id,i) {
+    let result = await this.$parent.queryData('msyApp/querySignatureOnline.do', {
+      userType: i,
+      contractId: id
+    },true)
+    console.log('签署', result);
+    let url = result.data.returnMap.url
+    this.$parent.globalData.temporary.webView = url
+    this.$parent.linkPage('../webView/webView', 1);
+  };
   onPullDownRefresh() {
     this.pageNum = 1
     this.fresh = true
@@ -384,7 +406,34 @@ export default class contract extends wepy.page {
       }else if(this.typea == 3){
         this.querySupplyChainContract(this.pageNum,this.status)
       }
-    }
+    },
+    //查看合同
+    checkht(item) {
+      let url = item.viewUrl
+      if(url){
+        this.$parent.globalData.temporary.webView = url
+        this.$parent.linkPage('../webView/webView', 1);
+      }else {
+        this.$parent.globalData.temporary.goodsData = item
+        this.$parent.globalData.temporary.goodsStatue = this.isSystem
+        this.$parent.linkPage('../contractCheck/contractCheck',1)
+        
+      }
+    },
+    //审核合同
+    htAudit(item){
+      this.$parent.globalData.temporary.goodsData = item
+      this.$parent.globalData.temporary.goodsStatue = this.isSystem
+      this.$parent.linkPage('../contractAudit/contractAudit',1)
+    },
+    //签署合同
+    initqian(id,i){
+      this.querySignatureOnline(id,i)
+    },
+    //发起审核提醒
+    shtip(id){
+      this.pushCheckControctMessage(id)
+    },
   };
   components = {
     header
