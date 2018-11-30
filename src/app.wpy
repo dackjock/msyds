@@ -12,6 +12,9 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/login/login',
+      'pages/contract/contract',
+      'pages/invoiceManagement/invoiceManagement',
+      'pages/newsDetail/newsDetail',
       'pages/newsCenter/newsCenter',
       'pages/capitalDetail/capitalDetail',
       'pages/editAuthDevlop/editAuthDevlop',
