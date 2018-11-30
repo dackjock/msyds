@@ -1,0 +1,398 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="合同管理"></header>
+    <view class="n-ctt">
+      <view class="n-ctta">
+        <view class="n-cttabx {{typea == 1? 'cur' : ''}}" @tap="htjs(1)">白银</view>
+        <view class="n-cttabx {{typea == 2? 'cur' : ''}}" @tap="htjs(2)">精矿</view>
+        <view class="n-cttabx {{typea == 3? 'cur' : ''}}" @tap="htjs(3)">供应链</view>
+      </view>
+      <view class="n-scroll">
+        <scroll-view class="scroll-view_x n-scrollbx" scroll-into-view="{{scrollid}}" scroll-x >
+          <view class="n-cttbx {{typeb == 0? 'cur' : ''}}" id="dsh" @tap="typetap(0,'dsh')">待审核</view>
+          <view class="n-cttbx {{typeb == 4? 'cur' : ''}}" id="dqz" @tap="typetap(4,'dqz')">待签章</view>
+          <view class="n-cttbx {{typeb == 2? 'cur' : ''}}" id="shyes" @tap="typetap(2,'shyes')">审核通过</view>
+          <view class="n-cttbx {{typeb == 1? 'cur' : ''}}" id="shno" @tap="typetap(1,'shno')">审核不通过</view>
+          <view class="n-cttbx {{typeb == -1? 'cur' : ''}}" id="all" @tap="typetap(-1,'all')">全部</view>
+          <view class="n-cttbx {{typeb == 3? 'cur' : ''}}" id="yqz" @tap="typetap(3,'yqz')">已签章</view>
+        </scroll-view>
+      </view>
+    </view>
+    <!-- 白银 -->
+    <view class="c-htbx" wx:if="{{typea == 1}}">
+      <view class="c-htli" wx:for="{{byList}}" wx:key="{{item.index}}">
+        <view class="mb10">合同编号：<text class="c6 fwb">{{item.contractCode}}</text></view>
+        <view class="mb10 flex">
+          <view class="c-htlil">订单编号：<text class="c6">{{item.orderCode}}</text></view>
+          <view class="flex-1">品名：<text class="c6">{{item.goods_name}}</text></view>
+        </view>
+        <view class="mb10">供方：<text class="c6">{{item.supplier_enterprise_name}}</text></view>
+        <view class="mb10">需方：<text class="c6">{{item.enterprise_name}}</text></view>
+        <view class="mb10 flex">
+          <view class="c-htlil">最终单价：<text class="c6">{{item.price}}元/KG</text></view>
+          <view class="flex-1">预估总价：<text class="red">{{item.total_price}}元</text></view>
+        </view>
+        <view class="mb10 flex">
+          <view class="c-htlil">数量：<text class="c6">{{item.goods_weight}}KG</text></view>
+          <view class="flex-1">状态：
+            <text class="c6" wx:if="{{isSystem==1 && item.orderType==3}}">
+              <text wx:if="{{item.status==0 && item.isReview==0 && (item.isReviewUser==0 || item.isReviewUser==1)}}">待确认合同</text>
+              <text wx:if="{{item.status==0 && item.isReview>0}}">本人已审核通过</text>
+              <text wx:if="{{item.status==1}}">审核不通过</text>
+              <text wx:if="{{item.status==2}}">审核通过</text>
+              <text wx:if="{{item.status==3}}">已签章</text>
+            </text>
+            <text class="c6" wx:if="{{isSystem==0 && item.orderType==3}}">
+              <text wx:if="{{item.supplierStatus==0 && item.isReview==0 && (item.isReviewUser==0 || item.isReviewUser==1 )}}">待确认合同</text>
+              <text wx:if="{{item.supplierStatus==0 && item.isReview>0}}">本人已审核通过</text>
+              <text wx:if="{{item.supplierStatus==1}}">审核不通过</text>
+              <text wx:if="{{item.supplierStatus==2}}">审核通过</text>
+              <text wx:if="{{item.supplierStatus==3}}">已签章</text>
+            </text>
+            <text class="c6"  wx:if="{{isSystem==1 && item.orderType!==3}}">
+              <text wx:if="{{item.supplierStatus==0 && item.isReview==0 && (item.isReviewUser==0 || item.isReviewUser==1 )}}">待确认合同</text>
+              <text wx:if="{{item.supplierStatus==0 && item.isReview>0}}">本人已审核通过</text>
+              <text wx:if="{{item.supplierStatus==1}}">审核不通过</text>
+              <text wx:if="{{item.supplierStatus==2}}">审核通过</text>
+              <text wx:if="{{item.supplierStatus==3}}">已签章</text>
+            </text>
+            <text class="c6" wx:if="{{isSystem==0 && item.orderType!==3}}">
+              <text wx:if="{{item.status==0 && item.isReview==0 && (item.isReviewUser==0 || item.isReviewUser==1 )}}">待确认合同</text>
+              <text wx:if="{{item.status==0 && item.isReview>0}}">本人已审核通过</text>
+              <text wx:if="{{item.status==1}}">审核不通过</text>
+              <text wx:if="{{item.status==2}}">审核通过</text>
+              <text wx:if="{{item.status==3}}">已签章</text>
+            </text>
+          </view>
+        </view>
+        <view class="c-htlibt">
+          <view class="clearfix mb10">
+            <view class="fwb left c6">审批流程：</view>
+            <view class="left c-htlilc">{{item.process_name}}</view>
+            <view class="right c-htbtna">查看合同</view>
+          </view>
+          <view class="clearfix">
+            <view wx:if="{{item.process_name !== '/'}}">
+              <view  wx:if="{{(isSystem==1 && item.orderType==3 && item.status==0 && item.isReview==0 && item.isReviewUser==0) || (isSystem==1 && item.orderType==3 && item.status==0 && item.isReview>0)}}">
+                <view class="red left">发起审核提醒</view>
+              </view>
+              <view wx:if="{{(isSystem==0 && item.orderType==3 && item.supplierStatus==0 && item.isReview==0 && item.isReviewUser==0) || (isSystem==0 && item.orderType==3 && item.supplierStatus==0 && item.isReview>0)}}">
+               <view class="red left">发起审核提醒</view>
+              </view>
+              <view wx:if="{{(isSystem==1 && item.orderType!==3 && item.supplierStatus==0 && item.isReview==0 && item.isReviewUser==0) || (isSystem==1 && item.orderType!==3 && item.supplierStatus==0 && item.isReview>0)}}">
+                <view class="red left">发起审核提醒</view>
+              </view>
+              <view wx:if="{{(isSystem==0 && item.orderType!==3 && item.status==0 && item.isReview==0 && item.isReviewUser==0) || (isSystem==0 && item.orderType!==3 && item.status==0 && item.isReview>0)}}">
+                <view class="red left">发起审核提醒</view>
+              </view>
+            </view>
+
+            <view  wx:if="{{isSystem==0 && item.orderType!==3 && item.orderStatus==5 && item.id!==null && item.supplierStatus==3 && item.status==2 }}">
+              <view class="right c-htbtnb">需方签署合同</view>
+            </view>
+            <view  wx:if="{{isSystem==1 && item.orderType!==3 && item.orderStatus==5 && item.id!==null && item.supplierStatus==2 }}">
+              <view class="right c-htbtnb">供方签署合同</view>
+            </view>
+            <view  wx:if="{{isSystem==1 && item.orderType==3 && item.id!==null && item.status==2 && item.supplierStatus==3 }}">
+              <view class="right c-htbtnb">需方签署合同</view>
+            </view>
+            <view  wx:if="{{isSystem==0 && item.orderType==3 && item.id!==null && item.supplierStatus==2 }}">
+              <view class="right c-htbtnb">供方签署合同</view>
+            </view>
+
+            <view  wx:if="{{isSystem==1 && item.orderType==3 && item.status==0 && item.isReview==0 && item.isReviewUser>0}}">
+                <view class="right c-htbtnb">审核合同</view>
+            </view>
+            <view  wx:if="{{isSystem==0 && item.orderType==3 && item.supplierStatus==0 && item.isReview==0 && item.isReviewUser>0}}">
+              <view class="right c-htbtnb">审核合同</view>
+            </view>
+            <view  wx:if="{{isSystem==1 && item.orderType!==3 && item.supplierStatus==0 && item.isReview==0 && item.isReviewUser>0}}">
+              <view class="right c-htbtnb">审核合同</view>
+            </view>
+            <view  wx:if="{{isSystem==0 && item.orderType!==3 && item.status==0 && item.isReview==0 && item.isReviewUser>0}}">
+              <view class="right c-htbtnb">审核合同</view>
+            </view>         
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 精矿 -->
+    <view class="c-htbx" wx:if="{{typea == 2}}">
+      <view class="c-htli" wx:for="{{jkList}}" wx:key="{{item.index}}">
+        <view class="mb10">合同编号：<text class="c6 fwb">{{item.contractCode}}</text></view>
+        <view class="mb10 flex">
+          <view class="c-htlil">订单编号：<text class="c6">{{item.orderCode}}</text></view>
+          <view class="flex-1">状态：<text class="c6">{{item.statusName}}</text></view>
+        </view>
+        <view class="c-htlibt">
+          <view class="clearfix mb10">
+            <view class="fwb left c6">审批流程：</view>
+            <view class="left c-htlilc">{{item.process_name}}</view>
+            <view class="right c-htbtna">查看合同</view>
+          </view>
+          <view class="clearfix">
+            <view wx:if="{{item.anniuType === 3}}">
+              <view class="right c-htbtnb">{{item.anniuName}}</view>
+            </view>
+            <view wx:if="{{item.anniuType === 4 || item.anniuType === 7}}">
+              <view class="right c-htbtnb">{{item.anniuName}}</view>
+            </view>
+            <view wx:if="{{item.anniuType === 5 || item.anniuType === 8}}">
+              <view class="right c-htbtnb">{{item.anniuName}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 供应链 -->
+    <view class="c-htbx" wx:if="{{typea == 3}}">
+      <view class="c-htli" wx:for="{{gylList}}" wx:key="{{item.index}}">
+        <view class="mb10">合同编号：<text class="c6 fwb">{{item.contractCode}}</text></view>
+        <view class="mb10 flex">
+          <view class="c-htlil">订单编号：
+            <text class="c6" wx:if = "{{item.orderCode == ''}}">/</text>
+            <text class="c6" wx:if = "{{item.orderCode !== ''}}">{{item.orderCode}}</text>
+          </view>
+          <view class="flex-1">状态：
+            <text class="c6" wx:if="{{isSystem==1 && item.orderType==5}}">
+              <text wx:if="{{item.supplierStatus==0 && item.isReview==0 && (item.isReviewUser==0 || item.isReviewUser==1 )}}">待确认合同</text>
+              <text wx:if="{{item.supplierStatus==0 && item.isReview>0}}">本人已审核通过</text>
+              <text wx:if="{{item.supplierStatus==1}}">审核不通过</text>
+              <text wx:if="{{item.supplierStatus==2}}">审核通过</text>
+              <text wx:if="{{item.supplierStatus==3}}">已签章</text>
+            </text>
+            <text class="c6" wx:if="{{isSystem==0 && item.orderType==5}}">
+              <text wx:if="{{item.status==0 && item.isReview==0 && (item.isReviewUser==0 || item.isReviewUser==1 )}}">待确认合同</text>
+              <text wx:if="{{item.status==0 && item.isReview>0}}">本人已审核通过</text>
+              <text wx:if="{{item.status==1}}">审核不通过</text>
+              <text wx:if="{{item.status==2}}">审核通过</text>
+              <text wx:if="{{item.status==3}}">已签章</text>
+            </text>
+          </view>
+        </view>
+        <view class="c-htlibt">
+          <view class="clearfix mb10">
+            <view class="fwb left c6">审批流程：</view>
+            <view class="left c-htlilc">{{item.process_name}}</view>
+            <view class="right c-htbtna">查看合同</view>
+          </view>
+          <view class="clearfix">
+            <view wx:if="{{item.process_name !== '/'}}">
+              <view class="red left" wx:if="{{(isSystem==1 && item.orderType==5 && item.status==0 && item.isReview==0 && item.isReviewUser==0) || (isSystem==1 && item.orderType==5 && item.status==0 && item.isReview>0)}}">
+                <text >发起审核提醒</text>
+              </view>
+              <view class="red left" wx:if="{{(isSystem==0 && item.orderType==5 && item.supplierStatus==0 && item.isReview==0 && item.isReviewUser==0) || (isSystem==0 && item.orderType==5 && item.supplierStatus==0 && item.isReview>0)}}">
+                <text >发起审核提醒</text>
+              </view>
+            </view>
+
+            <view wx:if="{{isSystem==0 && item.orderType === 5 && item.id!==null && item.supplierStatus==3 && item.status==2 }}">
+              <view class="right c-htbtnb" >需方签署合同</view>
+            </view>
+            <view wx:if="{{isSystem==1 && item.orderType === 5 && item.id!==null && item.supplierStatus==2 }}">
+              <view class="right c-htbtnb" >供方签署合同</view>
+            </view>
+
+            <view  wx:if="{{isSystem==1 && item.orderType ==5 && item.supplierStatus==0 && item.isReview==0 && item.isReviewUser>0}}">
+              <view class="right c-htbtnb" >审核合同</view>
+            </view>
+            <view  wx:if="{{isSystem==0 && item.orderType ==5 && item.status==0 && item.isReview==0 && item.isReviewUser>0}}">
+              <view class="right c-htbtnb" >审核合同</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="n-nodata" wx:if="{{dataleng}}">暂无更多数据！</view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class contract extends wepy.page {
+  config = {
+      "enablePullDownRefresh": true
+  };
+  data = {
+    userInfo:'',
+    byList:[],//白银
+    jkList:[],//精矿
+    gylList:[],//供应链
+    typea: 1,
+    typeb: -1,
+    scrollid: '',
+    pageNum: 1,
+    status: -1,//状态
+    supplierStatus: '',//供方合同状态
+    isSystem: '',
+    fresh: false,
+    flage: false,
+    dataleng: false,
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.byList = []
+    this.queryContract(this.pageNum,this.status,this.supplierStatus)
+  };
+ //白银合同列表
+  async queryContract(pageNum,status,supplierStatus,fresh) {
+    let result = await this.$parent.queryData('msyApp/queryContract.do', {
+      userId: this.userInfo.userId,
+      enterpriseId:this.userInfo.id,
+      pageNum:pageNum,
+      pageSize:'',
+      status:status,
+      supplierStatus:supplierStatus,
+    })
+    if(fresh){
+      this.byList = []
+      this.fresh = false
+    }
+    if(result.contractList.length>0){
+      this.flage= true
+      this.byList = this.byList.concat(result.contractList)
+    } else{
+      console.log('无更多数据')
+      this.flage= false
+    }
+    this.isSystem = result.isSystem
+    if(this.byList.length>0){
+      this.dataleng = false
+    }else{
+      this.dataleng = true
+    }
+    console.log('白银合同', this.byList);
+    this.$apply()
+  };
+  //精矿合同列表
+  async queryJKContractList(pageNum,status,fresh) {
+    let result = await this.$parent.queryData('msyApp/queryJKContractList.do', {
+      pageNum:pageNum,
+      enterpriseId:this.userInfo.id,
+      status:status,
+      userId: this.userInfo.userId,
+    })
+    //console.log('精矿合同', result);
+    if(fresh){
+      this.jkList = []
+      this.fresh = false
+    }
+    if(result.pageBean.list.length>0){
+      this.flage= true
+      this.jkList = this.jkList.concat(result.pageBean.list)
+    } else{
+      console.log('无更多数据')
+      this.flage= false
+    }
+    this.isSystem = result.isSystem
+    if(this.jkList.length>0){
+      this.dataleng = false
+    }else{
+      this.dataleng = true
+    }
+    console.log('精矿合同', this.jkList);
+    this.$apply()
+  };
+  //供应链合同列表
+  async querySupplyChainContract(pageNum,status,fresh) {
+    let result = await this.$parent.queryData('msyApp/querySupplyChainContract.do', {
+      userId: this.userInfo.userId,
+      enterpriseId:this.userInfo.id,
+      pageNum:pageNum,
+      status:status,
+    })
+    //console.log('供应链合同', result);
+    if(fresh){
+      this.gylList = []
+      this.fresh = false
+    }
+    if(result.contractList.length>0){
+      this.flage= true
+      this.gylList = this.gylList.concat(result.contractList)
+    } else{
+      console.log('无更多数据')
+      this.flage= false
+    }
+    this.isSystem = result.isSystem
+    if(this.gylList.length>0){
+      this.dataleng = false
+    }else{
+      this.dataleng = true
+    }
+    console.log('供应链合同', this.gylList);
+    this.$apply()
+  };
+  onPullDownRefresh() {
+    this.pageNum = 1
+    this.fresh = true
+    if(this.typea == 1){
+      this.queryContract(this.pageNum,this.status,this.supplierStatus,this.fresh)
+    }else if(this.typea == 2){
+      this.queryJKContractList(this.pageNum,this.status,this.fresh)
+    }else if(this.typea == 3){
+        this.querySupplyChainContract(this.pageNum,this.status,this.fresh)
+      }
+    
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
+  };
+  onReachBottom() {
+    if (this.flage) {
+        this.pageNum +=1
+        if(this.typea == 1){
+          this.queryContract(this.pageNum,this.status,this.supplierStatus)
+        }else if(this.typea == 2){
+          this.queryJKContractList(this.pageNum,this.status)
+        }else if(this.typea == 3){
+        this.querySupplyChainContract(this.pageNum,this.status)
+      }
+    }
+  };
+  methods = {
+    // 白银 精矿 供应链 点击
+    htjs(id) {
+      this.typea = id
+      this.byList = []
+      this.jkList = []
+      this.gylList = []
+      this.pageNum =1
+      this.status = -1
+      this.typeb = -1
+      if(this.typea == 1){
+        this.queryContract(this.pageNum,this.status,this.supplierStatus)
+      }else if(this.typea == 2){
+        this.queryJKContractList(this.pageNum,this.status)
+      }else if(this.typea == 3){
+        this.querySupplyChainContract(this.pageNum,this.status)
+      }
+    },
+    //状态 点击
+    typetap(type,scorllid){
+      this.typeb = type
+      this.scrollid = scorllid
+      this.byList = []
+      this.jkList = []
+      this.gylList = []
+      this.pageNum =1
+      this.status = type
+      if(this.typea == 1){
+        this.queryContract(this.pageNum,this.status,this.supplierStatus)
+      }else if(this.typea == 2){
+        this.queryJKContractList(this.pageNum,this.status)
+      }else if(this.typea == 3){
+        this.querySupplyChainContract(this.pageNum,this.status)
+      }
+    }
+  };
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/contract';
+  
+</style>

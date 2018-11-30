@@ -17,15 +17,15 @@
       </view>
       <view class="n-scroll">
         <scroll-view class="scroll-view_x n-scrollbx" scroll-into-view="{{scrollid}}" scroll-x >
-          <view class="n-cttbx {{classifyType === 0? 'cur' : ''}}" id="{{classType[0].id}}" @tap="typetap({{classType[0].type}},{{classType[0].id}})">全部消息</view>
-          <view class="n-cttbx {{classifyType == 2? 'cur' : ''}}" id="{{classType[1].id}}" @tap="typetap({{classType[1].type}},{{classType[1].id}})">修改密码</view>
-          <view class="n-cttbx {{classifyType == 4? 'cur' : ''}}" id="{{classType[2].id}}" @tap="typetap({{classType[2].type}},{{classType[2].id}})">合同签订成功</view>
-          <view class="n-cttbx {{classifyType == 6? 'cur' : ''}}" id="{{classType[3].id}}" @tap="typetap({{classType[3].type}},{{classType[3].id}})">二次结算</view>
-          <view class="n-cttbx {{classifyType == 7? 'cur' : ''}}" id="{{classType[4].id}}" @tap="typetap({{classType[4].type}},{{classType[4].id}})">码单生成</view>
-          <view class="n-cttbx {{classifyType == 5? 'cur' : ''}}" id="{{classType[5].id}}" @tap="typetap({{classType[5].type}},{{classType[5].id}})">提货</view>
-          <view class="n-cttbx {{classifyType == 11? 'cur' : ''}}" id="{{classType[6].id}}" @tap="typetap({{classType[6].type}},{{classType[6].id}})">催款</view>
-          <view class="n-cttbx {{classifyType == 8? 'cur' : ''}}" id="{{classType[7].id}}" @tap="typetap({{classType[7].type}},{{classType[7].id}})">开票</view>
-          <view class="n-cttbx {{classifyType == 9? 'cur' : ''}}" id="{{classType[8].id}}" @tap="typetap({{classType[8].type}},{{classType[8].id}})">锁单</view>
+          <view class="n-cttbx {{classifyType == 0? 'cur' : ''}}" id="all" @tap="typetap(0,'all')">全部消息</view>
+          <view class="n-cttbx {{classifyType == 2? 'cur' : ''}}" id="psw" @tap="typetap(2,'psw')">修改密码</view>
+          <view class="n-cttbx {{classifyType == 4? 'cur' : ''}}" id="ht" @tap="typetap(4,'ht')">合同签订成功</view>
+          <view class="n-cttbx {{classifyType == 6? 'cur' : ''}}" id="js" @tap="typetap(6,'js')">二次结算</view>
+          <view class="n-cttbx {{classifyType == 7? 'cur' : ''}}" id="md" @tap="typetap(7,'md')">码单生成</view>
+          <view class="n-cttbx {{classifyType == 5? 'cur' : ''}}" id="th" @tap="typetap(5,'th')">提货</view>
+          <view class="n-cttbx {{classifyType == 11? 'cur' : ''}}" id="ck" @tap="typetap(11,'ck')">催款</view>
+          <view class="n-cttbx {{classifyType == 8? 'cur' : ''}}" id="kp" @tap="typetap(8,'kp')">开票</view>
+          <view class="n-cttbx {{classifyType == 9? 'cur' : ''}}" id="sd" @tap="typetap(9,'sd')">锁单</view>
         </scroll-view>
       </view>
     </view>
@@ -75,17 +75,6 @@ export default class newsCenter extends wepy.page {
     newNewsCount: '',
     newsList: [],
     ynewsList: [],
-    classType: [
-      {type:0,id:'all'},
-      {type:2,id:'psw'},
-      {type:4,id:'ht'},
-      {type:6,id:'js'},
-      {type:7,id:'md'},
-      {type:5,id:'th'},
-      {type:11,id:'ck'},
-      {type:8,id:'kp'},
-      {type:9,id:'sd'},
-    ],
     scrollid: 'all',
     selid: '',
     showedit: '',
@@ -164,7 +153,7 @@ export default class newsCenter extends wepy.page {
     let that = this;
     if (that.flage) {
         that.pageNum +=1
-        this.appQueryMessageList(that.enable,that.classifyType,that.pageNum)
+        that.appQueryMessageList(that.enable,that.classifyType,that.pageNum)
     }
   };
   //全选
@@ -217,6 +206,7 @@ export default class newsCenter extends wepy.page {
         this.enable = id
       }
       this.newsList = []
+      this.pageNum = 1
       this.appQueryMessageList(this.enable,this.classifyType,this.pageNum)
     },
     //切换消息类型
@@ -224,6 +214,7 @@ export default class newsCenter extends wepy.page {
       this.classifyType = type
       this.scrollid = id
       this.newsList = []
+      this.pageNum = 1
       this.appQueryMessageList(this.enable,this.classifyType,this.pageNum)
     },
     //头部点击编辑 取消
