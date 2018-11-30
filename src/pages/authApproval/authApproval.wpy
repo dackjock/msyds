@@ -29,7 +29,7 @@
         </view>
       </view>
     </view>
-    <button class="page-btn fix-bot" @tap.stop="editApproval('')">新增管理员</button>
+    <button class="page-btn fix-bot" @tap.stop="editApproval('')">新增审批流程</button>
   </view>
 </template>
 

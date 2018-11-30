@@ -1,0 +1,23 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <web-view src="{{viewUrl}}" />
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+export default class webView extends wepy.page {
+  data = {
+    viewUrl: ''
+  };
+  onShow(){
+    this.viewUrl = this.$parent.globalData.temporary.webView
+    this.$parent.globalData.temporary.webView = []
+    console.log(this.viewUrl)
+  }
+}
+</script>
+
+<style lang="stylus">
+</style>
