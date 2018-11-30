@@ -47,6 +47,9 @@ export default class extends wepy.app {
       'pages/tradeIndex/tradeIndex',
       'pages/platRule/platRule',
       'pages/editAuthApproval/editAuthApproval',
+      'pages/codesQuery/codesQuery',
+      'pages/webView/webView',
+      'pages/oderPayment/oderPayment'
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -64,8 +67,9 @@ export default class extends wepy.app {
     wxUser: '',
     temporary: {
       goodsData: '',
-      goodsStatue:'',
-      contractId:''
+      goodsStatue: '',
+      contractId: '',
+      webView: ''
     }
   };
 

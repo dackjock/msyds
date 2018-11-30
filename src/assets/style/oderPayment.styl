@@ -1,0 +1,46 @@
+@import './base'
+
+.pay-info
+  display: flex
+  flex-flow: column
+  justify-content: flex-start
+  align-items: center
+  text-align: center
+  .top-tips
+    width: 100%
+    background: #feecbf
+    color: $theme-color
+    font-size: 20rpx
+    padding: 10rpx 0
+  .top-title,.price
+    width: 100%
+    line-height: 90rpx
+    border-bottom: 2rpx solid #eee
+  .price
+    font-size: 40rpx
+    color: $theme-color
+    font-weight: bold
+  .type-tips
+    line-height: 90rpx
+    display: flex
+    align-items: center
+    &:before,&:after
+      content: ''
+      width: 100rpx
+      height: 2rpx
+      background: #eee
+      margin: 0 20rpx
+  .pay-way
+    display: flex
+    width: 100%
+    justify-content: space-around
+    .pay-item
+      display: flex
+      justify-content: space-around
+      flex-flow: column
+      align-items: center
+      flex: 0 0 200rpx
+      font-size: 24rpx
+      margin-top: 100rpx
+      >text
+        margin-top: 30rpx
