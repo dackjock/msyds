@@ -138,6 +138,7 @@ export default class capitalManagement extends wepy.page {
     } else{
       console.log('无更多数据')
       this.flage= false
+      this.pageNum = 1
     }
 
     this.totalMap = result.totalMap

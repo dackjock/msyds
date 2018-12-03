@@ -86,6 +86,7 @@ export default class newDealby extends wepy.page {
     } else{
       console.log('无更多数据')
       that.flage= false
+      that.pageNum = 1
     }
     for(let i = 0;i<that.cjbyItem.length;i++){
       that.cjbyItem[i].goods_weight = Number(that.cjbyItem[i].goods_weight).toFixed(4)

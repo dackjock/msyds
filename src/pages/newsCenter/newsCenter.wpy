@@ -114,6 +114,7 @@ export default class newsCenter extends wepy.page {
     } else{
       console.log('无更多数据')
       this.flage= false
+      this.pageNum = 1
     }
     this.newNewsCount = result.newNewsCount
     if(this.newsList.length>0){

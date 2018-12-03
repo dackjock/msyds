@@ -1,0 +1,107 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="退票申请"></header>
+    <view class="tptop">
+      <view class="tptit borderbt-e"><text class="tit-i"></text>退票原因</view>
+      <view class="tpyy">
+        <view>退票原因</view>
+        <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
+          {{jstype}} >
+        </picker>
+      </view>
+    </view>
+    <view class="bgf">
+      <view class="tptit -e"><text class="tit-i"></text>备注</view>
+      <form bindsubmit="bindFormSubmit">
+        <view class="tpbz">
+          <view><textarea class="tpbztxt"  placeholder="" name="textarea" /></view>
+          <view class="tpbzw"><text class="tpbzi"></text>纸质发票：发起申请后，马山银收到纸质发票3个工作日内处理</view>
+        </view>
+        <view class="btnbx">
+          <button class="btna" form-type="submit" >确认</button>
+          <view class="btna btnb" bindtap="quxiao">取消</view>
+        </view>
+      </form>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class invoiceReturn extends wepy.page {
+  data = {
+    aid:'',
+    txt:'',
+    jstype:'请选择',
+    array:[],
+    
+  };
+  onShow() {
+    this.aid = this.$parent.globalData.temporary.contractId
+    this.$parent.globalData.temporary.contractId = ''
+    this.returnTicketInit()
+  };
+  //初始化
+  async returnTicketInit() {
+    let result = await this.$parent.queryData('msyApp/returnTicketInit.do', {
+      id: this.aid,
+    })
+    //console.log('退票', result);
+    for(let i =0;i<result.reasonList.length;i++){
+       this.array.push(result.reasonList[i].settingName)
+    }
+    this.$apply()
+  };
+  //确认
+  async returnTicketInfo() {
+    let result = await this.$parent.queryData('msyApp/returnTicketInfo.do', {
+      id: this.aid,
+      retype: this.jstype,
+      returnReason: this.txt,
+    },true)
+    console.log('确认', result);
+    if(result.data.type>0){
+      this.$parent.showTip('操作成功！')
+      await this.$parent.sleep(1)
+      this.$parent.linkPage('../invoiceManagement/invoiceManagement',2)
+    }else{
+      this.$parent.showTip(result.data.msg)
+    }
+    this.$apply()
+  };
+  bindPickerChange(e) {
+    this.index = e.detail.value
+    this.jstype = this.array[this.index]
+    this.$apply()
+  };
+  methods = {
+    bindFormSubmit(e) {
+      this.txt = e.detail.value.textarea
+      if(this.jstype == '请选择'){
+        this.$parent.showTip('请选择退票原因！')
+        return false
+      }
+      if(!this.txt){
+        this.$parent.showTip('请输入备注！')
+        return false
+      }
+      this.returnTicketInfo()
+    },
+    quxiao() {
+      this.$parent.globalData.temporary.contractId = this.aid
+      this.$parent.linkPage('../invoiceDetail/invoiceDetail',3)
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/invoiceReturn';
+  
+</style>

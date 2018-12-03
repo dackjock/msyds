@@ -1,7 +1,32 @@
 <template lang="wxml" minapp="wepy">
   <view class="container">
-    <header title="发票管理"></header>
-    
+    <header title="发票管理" editfp="true" @tokfp.user="gotokfp"></header>
+    <view class="fpbig">
+      <view class="fpbx" wx:for="{{ticketList}}" wx:key="{{item.index}}">
+        <view @tap="todetail({{item.aId}})">
+          <view class="mb20"><text class="fpbxsa">发票金额：</text><text class="red fs36">{{item.total_money}}元</text></view>
+          <view class="mb20 flex">
+            <view class="fpbxl"><text class="fpbxsa">发票编号：</text>{{item.apply_ticket_code}}</view>
+            <view class="flex-1">
+              <text class="fpbxsa">发票状态：</text>
+              <text wx:if="{{item.akstatus == 0}}">待审核</text>
+              <text wx:if="{{item.akstatus == 1}}">审核不通过</text>
+              <text wx:if="{{item.akstatus == 2}}">审核通过</text>
+              <text wx:if="{{item.akstatus == 3}}">邮寄中</text>
+              <text wx:if="{{item.akstatus == 4}}">已开票</text>
+              <text wx:if="{{item.akstatus == 5}}">退票申请中</text>
+              <text wx:if="{{item.akstatus == 6}}">退票已处理</text>
+            </view>
+          </view>
+          <view class="mb20 flex">
+            <view class="fpbxl"><text class="fpbxsa">品名：</text>{{item.goods_name}}</view>
+            <view class="flex-1"><text class="fpbxsa">数量：</text><text class="fs22">{{item.actual_weight}}KG</text></view>
+          </view>
+          <view><text class="fpbxsa">订单编号：</text>{{item.order_code}}</view>
+        </view>
+      </view>
+    </view>
+    <view class="n-nodata" wx:if="{{dataleng}}">暂无更多数据！</view>
   </view>
 </template>
 
@@ -10,15 +35,80 @@ import wepy from 'wepy';
 import header from '@/components/header';
 
 export default class invoiceManagement extends wepy.page {
+  config = {
+      "enablePullDownRefresh": true
+  };
   data = {
-    picPath:'',
+    userInfo:'',
+    gotokfp:'',
+    pageNum: 1,
+    ticketList: [],
+    fresh: false,
+    flage: false,
+    dataleng: false,
   };
   onShow() {
-    
+    this.userInfo = this.$parent.globalData.userInfo
+    this.ticketList = []
+    this.queryAllTicketList(this.pageNum)
   };
- 
-  methods = {
+  //发票管理列表
+  async queryAllTicketList(pageNum,fresh) {
+    let result = await this.$parent.queryData('msyApp/queryAllTicketList.do', {
+      userId: this.userInfo.userId,
+      pageNum: pageNum
+    })
+    //console.log('发票列表', result);
+   // this.ticketList = result.applyticketList
+    if(fresh){
+      this.ticketList = []
+      this.fresh = false
+    }
+    let applyticketList = result.applyticketList
+    if(applyticketList.length>0){
+      this.flage= true
+      for(let i = 0; i<applyticketList.length; i++){
+        applyticketList[i].total_money = applyticketList[i].total_money.toFixed(2)
+        applyticketList[i].actual_weight = applyticketList[i].actual_weight.toFixed(4)
+      }
+      this.ticketList = this.ticketList.concat(applyticketList)
+      
+    } else{
+      console.log('无更多数据')
+      this.flage= false
+      this.pageNum = 1
+    }
+    if(this.ticketList.length>0){
+      this.dataleng = false
+    }else{
+      this.dataleng = true
+    }
+    console.log('发票列表', this.ticketList);
+    this.$apply()
+  };
+  onPullDownRefresh() {
+    this.pageNum = 1
+    this.fresh = true
+    this.queryAllTicketList(this.pageNum,this.fresh)
     
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
+  };
+  onReachBottom() {
+    if (this.flage) {
+        this.pageNum +=1
+        this.queryAllTicketList(this.pageNum)
+    }
+  };
+  methods = {
+    //点击去开发票
+    gotokfp() {
+      console.log('点击了去开发票')
+    },
+    todetail(id) {
+      this.$parent.globalData.temporary.contractId = id
+      this.$parent.linkPage('../invoiceDetail/invoiceDetail',1)
+    }
   };
   
   components = {

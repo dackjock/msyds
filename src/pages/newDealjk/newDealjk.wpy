@@ -88,6 +88,7 @@ export default class newDealjk extends wepy.page {
     } else{
       console.log('无更多数据')
       that.flage= false
+      that.pageNum = 1
     }
     
     for(let i = 0;i<that.cjjkItem.length;i++){

@@ -15,7 +15,10 @@
       <view class="h-editbx" wx:if="{{edit == 'true'}}" bindtap="edittap">
         <view wx:if="{{!editFg}}">编辑<view class="h-editi"></view></view>
         <view wx:if="{{editFg}}">取消</view>
-        </view>
+      </view>
+      <view class="h-editbx" wx:if="{{editfp == 'true'}}" bindtap="tapToKFP">
+        <view>去开发票<view class="h-editi"></view></view>
+      </view>
     </view>
   </view>
 </template>
@@ -32,6 +35,7 @@ export default class header extends wepy.component {
     searchbx: String,
     tofirstpage: String,
     edit: String,
+    editfp: String,
   };
   data = {
     editFg:false
@@ -45,6 +49,9 @@ export default class header extends wepy.component {
       this.editFg = !this.editFg
       this.$emit('editfn',this.editFg)
       this.$apply()
+    },
+    tapToKFP() {
+      this.$emit('tokfp')
     }
   };
 }

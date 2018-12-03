@@ -256,6 +256,7 @@ export default class contract extends wepy.page {
     } else{
       console.log('无更多数据')
       this.flage= false
+      this.pageNum = 1
     }
     this.isSystem = result.isSystem
     if(this.byList.length>0){
@@ -285,6 +286,7 @@ export default class contract extends wepy.page {
     } else{
       console.log('无更多数据')
       this.flage= false
+      this.pageNum = 1
     }
     this.isSystem = result.isSystem
     if(this.jkList.length>0){
@@ -314,6 +316,7 @@ export default class contract extends wepy.page {
     } else{
       console.log('无更多数据')
       this.flage= false
+      this.pageNum = 1
     }
     this.isSystem = result.isSystem
     if(this.gylList.length>0){
@@ -342,9 +345,14 @@ export default class contract extends wepy.page {
       contractId: id
     },true)
     console.log('签署', result);
-    let url = result.data.returnMap.url
-    this.$parent.globalData.temporary.webView = url
-    this.$parent.linkPage('../webView/webView', 1);
+    if(result.data.type>0){
+      let url = result.data.returnMap.url
+      this.$parent.globalData.temporary.webView = url
+      this.$parent.linkPage('../webView/webView', 1);
+    }else{
+      this.$parent.showTip(result.data.msg)
+    }
+    
   };
   onPullDownRefresh() {
     this.pageNum = 1
