@@ -19,6 +19,9 @@
       <view class="h-editbx" wx:if="{{editfp == 'true'}}" bindtap="tapToKFP">
         <view>去开发票<view class="h-editi"></view></view>
       </view>
+      <view class="h-editbx" wx:if="{{checkkpxx == 'true'}}" bindtap="tapTockfpxx">
+        <view>查看开票信息<view class="h-editi"></view></view>
+      </view>
     </view>
   </view>
 </template>
@@ -36,6 +39,7 @@ export default class header extends wepy.component {
     tofirstpage: String,
     edit: String,
     editfp: String,
+    checkkpxx: String,
   };
   data = {
     editFg:false
@@ -52,6 +56,9 @@ export default class header extends wepy.component {
     },
     tapToKFP() {
       this.$emit('tokfp')
+    },
+    tapTockfpxx() {
+      this.$emit('tockkp')
     }
   };
 }

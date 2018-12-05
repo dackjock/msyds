@@ -103,7 +103,7 @@ export default class invoiceManagement extends wepy.page {
   methods = {
     //点击去开发票
     gotokfp() {
-      console.log('点击了去开发票')
+      this.$parent.linkPage('../invoiceCanApply/invoiceCanApply',1)
     },
     todetail(id) {
       this.$parent.globalData.temporary.contractId = id

@@ -41,7 +41,7 @@
               <view class="n-arrri"></view>
             </view>
           </view>
-          <view class="n-ctlibg" wx:if="{{item.selfage}}"><image class="n-ctlibgi" src="../../../assets/images/icon/bigright.png"></image></view>
+          <view class="n-ctlibg" wx:if="{{item.selfage}}"><text class="n-ctlibgi" ></text></view>
         </view>
       </view>
     </view>
