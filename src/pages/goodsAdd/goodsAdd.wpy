@@ -1,0 +1,134 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+      <view class="order_header">
+        <image @tap="goback" src="../../assets/images/icon/goback.png"  mode="aspectFit"  />
+         我要挂单-填写信息
+        <view class="kefu">有疑问    <image @tap="goback" src="../../assets/images/icon/yiwen.png"  mode="aspectFit"  /> </view>
+      </view>
+
+
+      <view class="form_cont">
+            <view class="info_item">
+                <view class="span">产品品名</view>
+                <view class="input_box"><input placeholder="输入产品品名" placeholder-class="Pc_holder" type="text" /></view>
+            </view>
+            <view class="info_item">
+                <view class="span">规格</view>
+                <view class="input_box"><view class="label">请选择</view><image mode="aspectFit" src="../../assets/images/icon/jiantou.png" /></view>
+            </view>
+            <view class="info_item">
+                <view class="span">单价</view>
+                <view class="input_box">
+                    <radio-group class="radio-group" >
+                    <view class="label" wx:for="{{price_type_chose}}" wx:key="{{index}}"><radio value="{{item.value}}" checked="{{item.checked}}" color="#d7092d" />{{item.name}}</view>
+                    </radio-group>
+                </view>
+            </view>
+            <view class="info_item">
+                <view class="span">当前升贴水</view>
+                <view class="input_box show_tab">
+                    
+                    <view class="add btn">+</view>
+                    <view class="tab_main">平水 0</view>
+                    <view class="del btn">-</view>
+                </view>
+            </view>
+            <view class="info_item">
+                <view class="span">数量（重量）</view>
+                <view class="input_box"><input placeholder="请输入白银重量" placeholder-class="Pc_holder" type="text" /></view>
+            </view>
+            <view class="info_item">
+                <view class="span">商品属性</view>
+                <view class="input_box"></view>
+            </view>
+            <view class="info_item">
+                <view class="span">商品类型</view>
+                <view class="input_box">现货</view>
+            </view>
+            <view class="info_item">
+            
+                <view class="span">品牌</view>
+                <view class="input_box"> <picker bindchange="changeBrand" mode="selector" range-key="name" range="{{brandList}}"  class="label">请选择</picker><image mode="aspectFit" src="../../assets/images/icon/jiantou.png" /></view>
+                
+            </view>
+            <view class="info_item">
+                <view class="span">交货地</view>
+                <view class="input_box"><view class="label">请选择</view><image mode="aspectFit" src="../../assets/images/icon/jiantou.png" /></view>
+            </view>
+            <view class="info_item">
+                <view class="span">分类</view>
+                <view class="input_box"><view class="label">请选择省市</view><image mode="aspectFit" src="../../assets/images/icon/jiantou.png" /></view>
+            </view>
+            <view class="info_item">
+                <view class="span">最晚提货时间</view>
+                <view class="input_box"><view class="label">请选择最晚提货时间</view><image mode="aspectFit" src="../../assets/images/icon/jiantou.png" /></view>
+            </view>
+            <view class="info_item">
+                <view class="span">提货仓库</view>
+                <view class="input_box"><input placeholder="请输入提货仓库" placeholder-class="Pc_holder" type="text" /></view>
+            </view>
+            <view class="info_item">
+                <view class="span">结算方式</view>
+                <view class="input_box">  <checkbox value="1" checked="{{true}}" color="#d7092d"/>现款现货</view>
+            </view>
+      </view>
+    <view class="info_warm">
+        <image src="../../assets/images/icon/gt-tips.png" mode="aspectFit" />
+        <view class="flex_1">温馨提示：如需上传码单信息，请在PC端下载Excel表格后在PC端上传。</view>
+    </view>
+    <view class="bottom_btn">
+        <view class="btn reset">重置</view>
+        <view class="btn save">保存</view>
+    </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+export default class goodsAdd extends wepy.page {
+  data = {
+    price_type_chose: [
+      { name: '现货', value: '1' },
+      { name: '期货', value: '2', checked: 'true' },
+      { name: '单价', value: '3' }
+    ],
+    brandList: [],
+    submitData:{
+        id:'',
+        goodsName:"",
+        goodsPrice:"",
+        goodsSpec:"",
+        mainPrice:"",
+        goodsWeiht:"",
+        goodsAttr:"",
+        goodsType:'',
+        brandId:'',
+    }
+  };
+  methods = {
+      changeBrand(e){
+          let index=e.detail.value;
+          this.submitData.brandId=this.brandList[index];
+      }
+  };
+  async onLoad(options) {
+    let res = await this.initWay(options.id);
+    console.log(res);
+    this.brandList = res.brandList;
+    this.$apply();
+  }
+  initWay(id) {
+    return this.$parent.queryData('msyApp/goodsAddOrUpdateInitForEnt.do', {
+      enterpriseId: this.$parent.globalData.userInfo.id,
+      userId: this.$parent.globalData.userInfo.userId,
+      id: id || ''
+    });
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/goodsAdd';
+</style>

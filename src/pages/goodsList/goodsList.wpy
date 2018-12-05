@@ -9,7 +9,7 @@
         
       <view class="order_main {{edit_status?'pd_80':''}}">
         <block  wx:for="{{listData}}"  wx:key="{{item.index}}">
-          <view class="order_item">
+          <view @tap="curChange({{index}})" class="order_item {{item.editD?'cur':''}}">
            
             <view class="main_cont">
 
@@ -69,7 +69,7 @@
       </view>
 
       <!-- 编辑商品 -->
-      <view wx:if="{{edit_status}}" class="btn_bottom">请选择商品</view>
+      <view wx:if="{{edit_status}}" @tap="piliang" class="btn_bottom {{curItem.ids?'red':''}}">{{curItem.ids?'上架':'请选择商品'}}</view>
       <!-- 内容弹窗 -->
       <view class="goods_layer {{showLayer?'show':''}}">
         <view class="layer_gary"></view>
@@ -95,17 +95,47 @@ export default class goodsList extends wepy.page {
     showLayer: false,
     layerEvent: '',
     layerText: '',
-    curItem: {},
+    curItem: { ids: '' },
     edit_status: false
   };
-    watch = {
-      listData (newValue, oldValue) {
-          console.log(`num value: ${oldValue} -> ${newValue}`)
-      }
-  }
+  watch = {
+    listData(newValue, oldValue) {
+      let arr = [];
+      newValue.map((v, i) => {
+        if (v.editD) {
+          arr.push(v.id);
+        }
+      });
+      this.curItem.ids = arr.join(',');
+    }
+  };
   methods = {
+    curChange(index) {
+      if (!this.edit_status) {
+        return;
+      }
+      if (this.listData[index].status == 1) {
+        return;
+      }
+      this.listData[index].editD = !this.listData[index].editD;
+    },
+    async piliang() {
+      this.edit_status = false;
+      this.layerText = '您确定上架当前挂单信息？';
+      this.curItem.status = 1;
+      this.curItem.userId = this.$parent.globalData.userInfo.userId;
+      await this.upDownGoods(this.curItem);
+      this.listData.map((v, i) => {
+        v.editD = false;
+      });
+      this.$apply();
+    },
     editList() {
-      this.edit_status = this.edit_status ? false : true;
+      this.edit_status = !this.edit_status;
+      this.listData.map((v, i) => {
+        v.editD = false;
+      });
+      this.$apply();
     },
     goback() {
       wx.navigateBack();
@@ -122,7 +152,7 @@ export default class goodsList extends wepy.page {
       this.layerText =
         '您确定' + (item.status == 1 ? '下架' : '上架') + '当前挂单信息？';
       this.curItem = {
-        ids: item.id,
+        ids: item.id + '',
         status: item.status == 1 ? '0' : '1',
         userId: this.$parent.globalData.userInfo.userId
       };
@@ -131,7 +161,7 @@ export default class goodsList extends wepy.page {
       this.showLayer = 'delete';
       this.layerText = '您确定删除当前挂单信息？';
       this.curItem = {
-        ids: item.id+"",
+        ids: item.id + '',
         userId: this.$parent.globalData.userInfo.userId
       };
     },
@@ -173,7 +203,7 @@ export default class goodsList extends wepy.page {
       })
       .then(d => {
         d.list.map((v, i) => {
-          d.editD=false;
+          d.editD = false;
           if (v.price_type == 3) {
             v.price_type = v.goods_price;
           } else {
@@ -186,11 +216,18 @@ export default class goodsList extends wepy.page {
   upDownGoods(obj) {
     return this.$parent.queryData('msyApp/upDownGoods.do', obj).then(res => {
       this.showLayer = false;
-      this.listData.map((v, i) => {
-        if (v.id == obj.ids) {
-          this.listData[i].status = obj.status;
-        }
+      if (!res) {
+        return;
+      }
+      let idArr = obj.ids.split(',');
+      idArr.map((id, index) => {
+        this.listData.map((v, i) => {
+          if (v.id == id) {
+            this.listData[i].status = obj.status;
+          }
+        });
       });
+
       this.$apply();
     });
   }
@@ -199,6 +236,9 @@ export default class goodsList extends wepy.page {
       .queryData('msyApp/deleteGoodsDataForEnt.do', obj)
       .then(res => {
         this.showLayer = false;
+        if (!res) {
+          return;
+        }
         let idArr = obj.ids.split(',');
         idArr.map((id, index) => {
           this.listData.map((v, i) => {

@@ -1,0 +1,137 @@
+.order_header
+    height: 85rpx
+    background: #d7092d
+    padding:0 30rpx
+    line-height: 85rpx
+    font-size: 30rpx
+    color: #fff
+    text-align: center
+    position: relative
+    position: fixed;
+    left:0;
+    right 0;
+    top:0;
+    z-index:99
+    >image
+        width: 38rpx;
+        height: 39rpx;
+        position: absolute;
+        left 30rpx;
+        top: 21rpx;
+    .kefu
+        position: absolute;
+        top: 0;
+        right: 30rpx;
+        font-size: 24rpx;
+        image
+            height: 24rpx;
+            width: 30rpx;
+.form_cont
+    font-size: 26rpx;
+    line-height: 30rpx;
+    margin-top: 85rpx;
+    .info_item
+        display:flex;
+        justify-content:space-between;
+        padding:20rpx 25rpx;
+        border-bottom:1px solid #eee;
+        align-items:center;
+        font-size:24rpx;
+        .span:before
+            content: '*';
+            display: inline;
+            color: #d7092d;
+            margin-right: 5rpx;
+            
+        .input_box
+            font-size: 24rpx;   
+        input 
+            display: inline-block;
+            vertical-align: middle;
+            text-align: right ;
+            height 30rpx;
+        .label
+            display: inline-block;
+            margin-right: 10rpx;
+            color: #666;
+        image
+            height:22rpx;
+            width: 12rpx;
+.Pc_holder
+    font-size: 24rpx;
+radio
+checkbox
+    height: 40rpx; 
+    width: 40rpx;
+    position: relative;
+    margin-right: 15rpx;
+    vertical-align: text-bottom;
+radio .wx-radio-input
+checkbox .wx-checkbox-input 
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    background: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left:0;
+
+.show_tab
+    display: flex;
+    align-items: center;
+    .tab_main
+        width:170rpx;
+        text-align: center;
+        height: 36rpx;
+        line-height: 36rpx;
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+        font-size: 24rpx;
+    .btn
+        height:45rpx;
+        line-height: 40rpx;
+        width: 45rpx;
+        text-align: center;
+        font-size: 24rpx;
+        box-sizing: border-box;
+        border:1px solid #eee;
+        &.add
+            color: #d7092d;
+        &.del
+            color: #80c269;
+.info_warm
+    display: flex;
+    padding:15rpx;
+    background: #feecbf;
+    margin-bottom: 100rpx;
+    image
+        width:24rpx;
+        height: 24rpx;
+        margin-right: 20rpx;
+    .flex_1
+        flex: 1;
+        font-size: 24rpx;
+
+.bottom_btn
+    padding: 15rpx 0; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    width:100%;
+    .btn
+        width: 256rpx;
+        height: 70rpx;
+        line-height: 70rpx;
+        text-align: center;
+        background: #999;
+        color: #fff;
+        border-radius: 10rpx;
+        &.save
+            background: #d7092d;
+        +.btn
+            margin-left: 40rpx;
+        
