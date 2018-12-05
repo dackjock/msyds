@@ -48,20 +48,29 @@
             <view class="info_item">
             
                 <view class="span">品牌</view>
-                <view class="input_box"> <picker bindchange="changeBrand" mode="selector" range-key="name" range="{{brandList}}"  class="label">请选择</picker><image mode="aspectFit" src="../../assets/images/icon/jiantou.png" /></view>
+                <view class="input_box"> <picker bindchange="changeBrand" mode="selector" range-key="name" range="{{brandList}}"  class="label">{{brandName}}</picker><image mode="aspectFit" src="../../assets/images/icon/jiantou.png" /></view>
                 
             </view>
             <view class="info_item">
                 <view class="span">交货地</view>
-                <view class="input_box"><view class="label">请选择</view><image mode="aspectFit" src="../../assets/images/icon/jiantou.png" /></view>
+                <view class="input_box">
+                     <picker mode="multiSelector" bindchange="" bindcolumnchange="" value="{{id}}"  range-key="name" range="{{objectMultiArray}}"  class="label">
+                       请选择省市
+                    </picker>
+                  
+                    <image mode="aspectFit" src="../../assets/images/icon/jiantou.png" />
+                </view>
             </view>
             <view class="info_item">
                 <view class="span">分类</view>
-                <view class="input_box"><view class="label">请选择省市</view><image mode="aspectFit" src="../../assets/images/icon/jiantou.png" /></view>
+               <view class="input_box"> <picker bindchange="typeChange" mode="selector" range-key="name" range="{{goodsTypeList}}"  class="label">{{typeName}}</picker><image mode="aspectFit" src="../../assets/images/icon/jiantou.png" /></view>
             </view>
             <view class="info_item">
                 <view class="span">最晚提货时间</view>
-                <view class="input_box"><view class="label">请选择最晚提货时间</view><image mode="aspectFit" src="../../assets/images/icon/jiantou.png" /></view>
+                <view class="input_box">
+                     <picker bindchange="dataChange" mode="date"   class="label">{{submitData.lastTime}}</picker>
+                     <image mode="aspectFit" src="../../assets/images/icon/jiantou.png" />
+                </view>
             </view>
             <view class="info_item">
                 <view class="span">提货仓库</view>
@@ -94,29 +103,65 @@ export default class goodsAdd extends wepy.page {
       { name: '期货', value: '2', checked: 'true' },
       { name: '单价', value: '3' }
     ],
-    brandList: [],
-    submitData:{
-        id:'',
-        goodsName:"",
-        goodsPrice:"",
-        goodsSpec:"",
-        mainPrice:"",
-        goodsWeiht:"",
-        goodsAttr:"",
-        goodsType:'',
-        brandId:'',
+    brandList: [], //品牌列表
+    goodsTypeList: [], //商品分类列表
+    objectMultiArray: [], //省市数据
+    cityData: [], //城市备用数据
+
+    //picker 显示数据
+    brandName: '请选择',
+    typeName:'请选择',
+    submitData: {
+      id: '',
+      goodsName: '',
+      goodsPrice: '',
+      goodsSpec: '',
+      mainPrice: '',
+      goodsWeiht: '',
+      goodsAttr: '',
+      goodsType: '',
+      brandId: '',
+      goodsTypeId:'',
+      cityId:'',
+      provinceId:'',
+      lastTime:"请选择最晚提货时间",
+      storeHouse:"",
+      enterpriseId:'',
+      userId:"",
+      priceType:"",
+      pmids:"",
+
     }
   };
   methods = {
-      changeBrand(e){
-          let index=e.detail.value;
-          this.submitData.brandId=this.brandList[index];
-      }
+    //品牌picker
+    changeBrand(e) {
+      let index = e.detail.value;
+      this.submitData.brandId = this.brandList[index].id;
+      this.brandName = this.brandList[index].name;
+    },
+    //分类picker
+    typeChange(e) {
+      let index = e.detail.value;
+      this.submitData.goodsTypeId = this.goodsTypeList[index].id;
+      this.typeName = this.goodsTypeList[index].name;
+    },
+    //最晚提货时间picker
+    dataChange(e){
+        this.submitData.lastTime= e.detail.value;
+    }
   };
   async onLoad(options) {
     let res = await this.initWay(options.id);
-    console.log(res);
+    let city = await this.initCity();
+    //  console.log(res);
+
     this.brandList = res.brandList;
+    this.goodsTypeList = res.goodsTypeList;
+    this.objectMultiArray.push(city.provinces);
+    this.objectMultiArray.push([{ id: 0, name: '北京市' }]);
+    this.cityData = res.citys;
+    console.log(this.objectMultiArray);
     this.$apply();
   }
   initWay(id) {
@@ -125,6 +170,9 @@ export default class goodsAdd extends wepy.page {
       userId: this.$parent.globalData.userInfo.userId,
       id: id || ''
     });
+  }
+  initCity() {
+    return this.$parent.queryData('msyApp/appAddTicketAddressInfoInit.do');
   }
 }
 </script>
