@@ -1,0 +1,175 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="申请开票"></header>
+    <view class="kpli">
+      <view>选择开票时间</view>
+      <picker mode="date" value="{{kpdate}}" start="{{stardate}}" end="" bindchange="bindDateChangeb">
+        <view class="c6">
+          {{kpdate}}
+        </view>
+      </picker>
+    </view>
+    <view class="kptip"><text class="tpbzi"></text>提示：只能选择当天和当天之后的时间。</view>
+    <view class="bgf">
+      <view class="kpli">
+        <view>开票类型</view>
+        <view class="c6">企业</view>
+      </view>
+      <view class="kpli">
+        <view>发票类型</view>
+        <view class="c6">增值税专用发票</view>
+      </view>
+      <view class="kpli">
+        <view>请选择收件人</view>
+        <view class="c6 ">
+          <picker class="sjr" bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
+            {{addren}} 
+          </picker>
+          <view class="magsjr" bindtap="managesjr">管理收件人</view>
+        </view>
+      </view>
+      <view class="kpli">
+        <view>所在地区</view>
+        <view class="c6">{{sellist.bname}}{{sellist.cname}}</view>
+      </view>
+      <view class="kpli">
+        <view>所在街道</view>
+        <view class="c6">{{sellist.address}}</view>
+      </view>
+      <view class="kpli">
+        <view>邮政编码</view>
+        <view class="c6">{{sellist.post_code}}</view>
+      </view>
+      <view class="kpli">
+        <view>手机号</view>
+        <view class="c6">{{sellist.telephone}}</view>
+      </view>
+    </view>
+    <view class="kpbt bgf">
+      <view class="kpbtna" bindtap="reset">重置</view>
+      <view class="kpbtna kpbtnb" bindtap="kpSubmit">开票提交</view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class invoiceApply extends wepy.page {
+  data = {
+    userInfo:'',
+    stardate:'',
+    ids:'',
+    totalMoney:'',
+    location:'',
+    index:0,
+    kpdate:'请选择开票时间',
+    addren:'请选择',
+    array: [],
+    list: [],
+    sellist: [],
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.ids = this.$parent.globalData.temporary.contractId
+    this.totalMoney = this.$parent.globalData.temporary.goodsData
+    this.$parent.globalData.temporary.contractId = ''
+    this.$parent.globalData.temporary.goodsData = ''
+    this.getNowDay()
+    this.appQueryTicketAddressList()
+  };
+  //收件人列表
+  async appQueryTicketAddressList() {
+    let result = await this.$parent.queryData('msyApp/appQueryTicketAddressList.do', {
+      enterpriseId: this.userInfo.id,
+    })
+    console.log('收件人', result);
+    this.list = result.list
+    for(let i =0;i<this.list.length;i++){
+      this.array.push(this.list[i].receiver_name)
+    }
+    this.$apply()
+  };
+  //申请开票
+  async addApplyTicket() {
+    let result = await this.$parent.queryData('msyApp/addApplyTicket.do', {
+      ids: this.ids,
+      money: this.totalMoney,
+      receiverName: this.addren,
+      location: this.location,
+      street: this.sellist.address,
+      postCode: this.sellist.post_code,
+      beginTime: this.kpdate,
+      telephone: this.sellist.telephone,
+      addressId: this.sellist.id,
+      enterprise_id: this.userInfo.id,
+      userId: this.userInfo.userId,
+    },true)
+    console.log('申请开票', result);
+    if(result.data.type>0){
+      this.$parent.showTip('提交成功。')
+      await this.$parent.sleep(1)
+      this.$parent.linkPage('../invoiceManagement/invoiceManagement',2);
+    }else{
+      this.$parent.showTip(result.data.msg)
+    }
+    this.$apply()
+  };
+  bindDateChangeb(e) {
+    this.kpdate = e.detail.value
+  };
+  bindPickerChange(e) {
+    this.index = e.detail.value
+    this.addren = this.array[this.index]
+    this.sellist = this.list[this.index]
+    this.location = this.sellist.bname + this.sellist.cname
+    this.$apply()
+  };
+  getNowDay() {
+    let date = new Date()
+    let getYear = date.getFullYear()
+    let getMonth = date.getMonth() +1
+    getMonth = getMonth > 9 ? getMonth : '0' + getMonth
+    let day = date.getDate()
+    this.stardate = getYear + '-' + getMonth + '-' + day;
+    this.$apply()
+  };
+  methods = {
+    //去管理收件人
+    managesjr() {
+      console.log('点击了管理收件人')
+    },
+    //重置
+    reset() {
+      this.sellist =[]
+      this.$apply()
+    },
+    //开票提交
+    kpSubmit() {
+      if(this.kpdate == '请选择开票时间' || this.kpdate == ''){
+        this.$parent.showTip('请选择开票时间')
+        return false
+      } else if(this.addren == '请选择' || this.addren == ''){
+        this.$parent.showTip('请选择收件人')
+        return false
+      } else if(this.sellist.length === 0){
+        this.$parent.showTip('所在地区不能为空')
+        return false
+      }else{
+        this.addApplyTicket()
+      }
+      
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/invoiceApply';
+  
+</style>

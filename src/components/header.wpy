@@ -22,6 +22,9 @@
       <view class="h-editbx" wx:if="{{checkkpxx == 'true'}}" bindtap="tapTockfpxx">
         <view>查看开票信息<view class="h-editi"></view></view>
       </view>
+      <view class="h-editbx" wx:if="{{searchr == 'true'}}" bindtap="tapSearch">
+        <view class="fdj"></view>
+      </view>
     </view>
   </view>
 </template>
@@ -40,6 +43,7 @@ export default class header extends wepy.component {
     edit: String,
     editfp: String,
     checkkpxx: String,
+    searchr: String,
   };
   data = {
     editFg:false
@@ -59,7 +63,10 @@ export default class header extends wepy.component {
     },
     tapTockfpxx() {
       this.$emit('tockkp')
-    }
+    },
+    tapSearch() {
+      this.$emit('searchbx')
+    },
   };
 }
 </script>

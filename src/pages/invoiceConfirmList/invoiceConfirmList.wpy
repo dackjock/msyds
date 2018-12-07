@@ -22,7 +22,7 @@
     </view>
     <view class="kpqdbt" wx:if="{{!delfage}}">
       <view class="red">合计：<text class="fs36" wx:if="totalMoney">{{totalMoney}}</text>元</view>
-      <view class="kpqdbtn" wx:if="{{totalMoney > 0}}">确认开票</view>
+      <view class="kpqdbtn" wx:if="{{totalMoney > 0}}" bindtap="toKP">确认开票</view>
       <view class="kpqdbtn kpqdbtnb" wx:if="{{totalMoney == 0}}">确认开票</view>
     </view>
     <view class="kpqdbt" wx:if="{{delfage}}">
@@ -46,11 +46,13 @@ export default class invoiceConfirmList extends wepy.page {
     selfage: false,
     delfage: false,
     ticketList: [],
+    idarr: [],
     totalMoney: 0,
   };
   onShow() {
     this.userInfo = this.$parent.globalData.userInfo
     this.ticketList = []
+    this.idarr = []
     this.queryPreApplyTicket()
   };
   //开票清单列表
@@ -67,6 +69,7 @@ export default class invoiceConfirmList extends wepy.page {
         applyticketList[i].total_price = applyticketList[i].total_price.toFixed(2)
         applyticketList[i].able_ticket_price = applyticketList[i].able_ticket_price.toFixed(2)
         this.totalMoney = (Number(this.totalMoney)*100 + Number(applyticketList[i].ticket_price)*100)/100
+        this.idarr.push(applyticketList[i].id)
       }
       this.ticketList = applyticketList.map(function(obj,index){
         return {
@@ -94,6 +97,7 @@ export default class invoiceConfirmList extends wepy.page {
       this.$parent.showTip('删除成功。')
       await this.$parent.sleep(1)
       this.ticketList = []
+      this.idarr = []
       this.totalMoney = ''
       this.queryPreApplyTicket()
     }else{
@@ -143,6 +147,13 @@ export default class invoiceConfirmList extends wepy.page {
       }else{
         this.$parent.showTip('请选择移除项')
       }
+    },
+    //确认开票
+    toKP() {
+      let ids = this.idarr.join(',')
+      this.$parent.globalData.temporary.contractId = ids
+      this.$parent.globalData.temporary.goodsData = this.totalMoney
+      this.$parent.linkPage('../invoiceApply/invoiceApply', 1);
     }
   };
   
