@@ -1,0 +1,204 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="议价管理"></header>
+    <view class="yjtop">
+      <view class="tr">当前状态<text class="ml20 mr20">{{stateName}}</text><switch class="sw" color="#d7092d" bindchange="switchChange"/></view>
+    </view>
+    <view class="yjul">
+      <view class="yjli" wx:for="{{yjlist}}" wx:key="{{item.index}}">
+        <view class=" mb10">订单编号：<text class="c6">{{item.order_code}}</text></view>
+        <view class=" mb10">供方：<text class="c6">{{item.supplier_enterprise_name}}</text></view>
+        <view class=" mb10">需方：<text class="c6">{{item.enterprise_name}}</text></view>
+        <view class="yjlip mb10">
+          <view class="yjlipl">品名：<text class="c6">{{item.goods_name}}</text></view>
+          <view class="yjlipl">数量：<text class="c6">{{item.goods_weight}}KG</text></view>
+        </view>
+        <view class="yjlip mb10">
+          <view class="yjlipl">基准单价：<text class="c6">{{item.jizhun_price}}元/KG</text></view>
+          <view class="yjlipl">挂单升贴水：<text class="c6">{{item.main_price}}</text></view>
+        </view>
+        <view class="yjlip mb10">
+          <view class="yjlipl">最终单价：<text class="c6">{{item.price}}元/KG</text></view>
+          <view class="yjlipl">升贴水：<text class="c6"><text wx:if="{{item.agio > 0}}">+</text>{{item.agio}}</text></view>
+        </view>
+        <view class="yjlip mb10">
+          <view class="yjlipl">预估总价：<text class="red">{{item.total_price}}元</text></view>
+          <view class="yjlipl">当前状态：
+            <text class="c6" wx:if="{{item.status > 1}}">议价通过</text>
+            <text class="c6" wx:if="{{item.status == 0}}">议价待审核</text>
+            <text class="c6" wx:if="{{item.status == 1 || item.status == -2}}">议价不通过</text>
+          </view>
+        </view>
+        <view class="tr" wx:if="{{item.status == 0 && orderType ==1 && userType == 1}}">
+          <view class="yjbtna" @tap="yjDo({{item.id}},1)">同意</view>
+          <view class="yjbtna" @tap="yjDo({{item.id}},0)">拒绝</view>
+        </view>
+      </view>
+    </view>
+     <view class="n-nodata" wx:if="{{dataleng}}">暂无更多数据！</view>
+
+     <!-- 同意开票 弹框 -->
+    <view class="kptk" wx:if="{{yesShow}}">
+      <view class="kptkbx">
+        <view class="tc c6 mt30">是否确认？</view>
+        <view class="tkbtnbx mt50">
+          <view class="tkbtna" bindtap="cansel">取消</view>
+          <view class="tkbtna tkbtnb" bindtap="agree">确定</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class negotiateManagement extends wepy.page {
+  config = {
+    "enablePullDownRefresh": true
+  };
+  data = {
+    stateName:'销售',
+    orderType: 1,
+    userInfo:'',
+    userType:'',
+    itemid:'',
+    agree:'',
+    jizhun_price:'',
+    pageNum: 1,
+    yjlist: [],
+    fresh: false,
+    flage: false,
+    dataleng: false,
+    yesShow: false,
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.yjlist = []
+    this.pageNum = 1
+    this.orderType = 1
+    this.queryBargainInit()
+    this.queryBargainList(this.orderType,this.pageNum)
+  };
+  //查看议价管理初始化
+  async queryBargainInit() {
+    let result = await this.$parent.queryData('msyApp/queryBargainInit.do', {
+      enterpriseId: this.userInfo.id,
+    })
+    //console.log('done', result);
+    this.userType = result.userType
+    this.$apply()
+  };
+  //发票审核管理列表
+  async queryBargainList(orderType,pageNum,fresh) {
+    let result = await this.$parent.queryData('msyApp/queryBargainList.do', {
+      userId: this.userInfo.userId,
+      orderType: orderType,
+      enterprise_id: this.userInfo.id,
+      pageNum: pageNum,
+      pageSize: '',
+    })
+    //console.log('议价管理', result);
+    if(fresh){
+      this.yjlist = []
+      this.fresh = false
+    }
+    let yfplist = result.bargainList
+    if(yfplist.length>0){
+      this.flage= true
+      for(let i = 0; i<yfplist.length; i++){
+        yfplist[i].goods_weight = yfplist[i].goods_weight.toFixed(4)
+        yfplist[i].price = yfplist[i].price.toFixed(2)
+        yfplist[i].total_price = yfplist[i].total_price.toFixed(2)
+        yfplist[i].jizhun_price = (yfplist[i].price-yfplist[i].agio).toFixed(2)
+      }
+      this.yjlist = this.yjlist.concat(yfplist)
+    } else{
+      console.log('无更多数据')
+      this.flage= false
+      this.pageNum = 1
+    }
+    if(this.yjlist.length>0){
+      this.dataleng = false
+    }else{
+      this.dataleng = true
+    }
+    console.log('议价管理', this.yjlist);
+
+    this.$apply()
+  };
+  //同意或不同意议价
+  async agreeOrNotPurchaseBargain(id,agree) {
+    let result = await this.$parent.queryData('msyApp/agreeOrNotPurchaseBargain.do', {
+      ids: id,
+      agree: agree,
+      userId: this.userInfo.userId,
+    },true)
+    //console.log('done', result);
+    if(result.data.type>0){
+      this.$parent.showTip('操作成功！')
+      this.yjlist = []
+      this.pageNum = 1
+      await this.$parent.sleep(1)
+      this.queryBargainList(this.orderType,this.pageNum)
+    }else{
+      this.$parent.showTip(result.data.msg)
+    }
+    this.$apply()
+  };
+  onPullDownRefresh() {
+    this.pageNum = 1
+    this.fresh = true
+    
+    this.queryBargainList(this.orderType,this.pageNum,this.fresh)
+    
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
+  };
+  onReachBottom() {
+    if (this.flage) {
+        this.pageNum +=1
+        this.queryBargainList(this.orderType,this.pageNum)
+    }
+  };
+  switchChange(e) {
+    if(e.detail.value){
+      this.stateName = '采购'
+      this.orderType = 2
+      this.yjlist = []
+      this.pageNum = 1
+      this.queryBargainList(this.orderType,this.pageNum)
+    }else{
+      this.stateName = '销售'
+      this.orderType = 1
+      this.yjlist = []
+      this.pageNum = 1
+      this.queryBargainList(this.orderType,this.pageNum)
+    }
+  };
+  methods = {
+    yjDo(id,state) {
+      this.yesShow = true
+      this.itemid = id
+      this.agree = state
+    },
+    cansel() {
+      this.yesShow = false
+    },
+    agree() {
+      this.agreeOrNotPurchaseBargain(this.itemid,this.agree)
+      this.yesShow = false
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/negotiateManagement';
+  
+</style>
