@@ -1,0 +1,161 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container pad-bot">
+    <header :title.sync="title"></header>
+    <view class="pi-tips">提示：预付款金额可以冲抵最后一次提货金额。</view>
+    <view class="pickup-item">
+      <text >首次确认单价</text>
+      <text>{{goodsInfo.price}}元/kg({{goodsInfo.costPrice || allData.costPrice}}+{{goodsInfo.agio}})</text>
+    </view>
+    <view class="pickup-item">
+      <text >订单总金额</text>
+      <text >{{goodsInfo.total_price}}元</text>
+    </view>
+    <view class="pickup-item">
+      <text >预付款金额</text>
+      <text>{{goodsInfo.prepay_price}}元</text>
+    </view>
+    <view class="pickup-item">
+      <text >已付货款</text>
+      <text style="color:#d7092d">{{goodsInfo.pay_money}}元</text>
+    </view>
+    <view class="pickup-item">
+      <text >订单总数量</text>
+      <text>{{goodsInfo.goods_total_weight}}KG</text>
+    </view>
+    <view class="pickup-item">
+      <text >可提货数量</text>
+      <text>{{goodsInfo.goods_weight}}KG</text>
+    </view>
+    <view class="pickup-item">
+      <text >是否使用预付款冲抵货款</text>
+      <picker mode="selector" range="{{['使用','不使用']}}" value="{{useIndex}}" bindchange="changeUsed">
+        <view >{{(useIndex === 0 ? '使用' : '不使用') || '请选择'}}</view>
+      </picker>
+    </view>
+    <view class="pickup-item">
+      <text >请填写提货数量</text>
+      <input type="number" placeholder="本次提货数量/Kg" />
+    </view>
+    <view class="pickup-item">
+      <text >剩余预付款金额</text>
+      <text>{{}}元</text>
+    </view>
+    <view class="pickup-item">
+      <text >最晚提货时间</text>
+      <text>{{goodsInfo.take_time}}</text>
+    </view>
+    <view class="pickup-item">
+      <text >本次提货时间</text>
+      <picker mode="date" start="{{startTime}}" end="{{goodsInfo.take_time}}" value="{{pickupDate}}" bindchange="changeTime">
+        <view >{{pickupDate || '请选择'}}</view>
+      </picker>
+    </view>
+    <view class="pickup-item">
+      <text >提货仓库</text>
+      <text>{{goodsInfo.depotName}}</text>
+    </view>
+    <button class="page-btn fix-bot" @tap.stop="subForm">提交</button>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class pickupGoods extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    title: '提货申请信息',
+    flagId: 0,
+    orderId: '',
+    cargoId: '',
+    depotListId: '',
+    indexs: '',
+    again: '',
+    pickupType: ['直接提货'],
+    startTime: '',
+    lastTime: '',
+    typeIndex: 0,
+    pickupDate: '',
+    goodsInfo: {},
+    allData:{}
+  };
+  methods = {
+    changeTime(event) {
+      this.pickupDate = event.detail.value;
+    },
+    changeType(event) {
+      this.typeIndex = event.detail.value;
+    },
+    async subForm() {
+      if (this.typeIndex === '' || this.pickupDate === '') {
+        this.$parent.showTip('请完善信息');
+        return false;
+      }
+      let url = ''
+      if(flagId === 1){
+        url = 'addCashSpotZQCargo.do'
+      }else{
+        url = '/msyApp/addCashSpotCargo.do'
+      }
+      let result = await this.$parent.queryData(url, {
+        cargoId: this.cargoId,
+        orderId:this.orderId,
+        depotListId:this.depotListId,
+        type: parseInt(this.typeIndex) + 1,
+        cargoTime: this.pickupDate
+      });
+      if (result) {
+        // this.$parent.linkPage(
+        //   '../entrustPickup/entrustPickup?orderId=' +
+        //     this.orderId +
+        //     '&cargoId=' +
+        //     this.cargoId,
+        //   4
+        // );
+      }
+      console.log(result);
+    }
+  };
+  onLoad(e) {
+    // console.log(e)
+    this.orderId = e.orderId || 5507;
+    this.cargoId = e.cargoId || 3187;
+    this.depotListId = e.depotListId || 3187;
+    this.indexs = e.index || 1;
+    this.again = e.again || 1;
+    this.take_time = e.take_time || '2018-12-31';
+  }
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.getPickupInfo();
+  }
+  async getPickupInfo() {
+    let result = await this.$parent.queryData(
+      '/msyApp/frontQueryYFCargoInit.do',
+      {
+        enterpriseId: this.userInfo.id,
+        orderId: this.orderId,
+        cargoId: this.cargoId,
+        depotListId: this.depotListId,
+        index: this.indexs,
+        again: this.again
+      }
+    );
+    this.allData = result
+    this.goodsInfo = result.goodsMap;
+    this.flagId = result.pay_method_id;
+    let d = new Date();
+    this.startTime =
+      d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+    this.$apply();
+    console.log(result);
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/pickup';
+</style>

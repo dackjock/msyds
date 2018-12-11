@@ -1,0 +1,228 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container cost-pad" wx:if="{{costInfo}}" @tap="hidePayWay">
+    <header :title.sync="title"></header>
+    <view class="entrust-title">
+      <text class="et-name">码单结算</text>
+    </view>
+    <view class="entrust-info">
+      <text >订单重量</text>
+      <text >{{goods_weight}}KG</text>
+    </view>
+    <view class="entrust-info">
+      <text >码单重量</text>
+      <text >{{costInfo.total_weight}}KG</text>
+    </view>
+    <view class="entrust-info">
+      <text >合同的单价</text>
+      <text class="red">{{price}}元/KG</text>
+    </view>
+    <view class="entrust-info">
+      <text >合同签订金额</text>
+      <text class="red">{{costInfo.order_total_price}}元</text>
+    </view>
+    <view class="entrust-info" wx:if="{{costInfo.payMethodId === 1}}">
+      <text >合同约定账期</text>
+      <text class="red">{{costInfo.accountDay}}天</text>
+    </view>
+    <view class="entrust-info" wx:if="{{costInfo.payMethodId === 1}}">
+      <text >实际已累积自然日</text>
+      <text class="red">{{costInfo.totalAccountDay}}天</text>
+    </view>
+    <view class="entrust-info">
+      <text >订单实际金额</text>
+      <text class="red">{{costInfo.order_pay_price}}元</text>
+    </view>
+    <view class="entrust-info">
+      <text >已支付的金额</text>
+      <text class="red">{{costInfo.order_pay_price}}元</text>
+    </view>
+    <view class="entrust-info">
+      <view class="has-tips">
+        <text >差价</text>
+        <text class="tips">提示：差价=码单的重量*合同单价-已支付的金额 </text>
+      </view>
+      <text class="red">{{compensate_price}}元</text>
+    </view>
+    <view class="entrust-info">
+      <text >小计</text>
+      <text class="red">{{compensate_price}}元</text>
+    </view>
+    <view class="entrust-title bord-top">
+      <text class="et-name">仓储费用</text>
+    </view>
+    <view class="entrust-info">
+      <text >是否支付仓储费</text>
+      <text >{{costInfo.is_pay_storehouse ? '线下已付款' : '线下未付款'}}</text>
+    </view>
+    <view class="entrust-info">
+      <text >仓储费用</text>
+      <text class="red">{{storehouse_price}}元</text>
+    </view>
+    <view class="entrust-info">
+      <text >小计</text>
+      <text class="red">{{storehouse_price}}元</text>
+    </view>
+    <view class="entrust-title bord-top">
+      <text class="et-name">其它费用</text>
+    </view>
+    <view class="entrust-info">
+      <text >金额</text>
+      <text class="red">{{other_price}}元</text>
+    </view>
+    <view class="entrust-info">
+      <text >备注</text>
+      <text >{{costInfo.other_remark}}</text>
+    </view>
+    <view class="entrust-info">
+      <text >小计</text>
+      <text class="red">{{other_price}}元</text>
+    </view>
+    <view class="cost-foot">
+      <view class="cf-top">
+        <text >合计：<text class="red">{{costInfo.allPayMoney}}元</text></text>
+        <text >已支付：<text class="red">{{costInfo.already_price}}元</text></text>
+      </view>
+      <view class="cf-bot">
+        <text >需支付：</text>
+        <text class="red">{{costInfo.payPrice}}元</text>
+      </view>
+      <text class="cf-diff" @tap="changeDiffShow">有异议？</text>
+      <button wx:if="{{costInfo.payPrice <= 0}}" class="page-btn" @tap.stop="confirmPay">确定</button>
+      <button wx:else class="page-btn" @tap.stop="choosePayWay">支付</button>
+    </view>
+    <view class="diff-dialog" wx:if="{{diffShow}}">
+      <form class="dd-wrap" bindsubmit="sendDiff">
+        <text class="w-head">有异议</text>
+        <textarea class="w-area" name="dissent"></textarea>
+        <text class="w-tips">温馨提示：收到异议后，马上银会在1个工作日内处理。</text>
+        <view class="w-btn">
+          <button form-type="submit" class="confirm">确定</button>
+          <button class="cancel" @tap="changeDiffShow">取消</button>
+        </view>
+      </form>
+    </view>
+    <view class="cost-payWay" wx:if="{{payWay}}" @tap.stop="stopThis">
+      <text class="type-tips">请选择支付方式</text>
+      <view class="pay-way">
+        <view class="pay-item">
+          <image src="../../assets/images/icon/pay-safe.png" style="width:76rpx;height:46rpx;"/>
+          <text >平安现货交易通</text>
+        </view>
+        <view class="pay-item" @tap="payForOffline">
+          <image src="../../assets/images/icon/pay-offline.png" mode="aspectFit" style="width:100%;height:46rpx;"/>
+          <text >线下支付</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class costConfirm extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    title: '费用确认',
+    id: '',
+    orderType: '',
+    diffShow: false,
+    costInfo: [],
+    payWay: false
+  };
+  computed = {
+    goods_weight() {
+      return Number.parseFloat(this.costInfo.goods_weight).toFixed(4);
+    },
+    price() {
+      return Number.parseFloat(this.costInfo.price).toFixed(2);
+    },
+    compensate_price() {
+      return Number.parseFloat(this.costInfo.compensate_price).toFixed(2);
+    },
+    storehouse_price() {
+      return Number.parseFloat(this.costInfo.storehouse_price).toFixed(2);
+    },
+    other_price() {
+      return Number.parseFloat(this.costInfo.other_price).toFixed(2);
+    }
+  };
+  methods = {
+    changeDiffShow() {
+      let flag = this.diffShow;
+      this.diffShow = !flag;
+    },
+    async sendDiff(event) {
+      let formData = event.detail.value;
+      formData['id'] = this.id;
+      formData['userId'] = this.userInfo.id;
+      let result = await this.$parent.queryData(
+        '/msyApp/submitDissent.do',
+        formData
+      );
+      if (result) {
+        this.$parent.showTip('异议提交成功，请等待工作人员处理');
+        await this.$parent.sleep(2);
+        this.$parent.linkPage('', 3);
+      }
+      console.log(result);
+    },
+    async confirmPay() {
+      let result = await this.$parent.queryData(
+        '/msyApp/updateFinalSettlementStatus.do',
+        {
+          finalSettlementId: this.id
+        }
+      );
+      if(!result){
+        this.$parent().showTip('操作成功')
+      }
+      console.log(result)
+    },
+    choosePayWay() {
+      this.payWay = true;
+    },
+    hidePayWay() {
+      this.payWay = false;
+    },
+    stopThis() {},
+    payForOffline() {
+      this.$parent.linkPage(
+        '../payOffline/payOffline?settlementId=' + this.id,
+        4
+      );
+    }
+  };
+  onLoad(e) {
+    this.id = e.id || 1052;
+    this.orderType = e.orderType || 2;
+  }
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.getCostInfo();
+  }
+  async getCostInfo() {
+    let result = await this.$parent.queryData(
+      '/msyApp/queryFinalSettlementDetail.do',
+      {
+        id: this.id,
+        orderType: this.orderType,
+        enterpriseId: this.userInfo.id
+      }
+    );
+    if (!result) {
+      // this.$parent.linkPage('',3)
+    }
+    console.log(result);
+    this.costInfo = result;
+    this.$apply();
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/pickup';
+</style>

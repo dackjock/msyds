@@ -166,6 +166,12 @@ export default class negotiate extends wepy.page {
     ctime: ''
   };
   onShow() {
+    this.$parent.globalData.temporary.goodsData = {
+      goods_type:1,
+      id:4848,
+      type:1,
+      enableBuy:1
+    }
     this.userInfo = this.$parent.globalData.userInfo
     this.goodsData = this.$parent.globalData.temporary.goodsData
     this.goodsStatue = this.$parent.globalData.temporary.goodsStatue

@@ -33,7 +33,7 @@ export default class codesQuery extends wepy.page {
   };
   onLoad(e) {
     // this.orderId = e.id
-    this.orderId = 5485;
+    this.orderId = 5506;
   }
   onShow() {
     this.userInfo = this.$parent.globalData.userInfo;
