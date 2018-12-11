@@ -82,7 +82,7 @@ export default class Login extends wepy.page {
     console.log('*********** 登录成功 ***********');
 
     console.log('用户信息：',result)
-    this.$parent.linkPage('../goodsAdd/goodsAdd',1)
+    this.$parent.linkPage('../goodsList/goodsList',1)
   }
 }
 </script>

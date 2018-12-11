@@ -10,36 +10,40 @@
       <view class="form_cont">
             <view class="info_item">
                 <view class="span">产品品名</view>
-                <view class="input_box"><input placeholder="输入产品品名" placeholder-class="Pc_holder" type="text" /></view>
+                <view class="input_box"><input placeholder="输入产品品名" placeholder-class="Pc_holder" value="{{submitData.goodsName}}" type="text" data-key='goodsName' @input="changeData" /></view>
             </view>
             <view class="info_item">
                 <view class="span">规格</view>
-                <view class="input_box"><view class="label">请选择</view><image mode="aspectFit" src="../../assets/images/icon/jiantou.png" /></view>
+                <view class="input_box">
+                    <view class="input_box"> <picker bindchange="specChange" mode="selector"  range="{{specList}}"  class="label">{{submitData.goodsSpec}}</picker><image mode="aspectFit" src="../../assets/images/icon/jiantou.png" /></view>
+                </view>
             </view>
             <view class="info_item">
                 <view class="span">单价</view>
                 <view class="input_box">
-                    <radio-group class="radio-group" >
-                    <view class="label" wx:for="{{price_type_chose}}" wx:key="{{index}}"><radio value="{{item.value}}" checked="{{item.checked}}" color="#d7092d" />{{item.name}}</view>
+                    <radio-group class="radio-group"  bindchange="priceChange" >
+                         <view class="label" wx:for="{{price_type_chose}}" wx:key="{{index}}"><radio value="{{item.value}}" checked="{{item.checked}}" color="#d7092d" />{{item.name}}</view>
                     </radio-group>
+                    <input type="number" wx:if="{{submitData.priceType==3}}" class="lit_input"  value="{{submitData.goodsPrice}}" @input="inputPrice"/>
                 </view>
             </view>
             <view class="info_item">
                 <view class="span">当前升贴水</view>
                 <view class="input_box show_tab">
-                    
-                    <view class="add btn">+</view>
-                    <view class="tab_main">平水 0</view>
-                    <view class="del btn">-</view>
+                    <view @tap="del" class="del btn">-</view>
+                   
+                    <view class="tab_main {{submitData.mainPrice>0?'red':''}} {{submitData.mainPrice < 0?'lv':''}}">{{mainPriceName}}</view>
+                
+                    <view @tap="add" class="add btn">+</view>
                 </view>
             </view>
             <view class="info_item">
                 <view class="span">数量（重量）</view>
-                <view class="input_box"><input placeholder="请输入白银重量" placeholder-class="Pc_holder" type="text" /></view>
+                <view class="input_box"><input placeholder="请输入白银重量" placeholder-class="Pc_holder" type="text"   value="{{submitData.goodsWeiht}}" data-key='goodsWeiht' @input="changeData" /></view>
             </view>
             <view class="info_item">
                 <view class="span">商品属性</view>
-                <view class="input_box"></view>
+                <view class="input_box">{{submitData.goodsAttr}}</view>
             </view>
             <view class="info_item">
                 <view class="span">商品类型</view>
@@ -54,8 +58,8 @@
             <view class="info_item">
                 <view class="span">交货地</view>
                 <view class="input_box">
-                     <picker mode="multiSelector" bindchange="" bindcolumnchange="" value="{{id}}"  range-key="name" range="{{objectMultiArray}}"  class="label">
-                       请选择省市
+                     <picker mode="multiSelector" bindchange="setCity" bindcolumnchange="city_chose" value="{{ProvinceAndCity}}"  range-key="name" range="{{objectMultiArray}}"  class="label">
+                       {{ProvinceAndCityName}}
                     </picker>
                   
                     <image mode="aspectFit" src="../../assets/images/icon/jiantou.png" />
@@ -74,11 +78,17 @@
             </view>
             <view class="info_item">
                 <view class="span">提货仓库</view>
-                <view class="input_box"><input placeholder="请输入提货仓库" placeholder-class="Pc_holder" type="text" /></view>
+                <view class="input_box"><input placeholder="请输入提货仓库" placeholder-class="Pc_holder" type="text"  data-key='storeHouse' @input="changeData" /></view>
             </view>
             <view class="info_item">
                 <view class="span">结算方式</view>
-                <view class="input_box">  <checkbox value="1" checked="{{true}}" color="#d7092d"/>现款现货</view>
+                <view class="input_box">  
+               <checkbox-group bindchange="checkboxChange">
+                <label  class="checkbox" wx:for="{{payList}}" wx:key="{{index}}">
+                  <checkbox value="{{item.value}}" checked="{{item.checked}}"/>{{item.name}}
+                </label>
+              </checkbox-group>
+                </view>
             </view>
       </view>
     <view class="info_warm">
@@ -87,53 +97,165 @@
     </view>
     <view class="bottom_btn">
         <view class="btn reset">重置</view>
-        <view class="btn save">保存</view>
+        <view class="btn save" @tap="submitWay">保存</view>
     </view>
+
+
+      <!-- 小键盘 -->
+    <keyboard :showfn.sync="showbx" :stnum.sync="shownewnum" @changenum.user="shownewnum"></keyboard>
     </view>
   </view>
 </template>
 
 <script>
 import wepy from 'wepy';
-
+import keyboard from '@/components/keyboard';
 export default class goodsAdd extends wepy.page {
+  components = {
+    keyboard
+  };
   data = {
+    payList: [{ name: '现款现货', value: '8' }],
     price_type_chose: [
       { name: '现货', value: '1' },
-      { name: '期货', value: '2', checked: 'true' },
+      { name: '期货', value: '2' },
       { name: '单价', value: '3' }
     ],
+    mainPriceName: '平水0',
+    //小键盘
+    showbx: 'false',
+    shownewnum: '',
+    shuinumber: '',
+    specList: ['国标1#'],
     brandList: [], //品牌列表
     goodsTypeList: [], //商品分类列表
     objectMultiArray: [], //省市数据
     cityData: [], //城市备用数据
 
+    qihuo: '', //期货价格
+    xianhuo: '', //现货价格
+
     //picker 显示数据
     brandName: '请选择',
-    typeName:'请选择',
+    typeName: '请选择',
+    ProvinceAndCity: [0, 0],
+    ProvinceAndCityName: '请选择省市',
     submitData: {
       id: '',
       goodsName: '',
       goodsPrice: '',
-      goodsSpec: '',
-      mainPrice: '',
+      goodsSpec: '请选择',
+      mainPrice: '0',
       goodsWeiht: '',
       goodsAttr: '',
-      goodsType: '',
+      goodsType: '1',
       brandId: '',
-      goodsTypeId:'',
-      cityId:'',
-      provinceId:'',
-      lastTime:"请选择最晚提货时间",
-      storeHouse:"",
-      enterpriseId:'',
-      userId:"",
-      priceType:"",
-      pmids:"",
-
+      goodsTypeId: '',
+      cityId: '',
+      provinceId: '',
+      lastTime: '请选择最晚提货时间',
+      storeHouse: '',
+      enterpriseId: '',
+      userId: '',
+      priceType: '',
+      pmids: ''
+    }
+  };
+  watch = {
+    submitData(newValue, oldValue) {
+      if (newValue.mainPrice == oldValue.mainPrice) {
+        return;
+      }
+      if (newValue.mainPrice > 0) {
+        this.mainPriceName = '升水' + newValue.mainPrice;
+      } else if (newValue.mainPrice < 0) {
+        this.mainPriceName = '贴水' + -newValue.mainPrice;
+      } else {
+        this.mainPriceName = '平水 0';
+      }
     }
   };
   methods = {
+    submitWay() {
+      this.submitData.userId = this.$parent.globalData.userInfo.userId;
+      this.submitData.enterpriseId = this.$parent.globalData.userInfo.id;
+      console.log(this.submitData);
+      this.$parent
+        .queryData('msyApp/goodsAddOrUpdateForEnt.do', this.submitData, true)
+        .then(d => {
+          if (d.type > 0) {
+            this.$parent.showTip('添加成功');
+            this.$parent.linkPage('../goodsList/goodsList', 2);
+          } else {
+            this.$parent.showTip(d.data ? d.data.msg : '请求失败');
+          }
+        });
+    },
+    changeData(event) {
+      this.submitData[event.currentTarget.dataset.key] = event.detail.value;
+    },
+    add() {
+      this.submitData.mainPrice = parseFloat(this.submitData.mainPrice) + 1;
+      this.$apply();
+    },
+    del() {
+      this.submitData.mainPrice = parseFloat(this.submitData.mainPrice) - 1;
+      this.$apply();
+    },
+    //付款方式
+    checkboxChange(e) {
+      this.submitData.pmids = e.detail.value.join(',');
+    },
+    //小键盘关闭
+    shownewnum(e) {
+      console.log(e);
+      this.$parent.showTip('当前升贴水值为 ' + 0 + '-' + 3);
+    },
+    // 规格picker
+
+    specChange() {
+      this.submitData.goodsSpec = '国标1#';
+      this.submitData.goodsAttr = '99.99%';
+    },
+    //省市picker
+    setCity(e) {
+      let pIndex = e.detail.value[0];
+      let cIndex = e.detail.value[1];
+      this.submitData.provinceId = this.objectMultiArray[0][pIndex].id;
+      this.submitData.cityId = this.objectMultiArray[1][cIndex].id;
+      this.ProvinceAndCityName =
+        this.objectMultiArray[0][pIndex].name +
+        this.objectMultiArray[1][cIndex].name;
+      this.$apply();
+    },
+    city_chose(e) {
+      if (e.detail.column == 0) {
+        const provinceId = this.objectMultiArray[0][e.detail.value].id;
+        let newCityArr = [];
+        this.cityData.map((v, i) => {
+          v.parentid == provinceId && newCityArr.push(v);
+        });
+        this.objectMultiArray.splice(1, 1, newCityArr);
+        //  this.ProvinceAndCity[1] = 0;
+        this.$apply();
+      }
+    },
+    //单价类型变化
+    inputPrice(e) {
+      this.submitData.goodsPrice = e.detail.value;
+    },
+    async priceChange(e) {
+      const value = e.detail.value;
+      if (value == 1) {
+        this.submitData.goodsPrice = this.xianhuo;
+        this.submitData.priceType = 1;
+      } else if (value == 2) {
+        this.submitData.goodsPrice = this.qihuo;
+        this.submitData.priceType = 2;
+      } else {
+        this.submitData.priceType = 3;
+      }
+    },
     //品牌picker
     changeBrand(e) {
       let index = e.detail.value;
@@ -147,21 +269,32 @@ export default class goodsAdd extends wepy.page {
       this.typeName = this.goodsTypeList[index].name;
     },
     //最晚提货时间picker
-    dataChange(e){
-        this.submitData.lastTime= e.detail.value;
+    dataChange(e) {
+      this.submitData.lastTime = e.detail.value;
     }
   };
   async onLoad(options) {
     let res = await this.initWay(options.id);
     let city = await this.initCity();
     //  console.log(res);
+    if (res.pageMap) {
+      for (let key in this.submitData) {
+        let newkey = key.replace(/[A-Z]/, function(word) {
+          return '_' + word.toLowerCase();
+        });
 
+        debugger;
+        this.submitData[key] = res.pageMap[newkey] || '';
+      }
+      console.log(this.submitData);
+    }
     this.brandList = res.brandList;
     this.goodsTypeList = res.goodsTypeList;
     this.objectMultiArray.push(city.provinces);
-    this.objectMultiArray.push([{ id: 0, name: '北京市' }]);
-    this.cityData = res.citys;
-    console.log(this.objectMultiArray);
+    this.objectMultiArray.push([{ id: 45052, name: '北京市' }]);
+    this.cityData = city.citys;
+    this.qihuo = await this.queryMarketPrice();
+    this.xianhuo = await this.queryFuturesPrice();
     this.$apply();
   }
   initWay(id) {
@@ -173,6 +306,37 @@ export default class goodsAdd extends wepy.page {
   }
   initCity() {
     return this.$parent.queryData('msyApp/appAddTicketAddressInfoInit.do');
+  }
+
+  //获取期货白银价格
+  queryMarketPrice() {
+    return this.$parent
+      .queryData('msyApp/queryMarketPrice.do', {}, true)
+      .then(d => {
+        if (d.data.type !== 1) {
+          wepy.showToast({
+            title: '请求接口异常',
+            icon: 'none'
+          });
+          return;
+        }
+        return d.data.resultMap.timePrice;
+      });
+  }
+  //获取白银现货价格
+  queryFuturesPrice() {
+    return this.$parent
+      .queryData('msyApp/queryFuturesPrice.do', {}, true)
+      .then(d => {
+        if (d.data.type !== 1) {
+          wepy.showToast({
+            title: '请求接口异常',
+            icon: 'none'
+          });
+          return;
+        }
+        return d.data.resultMap.timePrice;
+      });
   }
 }
 </script>
