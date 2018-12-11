@@ -44,7 +44,14 @@ export default class extends wepy.app {
       'pages/editAuthApproval/editAuthApproval',
       'pages/codesQuery/codesQuery',
       'pages/webView/webView',
-      'pages/oderPayment/oderPayment'
+      'pages/oderPayment/oderPayment',
+      'pages/payOffline/payOffline',
+      'pages/pickupGoods/pickupGoods',
+      'pages/entrustPickup/entrustPickup',
+      'pages/costConfirm/costConfirm',
+      'pages/costInfo/costInfo',
+      'pages/chargeConfirm/chargeConfirm',
+      'pages/YFCargo/YFCargo',
     ],
     window: {
       backgroundTextStyle: 'light',
