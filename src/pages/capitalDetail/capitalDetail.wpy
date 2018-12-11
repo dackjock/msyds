@@ -1,0 +1,62 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="交易详情"></header>
+    <view class="c-dtbx">
+      <view class="f60 tc red" wx:if="{{moneyLog.incomeMoney}}">{{moneyLog.incomeMoney}}<text class="f24">元</text></view>
+      <view class="f60 tc lv" wx:if="{{moneyLog.payMoney}}">{{moneyLog.payMoney}}<text class="f24">元</text></view>
+      <view class="c9 tc f24 mb50" wx:if="{{moneyLog.incomeMoney}}">收入金额</view>
+      <view class="c9 tc f24 mb50" wx:if="{{moneyLog.payMoney}}">支出金额</view>
+      <view class="c9 f24 mb20">支付方式：
+        <text class="c6" wx:if="{{moneyLog.payType == 1}}">平安银行支付</text>
+        <text class="c6" wx:if="{{moneyLog.payType == 2}}">微信</text>
+        <text class="c6" wx:if="{{moneyLog.payType == 3}}">支付宝</text>
+        <text class="c6" wx:if="{{moneyLog.payType == 4}}">线下支付</text>
+        </view>
+      <view class="c9 f24 mb20">款项用途：<text class="c6">{{basicSettingName}}</text></view>
+      <view class="c9 f24 mb20">发生时间：<text class="c6">{{moneyLog.createTime}}</text></view>
+      <view class="c9 f24 mb20">流水号：<text class="c6">{{moneyLog.logCode}}</text></view>
+      <view class="c9 f24 ">订单编号：<text class="c6">{{moneyLog.orderCode}}</text></view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class capitalDetail extends wepy.page {
+  data = {
+    moneylogId:'',
+    phonenum:'',
+    basicSettingName: '',//款项用途
+    moneyLog: [],
+  };
+  onShow() {
+    this.moneylogId = this.$parent.globalData.temporary.goodsData
+    this.$parent.globalData.temporary.goodsData = ''
+    this.queryMoneylogListDetail()
+  };
+    //资金流水详情
+  async queryMoneylogListDetail() {
+    let result = await this.$parent.queryData('msyApp/queryMoneylogListDetail.do', {
+      moneylogId: this.moneylogId
+    })
+    //console.log('详情', result);
+    this.basicSettingName = result.basicSettingName
+    this.moneyLog = result.moneyLog
+     this.$apply() 
+  };
+  methods = {
+    
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/capitalDetail';
+  
+</style>

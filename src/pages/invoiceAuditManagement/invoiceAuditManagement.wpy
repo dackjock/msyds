@@ -1,0 +1,278 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="发票审核管理" searchr='true' @searchbx.user="tapSearch"></header>
+    <view class="fpsh">
+      <view class="fpshli" wx:for="{{fplist}}" wx:key="{{item.index}}">
+        <view class="tc mb10">{{item.openingTime}}</view>
+        <view class="fpshlibx">
+          <view class="mb10">发票系统编号：<text class="c6">{{item.applyTicketCode}}</text></view>
+          <view class="mb10">企业名称：<text class="c6">{{item.enterpriseName}}</text></view>
+          <view class="mb10 flex">
+            <view class="fpshlibxl">开票总金额：<text class="red">{{item.totalMoney}}元</text></view>
+            <view class="flex-1">申请人：<text class="c6">{{item.login_account}}</text></view>
+          </view>
+          <view class="mb10 flex">
+            <view class="fpshlibxl">业务审核人：<text class="c6">{{item.review_name}}</text></view>
+            <view class="flex-1">当前状态：
+              <text class="c6" wx:if="{{item.status == 0}}">待审核</text>
+              <text class="c6" wx:if="{{item.status == 1}}">审核不通过</text>
+              <text class="c6" wx:if="{{item.status == 2}}">审核通过</text>
+              <text class="c6" wx:if="{{item.status == 3}}">邮寄中</text>
+              <text class="c6" wx:if="{{item.status == 4}}">已开票</text>
+              <text class="c6" wx:if="{{item.status == 5}}">退票申请中</text>
+              <text class="c6" wx:if="{{item.status == 6}}">退票申请已处理</text>
+            </view>
+          </view>
+          <view class="mb10 flex">
+            <view class="fpshlibxl">收件人：<text class="c6">{{item.receiver_name}}</text></view>
+            <view class="flex-1">联系电话：<text class="c6">{{item.telephone}}</text></view>
+          </view>
+          <view class="mb10">收件地址：<text class="c6">{{item.address}}</text></view>
+          <view class="mb10">审核时间：<text class="c6">{{item.openingTime}}</text></view>
+          <view class="tr">
+            <view class="fpshbtna" wx:if="{{item.status == 0}}" @tap="agreeKP({{item.id}})">同意开票</view>
+            <view class="fpshbtna fpshbtnb" wx:if="{{item.status == 0}}" @tap="refuseKP({{item.id}})">拒绝开票</view>
+            <view class="fpshbtna" @tap="checkOrderD({{item.applyTicketCode}})">查看订单详情</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 同意开票 弹框 -->
+    <view class="kptk" wx:if="{{yesShow}}">
+      <view class="kptkbx">
+        <view class="tc c6 mt30">同意开票</view>
+        <view class="tkbtnbx mt50">
+          <view class="tkbtna" bindtap="canselKPTK">取消</view>
+          <view class="tkbtna tkbtnb" bindtap="agreeKPTK">确定</view>
+        </view>
+      </view>
+    </view>
+    <!-- 拒绝开票 弹框 -->
+    <view class="kptk" wx:if="{{refuseShow}}">
+      <view class="kptkbx">
+        <form bindsubmit="bindFormSubmit">
+          <view class="tc c6 mb20">拒绝开票</view>
+          <view class="c6 flex">
+            <view class="mr5">填写原因</view>
+            <view class="flex-1"><textarea class="kptktxt"  placeholder="" name="textarea" /></view>
+          </view>
+          <view class="tkbtnbx mt50">
+            <view class="tkbtna" bindtap="canselJJKP">取消</view>
+            <button class="tkbtna tkbtnb" form-type="submit">确定</button>
+          </view>
+        </form>
+      </view>
+    </view>
+    <!-- 右侧搜索 -->
+    <view class="d-screen" wx:if="{{searchshow}}" >
+      <view class="d-bg" bindtap="sxclose"></view>
+      <view class="d-cont {{showconfn ? 'show' : ''}}">
+        <view class="d-contbx">
+          <view class="ssa">
+            <view class="mb10">发票编号</view>
+            <view><input class="kptkinp" bindinput="bindKeyInputA" value="{{FPVal}}" type="text" placeholder="请输入发票编号"/></view>
+          </view>
+          <view class="ssa">
+            <view class="mb10">申请人</view>
+            <view><input class="kptkinp" bindinput="bindKeyInputB" value="{{SQRVal}}" type="text" placeholder="请输入申请人姓名"/></view>
+          </view>
+        </view>
+        <view class="d-btnbx">
+          <view class="d-btnaa" bindtap="reset">重置</view>
+          <view class="d-btnaa d-btnab" bindtap="sxdone">完成</view>
+        </view>
+      </view>
+    </view>
+    <view class="n-nodata" wx:if="{{dataleng}}">暂无更多数据！</view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class invoiceAuditManagement extends wepy.page {
+  config = {
+    "enablePullDownRefresh": true
+  };
+  data = {
+    tapSearch:'',
+    userInfo:'',
+    pageNum: 1,
+    user_name: '',
+    ticket_code: '',
+    txt: '',
+    fpid: '',
+    FPVal: '',
+    SQRVal: '',
+    fplist: [],
+    fresh: false,
+    flage: false,
+    dataleng: false,
+    yesShow: false,
+    refuseShow: false,
+    searchshow: false,
+    showconfn: false,
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.$parent.globalData.temporary.contractId = ''
+    this.fplist = []
+    this.pageNum = 1
+    this.appQueryCheckApplyTicketList(this.pageNum,this.user_name,this.ticket_code)
+  };
+  //发票审核管理列表
+  async appQueryCheckApplyTicketList(pageNum,user_name,ticket_code,fresh) {
+    let result = await this.$parent.queryData('msyApp/appQueryCheckApplyTicketList.do', {
+      enterpriseId: this.userInfo.id,
+      pageNum: pageNum,
+      user_name: user_name,
+      ticket_code: ticket_code,
+    })
+    //console.log('发票管理', result);
+    if(fresh){
+      this.fplist = []
+      this.fresh = false
+    }
+    let yfplist = result.list
+    if(yfplist.length>0){
+      this.flage= true
+      this.fplist = this.fplist.concat(yfplist)
+    } else{
+      console.log('无更多数据')
+      this.flage= false
+      this.pageNum = 1
+    }
+    if(this.fplist.length>0){
+      this.dataleng = false
+    }else{
+      this.dataleng = true
+    }
+    console.log('发票管理', this.fplist);
+
+    this.$apply()
+  };
+  //同意或拒绝申请发票
+  async agreeOrNotApplyTicket(id,status,reviewReason) {
+    let result = await this.$parent.queryData('msyApp/agreeOrNotApplyTicket.do', {
+      id: id,
+      status: status,
+      userId: this.userInfo.userId,
+      reviewReason: reviewReason,
+    },true)
+    console.log('done', result);
+    if(result.data.type>0){
+      this.$parent.showTip(result.data.msg)
+      this.fplist = []
+      this.pageNum = 1
+      await this.$parent.sleep(1)
+      this.appQueryCheckApplyTicketList(this.pageNum,this.user_name,this.ticket_code)
+    }else{
+      this.$parent.showTip(result.data.msg)
+    }
+    this.fpid = ''
+    this.$apply()
+  };
+  onPullDownRefresh() {
+    this.pageNum = 1
+    this.fresh = true
+    this.user_name = ''
+    this.ticket_code = ''
+    this.appQueryCheckApplyTicketList(this.pageNum,this.user_name,this.ticket_code,this.fresh)
+    
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
+  };
+  onReachBottom() {
+    if (this.flage) {
+        this.pageNum +=1
+        this.appQueryCheckApplyTicketList(this.pageNum,this.user_name,this.ticket_code)
+    }
+  };
+  bindKeyInputA(e) {
+    this.FPVal = e.detail.value
+    this.$apply()
+  };
+   bindKeyInputB(e) {
+    this.SQRVal = e.detail.value
+    this.$apply()
+  };
+  methods = {
+    //点击 搜索
+    tapSearch() {
+      this.searchshow = true
+      this.showconfn = true
+    },
+    //关闭右侧搜索
+    sxclose() {
+      this.showconfn = false
+      this.searchshow = false
+    },
+    //搜索 重置
+    reset() {
+      this.FPVal = ''
+      this.SQRVal = ''
+    },
+    //搜索 完成
+    sxdone() {
+      console.log(this.FPVal,this.SQRVal)
+      this.pageNum = 1
+      this.user_name = this.SQRVal
+      this.ticket_code = this.FPVal
+      this.fplist = []
+      this.appQueryCheckApplyTicketList(this.pageNum,this.user_name,this.ticket_code)
+      this.FPVal = ''
+      this.SQRVal = ''
+      this.showconfn = false
+      this.searchshow = false
+    },
+    //点击 同意开票
+    agreeKP(id) {
+      this.yesShow = true
+      this.fpid = id
+    },
+    //同意开票 取消
+    canselKPTK() {
+      this.yesShow = false
+    },
+    //同意开票 确认
+    agreeKPTK() {
+      this.agreeOrNotApplyTicket(this.fpid,2)
+      this.yesShow = false
+    },
+    //点击 拒绝开票
+    refuseKP(id) {
+      this.refuseShow = true
+      this.fpid = id
+    },
+    //拒绝开票 取消
+    canselJJKP() {
+      this.refuseShow = false
+    },
+    //拒绝开票 确认 
+    bindFormSubmit(e) {
+      this.txt = e.detail.value.textarea
+      if(!this.txt){
+        this.$parent.showTip('请填写原因！')
+        return false
+      }
+      this.agreeOrNotApplyTicket(this.fpid,1,this.txt)
+      this.refuseShow = false
+    },
+    //查看订单详情
+    checkOrderD(code) {
+      this.$parent.globalData.temporary.contractId = code
+      this.$parent.linkPage('../invoiceOrderMsg/invoiceOrderMsg',1)
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/invoiceAuditManagement';
+  
+</style>

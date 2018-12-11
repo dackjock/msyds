@@ -1,0 +1,169 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="开票确认订单" edit="true" @editfn.user="editfn"></header>
+    <view class="kptop"><text class="tpbzi"></text>温馨提示：选择好你需要开票的列表后点击确认开票</view>
+    <view class="kpbx">
+      <view class="kpli" wx:for="{{ticketList}}" wx:key="{{item.index}}">
+        <view @tap="listTap({{item.list.id}},{{item.selfage}},{{index}})">
+          <view class="mb10">预开票金额：<text class="fs36 red">{{item.list.ticket_price}}元</text></view>
+          <view class="mb10 kplia">
+            <view class="kplial">未开票金额：<text class="red">{{item.list.able_ticket_price}}元</text></view>
+            <view class="kplial">合同金额：<text class="red">{{item.list.total_price}}元</text></view>
+          </view>
+          <view class="mb10">订单编号：<text class="c6">{{item.list.order_code}}</text></view>
+          <view class="mb10">合同编号：<text class="c6">{{item.list.contract_code}}</text></view>
+          <view class="kplibtnbx">
+            <view class="kplibtna kplibtnb" @tap="checkorder({{item}})">查看订单</view>
+            <view class="kplibtna" @tap="checkContract({{item.list.contract_url}})">查看合同</view>
+          </view>
+          <view class="n-ctlibg" wx:if="{{item.selfage}}"><text class="n-ctlibgi" ></text></view>
+        </view>
+      </view>
+    </view>
+    <view class="kpqdbt" wx:if="{{!delfage}}">
+      <view class="red">合计：<text class="fs36" wx:if="totalMoney">{{totalMoney}}</text>元</view>
+      <view class="kpqdbtn" wx:if="{{totalMoney > 0}}" bindtap="toKP">确认开票</view>
+      <view class="kpqdbtn kpqdbtnb" wx:if="{{totalMoney == 0}}">确认开票</view>
+    </view>
+    <view class="kpqdbt" wx:if="{{delfage}}">
+      <view class=""></view>
+      <view class="kpqdbtn" bindtap="removeList">确认移除</view>
+    </view>
+    <view class="n-nodata" wx:if="{{dataleng}}">暂无更多数据！</view>
+    
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class invoiceConfirmList extends wepy.page {
+  data = {
+    userInfo:'',
+    editfn:'',
+    dataleng: false,
+    selfage: false,
+    delfage: false,
+    ticketList: [],
+    idarr: [],
+    totalMoney: 0,
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.ticketList = []
+    this.idarr = []
+    this.queryPreApplyTicket()
+  };
+  //开票清单列表
+  async queryPreApplyTicket() {
+    let result = await this.$parent.queryData('msyApp/queryPreApplyTicket.do', {
+      enterpriseId: this.userInfo.id,
+    })
+    //console.log('开票列表', result);
+    
+    let applyticketList = result.preApplyTicketList
+    if(applyticketList.length>0){
+      for(let i = 0; i<applyticketList.length; i++){
+        applyticketList[i].ticket_price = applyticketList[i].ticket_price.toFixed(2)
+        applyticketList[i].total_price = applyticketList[i].total_price.toFixed(2)
+        applyticketList[i].able_ticket_price = applyticketList[i].able_ticket_price.toFixed(2)
+        this.totalMoney = (Number(this.totalMoney)*100 + Number(applyticketList[i].ticket_price)*100)/100
+        this.idarr.push(applyticketList[i].id)
+      }
+      this.ticketList = applyticketList.map(function(obj,index){
+        return {
+          list:obj,
+          selfage:false
+        }
+      })
+    }
+    if(this.ticketList.length>0){
+      this.dataleng = false
+    }else{
+      this.dataleng = true
+    }
+    console.log('开票列表', this.ticketList);
+    
+    this.$apply()
+  };
+  //移除开票清单
+  async deletePreApplyTicket(id) {
+    let result = await this.$parent.queryData('msyApp/deletePreApplyTicket.do', {
+      ids: id,
+    },true)
+    //console.log('删除', result);
+    if(result.data.type > 0){
+      this.$parent.showTip('删除成功。')
+      await this.$parent.sleep(1)
+      this.ticketList = []
+      this.idarr = []
+      this.totalMoney = ''
+      this.queryPreApplyTicket()
+    }else{
+      this.$parent.showTip(result.data.msg)
+    }
+  };
+  methods = {
+    //查看订单
+    checkorder(item) {
+      console.log('去查看订单')
+    },
+    //查看合同
+    checkContract(url) {
+      this.$parent.globalData.temporary.webView = url
+      this.$parent.linkPage('../webView/webView', 1);
+    },
+    //点击编辑
+    editfn(data) {
+      this.delfage = data
+      if(!this.delfage){
+        for(let j = 0;j<this.ticketList.length;j++){
+          this.ticketList[j].selfage = false
+        }
+      }
+      this.$apply()
+    },
+    //列表 点击
+    listTap(id,fg,i) {
+      if(this.delfage){
+        this.selid = id
+        this.ticketList[i].selfage = !fg
+        this.$apply()
+      }
+    },
+    //点击移除 
+    removeList() {
+      let delid = []
+      for(let a = 0;a <this.ticketList.length;a++){
+        if(this.ticketList[a].selfage){
+          delid.push(this.ticketList[a].list.id)
+        }
+      }
+      let id = ''
+      if(delid.length>0){
+        id = delid.join(',')
+        this.deletePreApplyTicket(id)
+      }else{
+        this.$parent.showTip('请选择移除项')
+      }
+    },
+    //确认开票
+    toKP() {
+      let ids = this.idarr.join(',')
+      this.$parent.globalData.temporary.contractId = ids
+      this.$parent.globalData.temporary.goodsData = this.totalMoney
+      this.$parent.linkPage('../invoiceApply/invoiceApply', 1);
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/invoiceConfirmList';
+  
+</style>

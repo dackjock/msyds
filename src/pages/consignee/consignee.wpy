@@ -1,0 +1,167 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="提货人管理" addMore='true' @addbx.user="addcont"></header>
+    <view class="thrbx">
+      <view class="thrli" wx:for="{{thrlist}}" wx:key="{{item.index}}">
+        <view class="thrlit mb20">
+          <view class="thrlil mb20">
+            <view class="thrlilh">提货人姓名：<text class="c6">{{item.name}}</text></view>
+            <view class="thrlilh fs22">证件号：<text class="c6">{{item.card}}</text></view>
+          </view>
+          <view class=" mb20">提货人手机号：<text class="c6">{{item.phone}}</text></view>
+        </view>
+        <view class="flex">
+          <view class="tc flex-1">
+            <view class="mb10">身份证正面</view>
+            <view class="thrimgbx"><image wx:if="{{item.cardFrontImg}}" src="{{item.cardFrontImg}}" mode="aspectFit"/></view>
+          </view>
+          <view class="tc flex-1">
+            <view class="mb10">身份证返面</view>
+            <view class="thrimgbx"><image wx:if="{{item.cardBackImg}}" src="{{item.cardBackImg}}" mode="aspectFit"/></view>
+          </view>
+          <view class="tc mt20 flex-1">
+            <view class="thrbtna thrbtnb mb20" @tap="delat({{item.id}})">删除</view>
+            <view class="tc"><view class="thrbtna" @tap="change({{item}})">修改</view></view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="n-nodata" wx:if="{{dataleng}}">暂无更多数据！</view>
+     <!-- 删除 弹框 -->
+    <view class="kptk" wx:if="{{delShow}}">
+      <view class="kptkbx">
+        <view class="tc c6 mt30">是否确定删除该条提货人信息？</view>
+        <view class="tkbtnbx mt50">
+          <view class="tkbtna" bindtap="cansel">取消</view>
+          <view class="tkbtna tkbtnb" bindtap="agree">确定</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class consignee extends wepy.page {
+  config = {
+    "enablePullDownRefresh": true
+  };
+  data = {
+    addcont:'',
+    userInfo:'',
+    delID:'',
+    pageNum: 1,
+    thrlist: [],
+    fresh: false,
+    flage: false,
+    dataleng: false,
+    delShow: false,
+    
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.$parent.globalData.temporary.goodsData = ''
+    this.thrlist = []
+    this.pageNum = 1
+    this.appQueryConsigneeInit(this.pageNum)
+  };
+  //提货人列表
+  async appQueryConsigneeInit(pageNum,fresh) {
+    let result = await this.$parent.queryData('msyApp/appQueryConsigneeInit.do', {
+      userId: this.userInfo.userId,
+      pageNum: pageNum,
+    })
+    //console.log('提货人列表', result);
+    if(fresh){
+      this.thrlist = []
+      this.fresh = false
+    }
+    let ythrlist = result.list
+    if(ythrlist.length>0){
+      this.flage= true
+      this.thrlist = this.thrlist.concat(ythrlist)
+    } else{
+      console.log('无更多数据')
+      this.flage= false
+      this.pageNum = 1
+    }
+    if(this.thrlist.length>0){
+      this.dataleng = false
+    }else{
+      this.dataleng = true
+    }
+    console.log('发票管理', this.thrlist);
+
+    this.$apply()
+  };
+  //删除提货人
+  async appDeleteDataConsignee(id) {
+    let result = await this.$parent.queryData('msyApp/appDeleteDataConsignee.do', {
+      ids: id,
+      userId: this.userInfo.userId,
+    },true)
+    //console.log('done', result);
+    if(result.data.type>0){
+      this.$parent.showTip(result.data.msg)
+      await this.$parent.sleep(1)
+      this.thrlist = []
+      this.pageNum = 1
+      this.appQueryConsigneeInit(this.pageNum)
+    }else{
+      this.$parent.showTip(result.data.msg)
+    }
+    
+    this.$apply()
+  };
+  onPullDownRefresh() {
+    this.pageNum = 1
+    this.fresh = true
+    this.appQueryConsigneeInit(this.pageNum,this.fresh)
+    
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
+  };
+  onReachBottom() {
+    if (this.flage) {
+        this.pageNum +=1
+        this.appQueryConsigneeInit(this.pageNum)
+    }
+  };
+  methods = {
+    //增加
+    addcont() {
+      this.$parent.linkPage('../consigneeChange/consigneeChange',1)
+    },
+    //删除 弹框
+    delat(id) {
+      this.delShow = true
+      this.delID = id
+    },
+    //删除 取消
+    cansel() {
+      this.delShow = false
+    },
+    //删除 确定
+    agree() {
+      this.appDeleteDataConsignee(this.delID)
+      this.delShow = false
+    },
+    //修改
+    change(item) {
+      this.$parent.globalData.temporary.goodsData = item
+      this.$parent.linkPage('../consigneeChange/consigneeChange',1)
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/consignee';
+  
+</style>

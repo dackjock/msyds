@@ -1,0 +1,108 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="查看相关订单信息"></header>
+    <view class="ioul">
+      <view class="ioli" wx:for="{{orderList}}" wx:key="item.index">
+        <view class="iolip mb20">
+          <view class="iolipl">订单编号：<text class="c6">{{item.order_code}}</text></view>
+          <view class="iolipl">合同编号：<text class="c6 f20">{{item.contract_code}}</text></view>
+        </view>
+        <view class="iolip mb20">
+          <view class="iolipl">合同数量：<text class="c6">{{item.actual_weight}}KG</text></view>
+          <view class="iolipl">合同金额：<text class="red">{{item.total_price}}元</text></view>
+        </view>
+        <view class="iolip mb20">
+          <view class="iolipl">已支付金额：<text class="red">{{item.pay_price}}元</text></view>
+          <view class="iolipl">本次开票金额：<text class="red">{{item.apply_ticket_price}}元</text></view>
+        </view>
+        <view class="tr">
+          <view class="iolibtn" @tap="checkMD({{item.order_id}})">查看码单</view>
+          <view class="iolibtn" @tap="checkWTH({{item.order_id}})">查看委托函</view>
+          <view class="iolibtn" @tap="checkHT({{item.order_id}})">查看合同</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class invoiceOrderMsg extends wepy.page {
+  data = {
+    code:'',
+    orderList: [],
+  };
+  onShow() {
+    this.code = this.$parent.globalData.temporary.contractId
+    //this.$parent.globalData.temporary.contractId = ''
+    this.orderList = []
+    this.appQueryorderDetailByApplyTicketCode()
+  };
+  //根据发票系统编号查看相关订单信息(列表)
+  async appQueryorderDetailByApplyTicketCode() {
+    let result = await this.$parent.queryData('msyApp/appQueryorderDetailByApplyTicketCode.do', {
+      applyTicketCode: this.code,
+    })
+    console.log('列表', result);
+    this.orderList = result.orderDetailList
+    this.$apply()
+  };
+  //查看码单
+  async appLooksingleCode(id) {
+    let result = await this.$parent.queryData('msyApp/appLooksingleCode.do', {
+      order_id: id,
+    })
+    let url = result.singleCodeUrlList[0].url //彩蛋？？
+    this.$parent.globalData.temporary.webView = url
+    this.$parent.linkPage('../webView/webView', 1);
+    this.$apply()
+  };
+  //查看委托函
+  async appLookProxy(id) {
+    let result = await this.$parent.queryData('msyApp/appLookProxy.do', {
+      order_id: id,
+    })
+    console.log('wth', result);
+    let url = result.proxyUrlList[0].url 
+    this.$parent.globalData.temporary.webView = url
+    this.$parent.linkPage('../webView/webView', 1);
+    this.$apply()
+  };
+  //查看合同
+  async appLookContract(id) {
+    let result = await this.$parent.queryData('msyApp/appLookContract.do', {
+      order_id: id,
+    })
+    console.log('ht', result);
+    let url = result.contractUrlList[0].url 
+    this.$parent.globalData.temporary.webView = url
+    this.$parent.linkPage('../webView/webView', 1);
+    this.$apply()
+  };
+  methods = {
+    //查看码单
+    checkMD(id) {
+      this.appLooksingleCode(id)
+    },
+    //查看委托函
+    checkWTH(id) {
+      this.appLookProxy(id)
+    },
+    //查看合同
+    checkHT(id){
+      this.appLookContract(id)
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/invoiceOrderMsg';
+  
+</style>

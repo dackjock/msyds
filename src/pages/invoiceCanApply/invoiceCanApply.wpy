@@ -1,0 +1,202 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="可开票订单" checkkpxx="true" @tockkp.user="gotokpxx"></header>
+    <view class="kptop"><text class="tpbzi"></text>温馨提示：点击列表输入想要开票的金额。</view>
+    <view class="kpbx">
+      <view class="kpli" wx:for="{{ticketList}}" wx:key="{{item.index}}">
+        <view @tap="showTK({{item}})">
+          <view class="mb10">可开票金额：<text class="fs36 red">{{item.ticket_price}}元</text></view>
+          <view class="mb10 kplia">
+            <view class="kplial">已开票金额：<text class="red">{{item.xPrice}}元</text></view>
+            <view class="kplial">合同金额：<text class="red">{{item.total_price}}元</text></view>
+          </view>
+          <view class="mb10">订单编号：<text class="c6">{{item.order_code}}</text></view>
+          <view class="mb10">合同编号：<text class="c6">{{item.contract_code}}</text></view>
+          <view class="mb10">卖方企业名称：<text class="c6">{{item.supplier_enterprise_name}}</text></view>
+        </view>
+        <view class="kplibtnbx">
+          <view class="kplibtna kplibtnb" @tap="checkorder({{item}})">查看订单</view>
+          <view class="kplibtna" @tap="checkContract({{item.contract_url}})">查看合同</view>
+        </view>
+      </view>
+    </view>
+    <view class="kpbt">
+      <view class="kpbtwx">
+        <view class="kpbtwxi"></view>
+        <view class="kpbtwxr">
+          <view>温馨提示：</view>
+          <view>1. 当月订单在25号之后只能下个月才可以开取发票。</view>
+          <view>2. 自2017.07.01起，申请普通发票需填写税号信息，否则将无法应税使用，请及时维护您的税号信息。</view>
+          <view>3.您设置的企业类发票抬头，将锁定为您资金提现的户名。</view>
+        </view>
+      </view>
+      <view class="kpbtbtnbx">
+        <view class="kpbtbtna" bindtap="cancelDo">取消操作</view>
+        <view class="kpbtbtna kpbtbtnb" bindtap="toSuerOrder">去确认订单</view>
+      </view>
+    </view>
+    <view class="n-nodata" wx:if="{{dataleng}}">暂无更多数据！</view>
+    <view class="kptk" wx:if="{{tkshow}}">
+      <view class="kptkbx">
+        <view class="tc mb30">请输入你需要开票的金额</view>
+        <view class="tc "><input class="kptkinp" bindinput="bindKeyInput" value="{{inpVal}}" type="digit" placeholder=""/>元</view>
+        <view class="kptkbtnbx">
+          <view class="kptkbtna" bindtap="cancelKP">取消开票</view>
+          <view class="kptkbtna kptkbtnb" bindtap="joinKp">加入开票清单</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class invoiceCanApply extends wepy.page {
+  config = {
+      "enablePullDownRefresh": true
+  };
+  data = {
+    userInfo:'',
+    gotokpxx:'',
+    inpVal:'',
+    order_id:'',
+    ableTicketMoney:'',
+    supplier_enterprise_name:'',
+    pageNum: 1,
+    fresh: false,
+    dataleng: false,
+    flage: false,
+    tkshow: false,
+    ticketList: [],
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.ticketList = []
+    this.queryApplyTicketbyOrderId(this.pageNum)
+  };
+  //开票申请列表
+  async queryApplyTicketbyOrderId(pageNum,fresh) {
+    let result = await this.$parent.queryData('msyApp/queryApplyTicketbyOrderId.do', {
+      enterpriseId: this.userInfo.id,
+      pageNum: pageNum
+    })
+    //console.log('开票列表', result);
+    
+    if(fresh){
+      this.ticketList = []
+      this.fresh = false
+    }
+    let applyticketList = result.applyTicketList
+    if(applyticketList.length>0){
+      this.flage= true
+      for(let i = 0; i<applyticketList.length; i++){
+        applyticketList[i].ticket_price = applyticketList[i].ticket_price.toFixed(2)
+        applyticketList[i].total_price = applyticketList[i].total_price.toFixed(2)
+        applyticketList[i].xPrice = applyticketList[i].xPrice.toFixed(2)
+      }
+      this.ticketList = this.ticketList.concat(applyticketList)
+      
+    } else{
+      console.log('无更多数据')
+      this.flage= false
+      this.pageNum = 1
+    }
+    if(this.ticketList.length>0){
+      this.dataleng = false
+    }else{
+      this.dataleng = true
+    }
+    console.log('开票列表', this.ticketList);
+    this.$apply()
+  };
+  //添加开票清单
+  async addPreApplyTicket(order_id,ableTicketMoney,ticket_price,supplier_enterprise_name) {
+    let result = await this.$parent.queryData('msyApp/addPreApplyTicket.do', {
+      order_id: order_id,
+      ableTicketMoney: ableTicketMoney,
+      enterprise_id: this.userInfo.id,
+      ticket_price: ticket_price,
+      supplier_enterprise_name: supplier_enterprise_name,
+    },true)
+    //console.log('kaipiao', result);
+    if(result.data.type>0){
+      this.$parent.showTip('操作成功！')
+      this.ticketList = []
+      await this.$parent.sleep(1)
+      this.queryApplyTicketbyOrderId(1)
+    }else{
+      this.$parent.showTip(result.data.msg)
+    }
+    this.$apply()
+  };
+  onPullDownRefresh() {
+    this.pageNum = 1
+    this.fresh = true
+    this.queryApplyTicketbyOrderId(this.pageNum,this.fresh)
+    
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
+  };
+  onReachBottom() {
+    if (this.flage) {
+        this.pageNum +=1
+        this.queryApplyTicketbyOrderId(this.pageNum)
+    }
+  };
+  bindKeyInput(e) {
+    this.inpVal = e.detail.value
+    this.$apply()
+  };
+  methods = {
+    gotokpxx() {
+      this.$parent.linkPage('../invoiceMessage/invoiceMessage',1)
+    },
+    //取消操作
+    cancelDo() {
+      this.$parent.linkPage('../invoiceManagement/invoiceManagement',3)
+    },
+    //点击去确认订单
+    toSuerOrder() {
+      this.$parent.linkPage('../invoiceConfirmList/invoiceConfirmList',1)
+    },
+    //查看订单
+    checkorder(item) {
+      console.log('去查看订单')
+    },
+    //查看合同
+    checkContract(url) {
+      this.$parent.globalData.temporary.webView = url
+      this.$parent.linkPage('../webView/webView', 1);
+    },
+    //点击列表 弹框
+    showTK(item) {
+      this.inpVal = item.ticket_price
+      this.order_id = item.order_id
+      this.ableTicketMoney = item.ticket_price
+      this.supplier_enterprise_name = item.supplier_enterprise_name
+      this.tkshow = true
+    },
+    //点击取消开票
+    cancelKP() {
+      this.tkshow = false
+    },
+    //点击加入开票清单
+    joinKp() {
+      console.log('inp',this.inpVal)
+      this.tkshow = false
+      this.addPreApplyTicket(this.order_id,this.ableTicketMoney,this.inpVal,this.supplier_enterprise_name)
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/invoiceCanApply';
+  
+</style>
