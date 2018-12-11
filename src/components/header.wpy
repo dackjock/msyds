@@ -12,13 +12,29 @@
     <!-- 右侧按钮容器 -->
     <view class="h-right">
       <navigator wx:if="{{tofirstpage == 'true'}}" url="../../pages/index/index">返回首页</navigator>
+      <view class="h-editbx" wx:if="{{edit == 'true'}}" bindtap="edittap">
+        <view wx:if="{{!editFg}}">编辑<view class="h-editi"></view></view>
+        <view wx:if="{{editFg}}">取消</view>
+      </view>
+      <view class="h-editbx" wx:if="{{editfp == 'true'}}" bindtap="tapToKFP">
+        <view>去开发票<view class="h-editi"></view></view>
+      </view>
+      <view class="h-editbx" wx:if="{{checkkpxx == 'true'}}" bindtap="tapTockfpxx">
+        <view>查看开票信息<view class="h-editi"></view></view>
+      </view>
+      <view class="h-editbx" wx:if="{{searchr == 'true'}}" bindtap="tapSearch">
+        <view class="fdj"></view>
+      </view>
+      <view class="h-editbx" wx:if="{{addMore == 'true'}}" bindtap="addTap">
+        <view class="">新增<text class="addcoint">+</text></view>
+      </view>
     </view>
   </view>
 </template>
 
 <script>
 import wepy from 'wepy';
-export default class botBar extends wepy.component {
+export default class header extends wepy.component {
   props = {
     hasBack: String,
     title: {
@@ -26,15 +42,37 @@ export default class botBar extends wepy.component {
       twoWay: true
     },
     searchbx: String,
-    tofirstpage: String
+    tofirstpage: String,
+    edit: String,
+    editfp: String,
+    checkkpxx: String,
+    searchr: String,
+    addMore: String,
   };
   data = {
-    //hasBack:true
+    editFg:false
   };
   onLoad() {}
   methods = {
     navBack() {
       wepy.navigateBack();
+    },
+    edittap() {
+      this.editFg = !this.editFg
+      this.$emit('editfn',this.editFg)
+      this.$apply()
+    },
+    tapToKFP() {
+      this.$emit('tokfp')
+    },
+    tapTockfpxx() {
+      this.$emit('tockkp')
+    },
+    tapSearch() {
+      this.$emit('searchbx')
+    },
+    addTap() {
+      this.$emit('addbx')
     }
   };
 }
@@ -42,4 +80,5 @@ export default class botBar extends wepy.component {
 
 <style lang='stylus'>
 @import '../assets/style/header';
+
 </style>

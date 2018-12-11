@@ -1,0 +1,202 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header :title.sync="thrtitle"></header>
+    <view class="bgf">
+      <view class="chthr">
+        <view>提货人姓名</view>
+        <view class="w-70"><input class="thrinp" placeholder="请输入提货人姓名" value="{{thrName}}" bindinput="thrNameFn"/></view>
+      </view>
+      <view class="chthr">
+        <view>手机号</view>
+        <view class="w-70"><input class="thrinp" placeholder="请输入提货人手机号" value="{{thrPhone}}" bindinput="thrPhoneFn"/></view>
+      </view>
+      <view class="chthr">
+        <view>证件号</view>
+        <view class="w-70"><input class="thrinp" placeholder="请输入提货人证件号" value="{{thrZj}}" bindinput="thrZjFn"/></view>
+      </view>
+      <view wx:if="{{item}}">
+        <view class="thrsfz">
+          <view class="tc">
+            <view class="mb20 tc">身份证正面</view>
+            <view class="tc mb20">
+              <image class="addupimg mt20" src="{{imgarr[0]}}" mode="aspectFit" />
+            </view>
+            <view class="changebtn" @tap.stop="choosePic(0)">更换</view>
+          </view>
+          <view class="tc">
+            <view class="mb20 tc">身份证反面</view>
+            <view class="tc mb20">
+              <image class="addupimg mt20" src="{{imgarr[1]}}" mode="aspectFit" />
+            </view>
+            <view class="changebtn" @tap.stop="choosePic(1)">更换</view>
+          </view>
+        </view>
+      </view>
+      <view wx:if="{{!item}}">
+        <view class="thrsfz">
+          <view class="tc">
+            <view class="mb20 tc">身份证正面</view>
+            <view class="tc">
+              <image class="addimg mt20 {{imgarr[0]? 'hasimg' : ''}}" src="{{imgarr[0] ? imgarr[0] : picUpload }}" mode="aspectFit" @tap.stop="choosePic(0)"/>
+            </view>
+          </view>
+          <view class="tc">
+            <view class="mb20 tc">身份证反面</view>
+            <view class="tc">
+              <image class="addimg mt20 {{imgarr[1]? 'hasimg' : ''}}" src="{{imgarr[1] ? imgarr[1] : picUpload}}" mode="aspectFit" @tap.stop="choosePic(1)"/>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+    </view>
+    <view class="thrbbx">
+      <view class="thrbtna" bindtap="cansel">取消</view>
+      <view class="thrbtna" bindtap="save">保存信息</view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class consigneeChange extends wepy.page {
+  data = {
+    thrtitle:'提货人信息修改',
+    userInfo: '',
+    imgUrl: '',
+    thrName: '',
+    thrPhone: '',
+    thrZj: '',
+    picUpload: '',
+    item: '',
+    thrId: '',
+    imgarr: [],
+
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.imgUrl = this.$parent.globalData.picPath
+    this.picUpload = this.imgUrl +'l-uploadAdd.png'
+    this.item = this.$parent.globalData.temporary.goodsData
+    if(this.item){
+      this.thrtitle = '提货人信息修改'
+      this.thrName = this.item.name
+      this.thrPhone = this.item.phone
+      this.thrZj = this.item.card
+      this.thrId = this.item.id
+      this.imgarr.push(this.item.cardFrontImg)
+      this.imgarr.push(this.item.cardBackImg)
+    }else{
+      this.thrtitle = '新增提货人'
+    }
+    console.log(this.item)
+    console.log('this.picUpload',this.picUpload)
+    
+  };
+  //上传照片
+  async uploadPic(index, data, filetype) {
+    let result = await this.$parent.queryData(
+      '/upload',
+      {
+        data: data,
+        filetype: filetype,
+        user_id: this.userInfo.userId
+      },'',
+      'POST'
+    );
+     //console.log(result);
+     this.imgarr[index] = result.imgurl;
+    
+    this.$apply();
+  };
+  //修改或添加提货人
+  async appConsigneeAddOrUpdate(id,name,card,cardFrontImg,cardBackImg,phone) {
+    let result = await this.$parent.queryData('msyApp/appConsigneeAddOrUpdate.do', {
+      id: id,
+      name: name,
+      card: card,
+      cardFrontImg: cardFrontImg,
+      cardBackImg: cardBackImg,
+      phone: phone,
+      userId: this.userInfo.userId,
+    },true)
+    //console.log('done', result);
+    if(result.data.type>0){
+      this.$parent.showTip(result.data.msg)
+      await this.$parent.sleep(1)
+      this.$parent.linkPage('../consignee/consignee',2)
+    }else{
+      this.$parent.showTip(result.data.msg)
+    }
+    
+    this.$apply()
+  };
+  thrNameFn(event) {
+    this.thrName = event.detail.value;
+    this.$apply();
+  };
+  thrPhoneFn(event) {
+    this.thrPhone = event.detail.value;
+    this.$apply();
+  };
+  thrZjFn(event) {
+    this.thrZj = event.detail.value;
+    this.$apply();
+  };
+  methods = {
+    choosePic(index) {
+      let that = this;
+      wx.chooseImage({
+        success: function(res) {
+          let base64 = wx
+            .getFileSystemManager()
+            .readFileSync(res.tempFilePaths[0], 'base64');
+          wx.getImageInfo({
+            src: res.tempFilePaths[0],
+            success(res) {
+              that.uploadPic(index, base64, res.type);
+            }
+          });
+        }
+      });
+    },
+    //取消
+    cansel() {
+      this.$parent.linkPage('../consignee/consignee',3)
+    },
+    //保存
+    save() {
+      if(!this.thrName){
+        this.$parent.showTip('请输入提货人姓名')
+        return false
+      }else if(!this.thrPhone){
+        this.$parent.showTip('请输入手机号')
+        return false
+      }else if(!this.thrZj){
+        this.$parent.showTip('请输入证件号')
+        return false
+      }else if(!this.imgarr[0]){
+        this.$parent.showTip('请上传身份证正面照片')
+        return false
+      }else if(!this.imgarr[1]){
+        this.$parent.showTip('请上传身份证反面照片')
+        return false
+      }else{
+        this.appConsigneeAddOrUpdate(this.thrId,this.thrName,this.thrZj,this.imgarr[0],this.imgarr[1],this.thrPhone)
+      }
+      
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/consigneeChange';
+  
+</style>

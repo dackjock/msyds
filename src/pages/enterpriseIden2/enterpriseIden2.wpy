@@ -172,7 +172,7 @@ export default class enterpriseIden2 extends wepy.page {
         data: data,
         filetype: filetype,
         user_id: this.userInfo.id
-      },
+      },'',
       'POST'
     );
     // console.log(result);
