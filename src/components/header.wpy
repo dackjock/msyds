@@ -25,6 +25,9 @@
       <view class="h-editbx" wx:if="{{searchr == 'true'}}" bindtap="tapSearch">
         <view class="fdj"></view>
       </view>
+      <view class="h-editbx" wx:if="{{addMore == 'true'}}" bindtap="addTap">
+        <view class="">新增<text class="addcoint">+</text></view>
+      </view>
     </view>
   </view>
 </template>
@@ -44,6 +47,7 @@ export default class header extends wepy.component {
     editfp: String,
     checkkpxx: String,
     searchr: String,
+    addMore: String,
   };
   data = {
     editFg:false
@@ -67,10 +71,14 @@ export default class header extends wepy.component {
     tapSearch() {
       this.$emit('searchbx')
     },
+    addTap() {
+      this.$emit('addbx')
+    }
   };
 }
 </script>
 
 <style lang='stylus'>
 @import '../assets/style/header';
+
 </style>

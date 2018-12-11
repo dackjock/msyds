@@ -118,7 +118,7 @@
     <keyboard :showfn.sync="showbx" :stnum.sync="shuinumber" @changenum.user="shownewnum"></keyboard>
   </view>
 </template>
-    
+
 <script>
 import wepy from 'wepy';
 import header from '@/components/header';
