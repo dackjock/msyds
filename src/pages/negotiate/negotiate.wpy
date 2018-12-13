@@ -126,300 +126,332 @@ import progressbar from '@/components/progressBar';
 import keyboard from '@/components/keyboard';
 export default class negotiate extends wepy.page {
   data = {
-    array: [],//结算方式
-    arraysel: [],//结算方式selct
-    arrayb: [
-      {id:1,name:'平台点价权'},
-      {id:2,name:'我方点价权'}
-    ],//点价权
-    arraybsel: ['平台点价权','我方点价权'],//点价权selct
-    arrayc: [],//账期
-    arraycid: [],//账期id
+    array: [], //结算方式
+    arraysel: [], //结算方式selct
+    arrayb: [{ id: 1, name: '平台点价权' }, { id: 2, name: '我方点价权' }], //点价权
+    arraybsel: ['平台点价权', '我方点价权'], //点价权selct
+    arrayc: [], //账期
+    arraycid: [], //账期id
     index: 0,
     indexb: 0,
     indexc: 0,
-    jstype: '',//结算方式 值
-    nowPayMethodId: '',//结算方式 id
-    djq: '平台点价权',//点价权 值
-    djqid: '1',//点价权 id
-    zhangqiid: 1,//账期 id
-    zhangqi: '',//账期 值
+    jstype: '', //结算方式 值
+    nowPayMethodId: '', //结算方式 id
+    djq: '平台点价权', //点价权 值
+    djqid: '1', //点价权 id
+    zhangqiid: 1, //账期 id
+    zhangqi: '', //账期 值
     showbx: '',
-    goodsData: '',//商品data
-    goodsStatue:'',
+    goodsData: '', //商品data
+    goodsStatue: '',
     yjlist: [],
-    nowtime:'',
-    shengtxt:'',//升贴水 文字
-    shengysnum:'',//升贴水 原始数字
-    shengnum:'',//升贴水 数字
-    minAgio:0,//最低升贴水
-    maxAgio:1,//最高升贴水
-    piontPriceRate:'',//延期点价费率
-    piontPriceRateMin:'',//平台约定费率最低值
-    piontPriceRateMax:'',//平台约定费率最高值
-    djrange:'',//点价范围
-    heartTime:'',//议价时间
-    shuinumber:'',//
-    shownewnum:'',
-    selected:'',//checkbox
-    item:{checks:false},
+    nowtime: '',
+    shengtxt: '', //升贴水 文字
+    shengysnum: '', //升贴水 原始数字
+    shengnum: '', //升贴水 数字
+    minAgio: 0, //最低升贴水
+    maxAgio: 1, //最高升贴水
+    piontPriceRate: '', //延期点价费率
+    piontPriceRateMin: '', //平台约定费率最低值
+    piontPriceRateMax: '', //平台约定费率最高值
+    djrange: '', //点价范围
+    heartTime: '', //议价时间
+    shuinumber: '', //
+    shownewnum: '',
+    selected: '', //checkbox
+    item: { checks: false },
     ctime: ''
   };
   onShow() {
-    this.userInfo = this.$parent.globalData.userInfo
-    this.goodsData = this.$parent.globalData.temporary.goodsData
-    this.goodsStatue = this.$parent.globalData.temporary.goodsStatue
-    this.$parent.globalData.temporary.goodsData = ''
-    this.$parent.globalData.temporary.goodsStatue = ''
-    this.buyGoodsInit()
-    this.getInvDate()
-    this.queryGoodsLock()
-  };
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.goodsData = Object.assign(
+      {
+        goods_type: 1,
+        id: 4848,
+        type: 1,
+        enableBuy: 1
+      },
+      this.$parent.globalData.temporary.goodsData
+    );
+    console.log(this.goodsData)
+    this.goodsStatue = this.$parent.globalData.temporary.goodsStatue;
+    this.$parent.globalData.temporary.goodsData = '';
+    this.$parent.globalData.temporary.goodsStatue = '';
+    this.buyGoodsInit();
+    this.getInvDate();
+    this.queryGoodsLock();
+  }
   //购买商品初始化
   async buyGoodsInit() {
     let result = await this.$parent.queryData('msyApp/buyGoodsInit.do', {
-      lookType:this.goodsData.goods_type,
-      id:this.goodsData.id,
-      type:this.goodsStatue,
-      enterpriseId:this.userInfo.id,
-      enableBuy:this.goodsData.enableBuy,
-    })
+      lookType: this.goodsData.goods_type,
+      id: this.goodsData.id,
+      type: this.goodsStatue,
+      enterpriseId: this.userInfo.id,
+      enableBuy: this.goodsData.enableBuy
+    });
     console.log('购买商品初始化', result);
     this.yjlist = result;
-    this.arraysel = []
-    this.arrayc = []
+    this.arraysel = [];
+    this.arrayc = [];
     //结算方式数据
-    this.array = result.paymethodlist
-    this.jstype = result.payMethods
-    this.nowPayMethodId = result.nowPayMethodId
-    for(let i = 0;i<this.array.length;i++){
-      this.arraysel.push(this.array[i].name)
+    this.array = result.paymethodlist;
+    this.jstype = result.payMethods;
+    this.nowPayMethodId = result.nowPayMethodId;
+    for (let i = 0; i < this.array.length; i++) {
+      this.arraysel.push(this.array[i].name);
     }
     //账期 数据
-    let zqarr = result.paymentDaysList
-    for(let j = 0;j<zqarr.length;j++){
-      this.arrayc.push(zqarr[j].setting_name+'天')
+    let zqarr = result.paymentDaysList;
+    for (let j = 0; j < zqarr.length; j++) {
+      this.arrayc.push(zqarr[j].setting_name + '天');
     }
-    for(let j = 0;j<zqarr.length;j++){
-      this.arraycid.push(zqarr[j].setting_name)
+    for (let j = 0; j < zqarr.length; j++) {
+      this.arraycid.push(zqarr[j].setting_name);
     }
     //升贴水 数据
-    this.shengysnum = result.main_price
-    this.shengnum = Math.abs(this.shengysnum)
-    this.changeTxt(this.shengysnum)
-    this.minAgio = result.minAgio
-    this.maxAgio = result.maxAgio
+    this.shengysnum = result.main_price;
+    this.shengnum = Math.abs(this.shengysnum);
+    this.changeTxt(this.shengysnum);
+    this.minAgio = result.minAgio;
+    this.maxAgio = result.maxAgio;
     //延期点价费率 数据
-    this.piontPriceRate = result.piontPriceRateMax
-    this.piontPriceRateMin = result.piontPriceRateMin
-    this.piontPriceRateMax = result.piontPriceRateMax
-    this.$apply() 
-  };
+    this.piontPriceRate = result.piontPriceRateMax;
+    this.piontPriceRateMin = result.piontPriceRateMin;
+    this.piontPriceRateMax = result.piontPriceRateMax;
+    this.$apply();
+  }
   //查询议价时间
   async queryGoodsLock() {
     let result = await this.$parent.queryData('msyApp/queryGoodsLock.do', {
-      enterpriseId:this.userInfo.id,
-      goodsId:this.goodsData.id,
-    })
+      enterpriseId: this.userInfo.id,
+      goodsId: this.goodsData.id
+    });
     //console.log('议价时间', result);
-    this.heartTime = result.heartTime
-    this.countTime()
-     this.$apply() 
+    this.heartTime = result.heartTime;
+    this.countTime();
+    this.$apply();
   }
   //提交议价
   async addEnterpriseOrder() {
     let result = await this.$parent.queryData('msyApp/addEnterpriseOrder.do', {
-      lookType: this.goodsData.goods_type,//商品类型
-      goodsId:this.goodsData.id,//商品id
-      payMethodId: this.nowPayMethodId,//付款方式id
-      enterpriseId: this.userInfo.id,//企业id
-      userId: this.userInfo.userId,//用户id
-      goodsPrice: this.yjlist.goods_price,//实时价格
-      mainPrice: this.shengysnum,//升贴水（一口价购买不填）
-      weight: this.yjlist.goods_total_weight,//商品重量
-      priceType: this.goodsStatue,//单价类型
-      piontPriceRate: this.piontPriceRate,//延期点价费率
-      priceRange: this.djrange,//点价范围
-      priceRight: this.djqid,//点价方
-      days: this.zhangqiid,//账期天数
-    })
+      lookType: this.goodsData.goods_type, //商品类型
+      goodsId: this.goodsData.id, //商品id
+      payMethodId: this.nowPayMethodId, //付款方式id
+      enterpriseId: this.userInfo.id, //企业id
+      userId: this.userInfo.userId, //用户id
+      goodsPrice: this.yjlist.goods_price, //实时价格
+      mainPrice: this.shengysnum, //升贴水（一口价购买不填）
+      weight: this.yjlist.goods_total_weight, //商品重量
+      priceType: this.goodsStatue, //单价类型
+      piontPriceRate: this.piontPriceRate, //延期点价费率
+      priceRange: this.djrange, //点价范围
+      priceRight: this.djqid, //点价方
+      days: this.zhangqiid //账期天数
+    });
     console.log('提交议价', result);
-    if(result.contractId){
-      this.$parent.globalData.temporary.contractId = result.contractId //合同id（订单是一口价购买的时候生成）
-      this.$parent.linkPage('../index/index',1) //应该跳转到合同管理页面
-    }else{
-      this.$parent.linkPage('../index/index',1) //应该跳转到订单列表页
+    if (result.contractId) {
+      this.$parent.globalData.temporary.contractId = result.contractId; //合同id（订单是一口价购买的时候生成）
+      this.$parent.linkPage('../index/index', 1); //应该跳转到合同管理页面
+    } else {
+      this.$parent.linkPage('../index/index', 1); //应该跳转到订单列表页
     }
-     this.$apply() 
+    this.$apply();
   }
   getdj(e) {
-    this.djrange = e.detail.value
-    this.$apply()
+    this.djrange = e.detail.value;
+    this.$apply();
   }
-  checkbxChange(e){
-    this.item.checks= !this.item.checks
-    this.selected = e.target.dataset.checks?false : true
-    this.$apply()
+  checkbxChange(e) {
+    this.item.checks = !this.item.checks;
+    this.selected = e.target.dataset.checks ? false : true;
+    this.$apply();
   }
   //改变升贴水 文字
   changeTxt(num) {
-    if(num>0){
-      this.shengtxt = '升水'
-    } else if(num = 0){
-      this.shengtxt = '平水'
-    }else{
-      this.shengtxt = '贴水'
+    if (num > 0) {
+      this.shengtxt = '升水';
+    } else if ((num = 0)) {
+      this.shengtxt = '平水';
+    } else {
+      this.shengtxt = '贴水';
     }
-    this.$apply() 
+    this.$apply();
   }
   countTime() {
     let that = this;
-    that.ctime = setInterval(function(){
-      if(that.heartTime>0){
-        that.heartTime = that.heartTime-1
-      }else{
-        that.$parent.showTip('议价结束，请重新开始议价')
-        clearInterval(that.ctime)
-        setTimeout(function(){
-          that.$parent.linkPage('../index/index',1)
-        },1500)
-       
+    that.ctime = setInterval(function() {
+      if (that.heartTime > 0) {
+        that.heartTime = that.heartTime - 1;
+      } else {
+        that.$parent.showTip('议价结束，请重新开始议价');
+        clearInterval(that.ctime);
+        setTimeout(function() {
+          that.$parent.linkPage('../index/index', 1);
+        }, 1500);
       }
-    },1000)
-    
-    this.$apply() 
+    }, 1000);
+
+    this.$apply();
   }
   onUnload() {
-    var that =this;
-    //清除计时器 
-    clearInterval(that.ctime)
+    var that = this;
+    //清除计时器
+    clearInterval(that.ctime);
   }
-  getInvDate(){
+  getInvDate() {
     let that = this;
-    setInterval(function(){
-      that.getNowTime()
-    },1000)
+    setInterval(function() {
+      that.getNowTime();
+    }, 1000);
   }
   getNowTime() {
-    let date = new Date()
-    let getYear = date.getFullYear()
-    let getMonth = date.getMonth() +1
-    getMonth = getMonth > 9 ? getMonth : '0' + getMonth
-    let day = date.getDate()
-    let hours = date.getHours()
-    let minute = date.getMinutes()
-    let second = date.getSeconds()
-    minute = minute > 9 ? minute : '0' + minute
-    second = second > 9 ? second : '0' + second
-    this.nowtime = getYear + '-' + getMonth + '-' + day + ' ' + hours + ':' + minute + ':' + second;
-    this.$apply()
+    let date = new Date();
+    let getYear = date.getFullYear();
+    let getMonth = date.getMonth() + 1;
+    getMonth = getMonth > 9 ? getMonth : '0' + getMonth;
+    let day = date.getDate();
+    let hours = date.getHours();
+    let minute = date.getMinutes();
+    let second = date.getSeconds();
+    minute = minute > 9 ? minute : '0' + minute;
+    second = second > 9 ? second : '0' + second;
+    this.nowtime =
+      getYear +
+      '-' +
+      getMonth +
+      '-' +
+      day +
+      ' ' +
+      hours +
+      ':' +
+      minute +
+      ':' +
+      second;
+    this.$apply();
   }
-  
+
   bindPickerChange(e) {
-    this.index = e.detail.value
-    this.jstype = this.array[this.index].name
-    this.nowPayMethodId = this.array[this.index].id
-    this.piontPriceRate = this.piontPriceRateMax
-    this.djrange = ''
-    if(this.nowPayMethodId == 6 || this.nowPayMethodId == 7){
-      this.djqid = 1
-    }else {
-      this.djqid = ''
+    this.index = e.detail.value;
+    this.jstype = this.array[this.index].name;
+    this.nowPayMethodId = this.array[this.index].id;
+    this.piontPriceRate = this.piontPriceRateMax;
+    this.djrange = '';
+    if (this.nowPayMethodId == 6 || this.nowPayMethodId == 7) {
+      this.djqid = 1;
+    } else {
+      this.djqid = '';
     }
-    this.zhangqi = ''
-    this.zhangqiid = ''
-    this.$apply()
-  };
+    this.zhangqi = '';
+    this.zhangqiid = '';
+    this.$apply();
+  }
   bindPickerChangeb(e) {
-    this.indexb = e.detail.value
-    this.djq = this.arrayb[this.indexb].name
-    this.djqid = this.arrayb[this.indexb].id
-    this.$apply()
+    this.indexb = e.detail.value;
+    this.djq = this.arrayb[this.indexb].name;
+    this.djqid = this.arrayb[this.indexb].id;
+    this.$apply();
   }
   bindPickerChangec(e) {
-    this.indexc = e.detail.value
-    this.zhangqi = this.arrayc[this.indexc]
-    this.zhangqiid = this.arraycid[this.indexc]
-    this.$apply()
+    this.indexc = e.detail.value;
+    this.zhangqi = this.arrayc[this.indexc];
+    this.zhangqiid = this.arraycid[this.indexc];
+    this.$apply();
   }
   methods = {
     //点击 提交议价
     submitbtn() {
-      if(!this.selected){
-        this.$parent.showTip('请确认《马上银电商平台服务协议》 ')
-        return false
+      if (!this.selected) {
+        this.$parent.showTip('请确认《马上银电商平台服务协议》 ');
+        return false;
       }
-      this.addEnterpriseOrder()
+      this.addEnterpriseOrder();
     },
     //小键盘 关闭
     shownewnum(newnum) {
-      let nNum = Number(newnum)
-      if(nNum > this.minAgio && nNum < this.maxAgio){
-        this.shengysnum = nNum
-        this.shengnum = Math.abs(this.shengysnum)
-        this.changeTxt(this.shengysnum)
-        this.showbx = 'false'
+      let nNum = Number(newnum);
+      if (nNum > this.minAgio && nNum < this.maxAgio) {
+        this.shengysnum = nNum;
+        this.shengnum = Math.abs(this.shengysnum);
+        this.changeTxt(this.shengysnum);
+        this.showbx = 'false';
       } else {
-        this.$parent.showTip('当前升贴水值为 '+ this.minAgio +'-'+ this.maxAgio)
+        this.$parent.showTip(
+          '当前升贴水值为 ' + this.minAgio + '-' + this.maxAgio
+        );
       }
-      this.$apply() 
+      this.$apply();
     },
     //小键盘弹出
     ssclick() {
-      this.showbx = 'true'
-      this.shuinumber = this.shengysnum
-      this.$apply()
+      this.showbx = 'true';
+      this.shuinumber = this.shengysnum;
+      this.$apply();
     },
     //升贴水 减
     shuiCut() {
-      if(this.shengysnum>this.minAgio){
-        this.shengysnum =this.shengysnum - 1
-        this.shengnum = Math.abs(this.shengysnum)
-        this.changeTxt(this.shengysnum)
-      }else{
-        this.$parent.showTip('当前升贴水值为 '+ this.minAgio +'-'+ this.maxAgio)
+      if (this.shengysnum > this.minAgio) {
+        this.shengysnum = this.shengysnum - 1;
+        this.shengnum = Math.abs(this.shengysnum);
+        this.changeTxt(this.shengysnum);
+      } else {
+        this.$parent.showTip(
+          '当前升贴水值为 ' + this.minAgio + '-' + this.maxAgio
+        );
       }
-      this.$apply() 
+      this.$apply();
     },
     //升贴水 加
     shuiAdd() {
-      if(this.shengysnum<this.maxAgio){
-        this.shengysnum =this.shengysnum + 1
-        this.shengnum = Math.abs(this.shengysnum)
-        this.changeTxt(this.shengysnum)
-      }else{
-        this.$parent.showTip('当前升贴水值为 '+ this.minAgio +'-'+ this.maxAgio)
+      if (this.shengysnum < this.maxAgio) {
+        this.shengysnum = this.shengysnum + 1;
+        this.shengnum = Math.abs(this.shengysnum);
+        this.changeTxt(this.shengysnum);
+      } else {
+        this.$parent.showTip(
+          '当前升贴水值为 ' + this.minAgio + '-' + this.maxAgio
+        );
       }
-      this.$apply() 
+      this.$apply();
     },
     //延期点价费率 减
     rateCut() {
-      if(this.piontPriceRate>this.piontPriceRateMin){
-        this.piontPriceRate =Number((this.piontPriceRate - 0.01)*100)/100
-      }else{
-        this.$parent.showTip('延期点价费率为 '+ this.piontPriceRateMin +'-'+ this.piontPriceRateMax)
+      if (this.piontPriceRate > this.piontPriceRateMin) {
+        this.piontPriceRate = Number((this.piontPriceRate - 0.01) * 100) / 100;
+      } else {
+        this.$parent.showTip(
+          '延期点价费率为 ' +
+            this.piontPriceRateMin +
+            '-' +
+            this.piontPriceRateMax
+        );
       }
-      this.$apply() 
+      this.$apply();
     },
     //延期点价费率 加
     rateAdd() {
-      if(this.piontPriceRate<this.piontPriceRateMax){
-        this.piontPriceRate =Math.round((this.piontPriceRate + 0.01)*100)/100
-      }else{
-        this.$parent.showTip('延期点价费率为 '+ this.piontPriceRateMin +'-'+ this.piontPriceRateMax)
+      if (this.piontPriceRate < this.piontPriceRateMax) {
+        this.piontPriceRate =
+          Math.round((this.piontPriceRate + 0.01) * 100) / 100;
+      } else {
+        this.$parent.showTip(
+          '延期点价费率为 ' +
+            this.piontPriceRateMin +
+            '-' +
+            this.piontPriceRateMax
+        );
       }
-      this.$apply() 
-    },
+      this.$apply();
+    }
   };
   components = {
     header,
     progressbar,
-    keyboard,
+    keyboard
   };
 }
 </script>
 
 <style lang="stylus">
 @import '../../assets/style/negotiate';
-  
 </style>

@@ -1,0 +1,290 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container pad-bot">
+    <header :title.sync="title"></header>
+    <view class="entrust-title">
+      <text class="et-name">货物信息</text>
+    </view>
+    <view class="entrust-info">
+      <text >合同编号</text>
+      <text >{{pageMap.contract_code}}</text>
+    </view>
+    <view class="entrust-info">
+      <text >订单信息</text>
+      <text >{{pageMap.goods_name}}({{pageMap.cargo_total_num}}KG)</text>
+    </view>
+    <view class="entrust-info">
+      <view class="has-tips">
+        <text >最晚提货时间</text>
+        <text class="tips">提示：逾期提货产生的仓库费用由本人承担</text>
+      </view>
+      <text >{{pageMap.last_time}}</text>
+    </view>
+    <view class="entrust-info">
+      <text >本次提货时间</text>
+      <text >{{pageMap.cargo_time}}</text>
+    </view>
+    <!-- 提货人信息 -->
+    <view class="entrust-title bord-top">
+      <text class="et-name">提货人信息</text>
+      <view >
+        <button @tap="choosePicker">+ 添加提货人</button>
+        <button >管理提货人</button>
+      </view>
+    </view>
+    <!-- 循环提货人 -->
+    <view class="bord-top" wx:for="{{consigneesCurr}}" wx:key="">
+      <view class="entrust-info">
+        <text >提货人名字</text>
+        <text >{{consignees[item].name}}</text>
+      </view>
+      <view class="entrust-info">
+        <view class="has-tips">
+          <text >提货人身份证</text>
+          <text class="tips">提示：本平台对身份信息保密</text>
+        </view>
+        <text >{{consignees[item].card}}</text>
+      </view>
+      <view class="entrust-info">
+        <view class="has-tips">
+          <text >提货人手机号</text>
+          <text class="tips">提示：本平台对身份信息保密</text>
+        </view>
+        <text >{{consignees[item].phone}}</text>
+      </view>
+      <view class="entrust-card">
+        <view class="ec-item">
+          <text >身份证正面</text>
+          <image @tap="viewPic({{item}},1,1)" src="{{consignees[item].cardFrontImg}}" />
+        </view>
+        <view class="ec-item">
+          <text >身份证反面</text>
+          <image @tap="viewPic({{item}},2,1)" src="{{consignees[item].cardBackImg}}" />
+        </view>
+      </view>
+    </view>
+    <!-- 司机信息 -->
+    <view class="entrust-title bord-top">
+      <text class="et-name">司机信息</text>
+      <view >
+        <button @tap="chooseDriver">+ 添加司机</button>
+        <button >管理司机</button>
+      </view>
+    </view>
+    <!-- 循环司机 -->
+    <view class="bord-top" wx:for="{{driversCurr}}" wx:key="">
+      <view class="entrust-info">
+        <text >提货人名字</text>
+        <text >{{drivers[item].name}}</text>
+      </view>
+      <view class="entrust-info">
+        <view class="has-tips">
+          <text >提货人身份证</text>
+          <text class="tips">提示：本平台对身份信息保密</text>
+        </view>
+        <text >{{drivers[item].card}}</text>
+      </view>
+      <view class="entrust-info">
+        <view class="has-tips">
+          <text >提货人手机号</text>
+          <text class="tips">提示：本平台对身份信息保密</text>
+        </view>
+        <text >{{drivers[item].phone}}</text>
+      </view>
+      <view class="entrust-card">
+        <view class="ec-item">
+          <text >身份证正面</text>
+          <image @tap="viewPic({{item}},1,2)" src="{{drivers[item].cardFrontImg}}" />
+        </view>
+        <view class="ec-item">
+          <text >身份证反面</text>
+          <image @tap="viewPic({{item}},2,2)" src="{{drivers[item].cardBackImg}}" />
+        </view>
+      </view>
+    </view>
+    <checkbox-group class="check-rule bord-top" bindchange="readRule">
+      <label>
+        <checkbox color="#d7092d" checked="{{ruleRead}}"/>已确认以上信息无误并遵守
+      </label>
+      <navigator url="../platRule/platRule" hover-class="none">《马上银产业互联网交易总则》</navigator>
+    </checkbox-group>
+    <view class="entrust-btn">
+      <button class="e-reset" @tap="resetCurr">重置</button>
+      <button class="e-confirm" @tap="subFomr">确定</button>
+    </view>
+    <!-- 弹窗 -->
+    <view class="choose-dialog" wx:if="{{dialogInfo.data.length>0}}">
+      <view class="cd-model">
+        <text class="cd-tit">添加{{dialogInfo.title}}信息</text>
+        <view class="cd-body">
+          <block wx:for="{{dialogInfo.data}}" wx:key="">
+            <text class="{{item.checked ? 'active' : ''}}" @tap="chooseInfo({{index}})">{{item.name}}</text>
+          </block>
+        </view>
+        <view class="cd-btn">
+          <button class="cb-cf" @tap="dialogConfirm">确定</button>
+          <button class="cb-cc" @tap="dialogCancel">取消</button>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class entrustPickup extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    title: '委托提货',
+    consignees: [],
+    consigneesCurr: [],
+    drivers: [],
+    driversCurr: [],
+    pageMap: [],
+    ruleRead: true,
+    dialogInfo: {
+      title: '提货人',
+      data: [],
+      type: '1', // 提货人：1；司机：2
+      tmpIndex: []
+    }
+  };
+  onLoad(e) {
+    // console.log(e)
+    this.orderId = e.orderId || 5506;
+    this.cargoId = e.cargoId || 3185;
+  }
+  onShow() {
+    this.getEntrustInfo();
+  }
+  methods = {
+    choosePicker() {
+      let d = this.dialogInfo;
+      d.title = '提货人';
+      d.data = this.consignees;
+      this.setChecked(d.data);
+      d.tmpIndex = [];
+      d.type = '1';
+      this.dialogInfo = d;
+    },
+    chooseDriver() {
+      let d = this.dialogInfo;
+      d.title = '司机';
+      d.data = this.drivers;
+      this.setChecked(d.data);
+      d.tmpIndex = [];
+      d.type = '2';
+      this.dialogInfo = d;
+    },
+    chooseInfo(idx) {
+      let d = this.dialogInfo;
+      if (d.data[idx]['checked']) {
+        d.data[idx]['checked'] = false;
+        let i = d.tmpIndex.indexOf(idx);
+        d.tmpIndex.splice(i, 1);
+      } else {
+        d.data[idx]['checked'] = true;
+        d.tmpIndex.push(idx);
+      }
+    },
+    dialogCancel() {
+      let d = this.dialogInfo;
+      d.data = [];
+      d.tmpIndex = [];
+      this.dialogInfo = d;
+    },
+    dialogConfirm() {
+      let d = this.dialogInfo;
+      let _type = d.type;
+      if (_type === '1') {
+        this.consigneesCurr = Object.assign([], d.tmpIndex);
+      } else {
+        this.driversCurr = Object.assign([], d.tmpIndex);
+      }
+      d.data = [];
+      this.dialogInfo = d;
+    },
+    viewPic(idx, curr, type) {
+      // console.log(idx, curr,type);
+      let _urls = [];
+      let _data = type === '1' ? this.consignees : this.drivers;
+      let _curr =
+        curr === '1' ? _data[idx].cardFrontImg : _data[idx].cardBackImg;
+      _urls.push(_data[idx].cardFrontImg);
+      _urls.push(_data[idx].cardBackImg);
+      wepy.previewImage({
+        urls: _urls,
+        current: _curr
+      });
+    },
+    readRule(event) {
+      this.ruleRead = !this.ruleRead;
+    },
+    resetCurr() {
+      this.consigneesCurr = [];
+      this.driversCurr = [];
+    },
+    async subFomr() {
+      let _consigneesIds = this.getIdByIndex(
+        this.consigneesCurr,
+        this.consignees
+      );
+      let _driversIds = this.getIdByIndex(this.driversCurr, this.drivers);
+      if (_consigneesIds.length <= 0 || _driversIds <= 0) {
+        this.$parent.showTip('提货人或司机不可为空');
+        return false;
+      }
+      if (!this.ruleRead) {
+        this.$parent.showTip('请[勾选]确认信息无误');
+        return false;
+      }
+      let result = await this.$parent.queryData('/msyApp/addProxy.do', {
+        cargoId: this.cargoId,
+        consigneeIds: _consigneesIds,
+        driverIds: _driversIds
+      });
+      if (result) {
+        this.$parent.globalData.temporary.webView = result.url;
+        this.$parent.linkPage('../webView/webView', 1);
+      }
+      console.log(result);
+    }
+  };
+  async getEntrustInfo() {
+    let result = await this.$parent.queryData(
+      '/msyApp/frontQueryProxyInit.do',
+      {
+        orderId: this.orderId,
+        cargoId: this.cargoId
+      }
+    );
+    this.consignees = result.consignees;
+    this.drivers = result.drivers;
+    this.pageMap = result.pageMap;
+    this.$apply();
+    if(!result){
+      this.$parent.linkPage('',3)
+    }
+    console.log(result);
+  }
+  setChecked(arr) {
+    for (let i in arr) {
+      arr[i]['checked'] = false;
+    }
+  }
+  getIdByIndex(arr, list) {
+    let ids = '';
+    for (let i in arr) {
+      ids += list[arr[i]].id + ',';
+    }
+    return ids;
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/pickup';
+</style>

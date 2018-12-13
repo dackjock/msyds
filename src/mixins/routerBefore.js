@@ -6,6 +6,9 @@ let firewall = [
   '../enterpriseIden2/enterpriseIden2',
   '../enterpriseIden3/enterpriseIden3',
   '../negotiate/negotiate',
+  '../tradeIndex/tradeIndex',
+  '../order/order',
+  '../accountIndex/accountIndex'
 ]
 
 let actionType = 1

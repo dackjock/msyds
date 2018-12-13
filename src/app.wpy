@@ -12,6 +12,7 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/login/login',
+      'pages/index/index',
       'pages/consigneeChange/consigneeChange',
       'pages/consignee/consignee',
       'pages/negotiateManagement/negotiateManagement',
@@ -34,6 +35,10 @@ export default class extends wepy.app {
       'pages/authDevlop/authDevlop',
       'pages/capitalManagement/capitalManagement',
       'pages/order/order',
+      'pages/orderDetail/orderDetail',
+      'pages/orderDetail2/orderDetail2',
+      'pages/orderSearch/orderSearch',
+      'pages/orderDetailItem/orderDetailItem',
       'pages/helpcenter/helpcenter',
       'pages/privacypolicy/privacypolicy',
       'pages/userprotocol/userprotocol',
@@ -47,10 +52,8 @@ export default class extends wepy.app {
       'pages/enterpriseIden3/enterpriseIden3',
       'pages/newDealjk/newDealjk',
       'pages/newDealby/newDealby',
-      'pages/index/index',
       'pages/forgetPass/forgetPass',
       'pages/sign/sign',
-      'pages/mallIndex/mallIndex',
       'pages/authManage/authManage',
       'pages/authManager/authManager',
       'pages/editAuthManager/editAuthManager',
@@ -62,7 +65,17 @@ export default class extends wepy.app {
       'pages/editAuthApproval/editAuthApproval',
       'pages/codesQuery/codesQuery',
       'pages/webView/webView',
-      'pages/oderPayment/oderPayment'
+      'pages/oderPayment/oderPayment',
+      'pages/payOffline/payOffline',
+      'pages/pickupGoods/pickupGoods',
+      'pages/entrustPickup/entrustPickup',
+      'pages/costConfirm/costConfirm',
+      'pages/costInfo/costInfo',
+      'pages/chargeConfirm/chargeConfirm',
+      'pages/YFCargo/YFCargo',
+      'pages/mallIndex/mallIndex',
+      'pages/goodsList/goodsList',
+      'pages/goodsAdd/goodsAdd'
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -82,7 +95,9 @@ export default class extends wepy.app {
       goodsData: '',
       goodsStatue: '',
       contractId: '',
-      webView: ''
+      webView: '',
+      YFCdata:''
+      contractId: ''
     }
   };
 

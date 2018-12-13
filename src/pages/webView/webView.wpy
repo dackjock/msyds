@@ -12,6 +12,7 @@ export default class webView extends wepy.page {
     viewUrl: ''
   };
   onShow(){
+    console.log(0)
     this.viewUrl = this.$parent.globalData.temporary.webView
     this.$parent.globalData.temporary.webView = []
     console.log(this.viewUrl)
