@@ -35,6 +35,10 @@ export default class extends wepy.app {
       'pages/authDevlop/authDevlop',
       'pages/capitalManagement/capitalManagement',
       'pages/order/order',
+      'pages/orderDetail/orderDetail',
+      'pages/orderDetail2/orderDetail2',
+      'pages/orderSearch/orderSearch',
+      'pages/orderDetailItem/orderDetailItem',
       'pages/helpcenter/helpcenter',
       'pages/privacypolicy/privacypolicy',
       'pages/userprotocol/userprotocol',
@@ -69,6 +73,9 @@ export default class extends wepy.app {
       'pages/costInfo/costInfo',
       'pages/chargeConfirm/chargeConfirm',
       'pages/YFCargo/YFCargo',
+      'pages/mallIndex/mallIndex',
+      'pages/goodsList/goodsList',
+      'pages/goodsAdd/goodsAdd'
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -90,6 +97,7 @@ export default class extends wepy.app {
       contractId: '',
       webView: '',
       YFCdata:''
+      contractId: ''
     }
   };
 

@@ -1,29 +1,51 @@
 <template lang="wxml" minapp="wepy">
     <view class="order_container">
-      <!-- 订单头部 -->
+ 
+     
+      <view class="type_order_con">
+             <!-- 订单头部 -->
       <view class="order_header">
-        <image  src="../../assets/images/icon/searcha.png" />
+        <image @tap="goSearch" src="../../assets/images/icon/searcha.png" />
            <view class="show_tab"> 
-             销售
-            <switch checked @change="switch1Change" color="#fff"/>
+             {{order_type}}
+            <switch checked="{{true}}" @change="switch1Change" color="#fff"/>
             </view>
          订单中心
         
           
       </view>
-      <!-- 订单条件 -->
-      <view class="type_order" style="border-bottom:1px solid #eee">
-        <view class="cur"><text>白银</text></view>
-        <view ><text>精矿</text></view>
+       <!-- 订单条件 -->
+        <view class="type_order" style="border-bottom:1px solid #eee">
+          <view @tap="changeListType(0)" class="{{list_type==0?'cur':''}}"><text>白银</text></view>
+          <view @tap="changeListType(1)" class="{{list_type==1?'cur':''}}"><text>精矿</text></view>
+        </view>
+        <view wx:if="{{list_type==0}}" class="type_order">
+          <view  @tap="changeStaus(0)" class="{{queryData.orderStatus==0?'cur':''}}"><text>全部</text></view>
+          <view  @tap="changeStaus(1)" class="{{queryData.orderStatus==1?'cur':''}}"><text>未完成</text></view>
+          <view  @tap="changeStaus(2)" class="{{queryData.orderStatus==2?'cur':''}}"><text>已完成</text></view>
+          <view  @tap="changeStaus(3)" class="{{queryData.orderStatus==3?'cur':''}}"><text>已撤销</text></view>
+        </view>
+        <view wx:else  class="jingkuang_control">
+          <view class="sec_jK" @tap.stop="change">
+            {{typeName}} 
+            <view  class="ab_list {{toggle_type?'show':''}}">
+              <view class="item" @tap.stop="changeJK(1,'整单')">整单</view>
+              <view class="item" @tap.stop="changeJK(2,'子单')">子单</view>
+            </view>
+          </view>
+          <view class="type_order jk">
+            <view  @tap="changeStaus(-1)"  class="{{queryData_jingkuang.status==-1?'cur':''}}"><text>全部</text></view>
+            <view  @tap="changeStaus(0)" class="{{queryData_jingkuang.status==0?'cur':''}}"><text>未完成</text></view>
+            <view  @tap="changeStaus(1)" class="{{queryData_jingkuang.status==1?'cur':''}}"><text>已完成</text></view>
+            <view  @tap="changeStaus(2)"  class="{{queryData_jingkuang.status==2?'cur':''}}"><text>已撤销</text></view>
+        </view>
+        </view>
+         
       </view>
-       <view class="type_order">
-        <view class="cur"><text>全部</text></view>
-        <view ><text>未完成</text></view>
-        <view ><text>已完成</text></view>
-        <view ><text>已撤销</text></view>
-      </view>
-      <!-- 订单列表主体 -->
-      <view class="order_main">
+     
+      <!-- 白银订单列表主体 -->
+   
+      <view wx:if="{{list_type==0}}" class="order_main">
         <block  wx:for="{{listData}}"  wx:key="{{item.index}}">
           <view class="order_item">
             <view class="top">
@@ -52,15 +74,17 @@
                   <view class="w134">单价</view>
                   <view class="w186">{{item.price}}元</view>
                   <view class="w85" style="line-height:1em;padding-top:6rpx;"> <text>结算\n方式</text></view>
-                  <view class="flex_1">现款现货</view>
+                  <view class="flex_1 max120">{{item.payMethodName}}</view>
                 </view>
                 <view class="flex_box">
                   <view class="w134">当前状态</view>
-                 
-                  <view class="flex_1 f20">合同确认成功（等待供方签署合同）{{aPlus}}</view>
+                
+                  <view class="flex_1 f20">{{item.orderStatusName}}</view>
                 </view>
                 <view class="flex_box right">
-                <view class="btn_order">查看详情</view> 
+                  <view wx:if="{{item.orderConstraintName}}" class="btn_order {{item.orderConstraintName ==='查看结算'?'':'red'}}"   >{{item.orderConstraintName}}</view>
+              
+                <navigator url="../orderDetail/orderDetail?id={{item.id}}&contract_id={{item.contract_id}}" class="btn_order">查看详情</navigator> 
                 </view>
               </view>
             </view>
@@ -68,7 +92,53 @@
         </block>
 
       </view>
-        <botBar curr='4'></botBar>
+      
+
+
+        <!-- 精矿订单列表主体 -->
+      <view  wx:if="{{list_type==1}}" class="order_main">
+        <block  wx:for="{{listData_jk}}"  wx:key="{{item.index}}">
+          <view class="order_item">
+            <view class="top">
+              {{item.enterprise_name}}
+              <view class="timer">{{item.create_time}}</view>
+            </view>
+
+            <view class="main_cont">
+              <view class="pro_name">
+                {{item.name}}
+              </view>
+
+              <view class="right_cont">
+                <view class="flex_box">
+                  <view class="w134">订单编号</view>
+                  <view class="flex_1">{{item.apply_code}}</view>
+                </view>
+                <view class="flex_box">
+                  <view class="w134">数量</view>
+                  <view class="w186" style="color:#666">{{item.con_weight}}T</view>
+                 <view class="w85" style="line-height:1em;padding-top:6rpx;"> <text>结算\n方式</text></view>
+                  <view class="flex_1">{{item.settlement_type_name}}</view>
+                </view>
+                <view class="flex_box">
+                  <view class="w134">当前状态</view>
+                
+                  <view class="flex_1 f20">{{item.statusName}}</view>
+                </view>
+                <view class="flex_box right">
+                  <view wx:if="{{item.orderConstraintName}}" class="btn_order {{item.orderConstraintName ==='查看结算'?'':'red'}}"   >{{item.orderConstraintName}}</view>
+              
+                <view wx:if="{{item.anniuNameTwo}}" class="btn_order red">{{item.anniuNameTwo}}</view> 
+                <view wx:if="{{item.anniuName}}" class="btn_order">{{item.anniuName}}</view> 
+                
+                </view>
+              </view>
+            </view>
+          </view>
+        </block>
+
+      </view>
+      <botBar curr='4'></botBar>
     </view>
 </template>
 
@@ -77,43 +147,211 @@ import wepy from 'wepy';
 import botBar from '@/components/botBar';
 
 export default class Order extends wepy.page {
+  config = {
+    enablePullDownRefresh: true
+  };
   data = {
     listData: [],
     queryData: {
       orderType: 1,
       orderStatus: 0,
       pageNum: 1
-    }
+    },
+
+    queryData_jingkuang: {
+      orderType: 1,
+      type: 2,
+      status: -1,
+      pageNum: 1
+    },
+    listData_jk: [],
+    list_type: 0,
+    typeName: '整单',
+    order_type: '采购',
+    toggle_type: false
   };
   components = {
     botBar
   };
-  computed = {
-    aPlus() {
-      this.listData.map((v, i) => {
-        if(v.status===5){}
-      });
-      return '';
-    }
-  };
+
   methods = {
-    switch1Change() {
-      console.log(1);
+    goSearch(){
+         this.$parent.linkPage(
+        '../orderSearch/orderSearch',
+        1
+      );
+    },
+    changeListType(val) {
+      this.list_type = val;
+     // console.log(this.list_type);
+      this.$apply();
+    },
+    switch1Change(val) {
+      this.order_type = val.detail.value ? '采购' : '销售';
+      this.queryData_jingkuang.type = val.detail.value ? 1 : 2;
+      this.queryData.orderType = val.detail.value ? 1: 2;
+      this.onPullDownRefresh();
+    },
+    change() {
+      this.toggle_type = !this.toggle_type;
+    },
+    async changeStaus(orderStatus) {
+      if (this.list_type == 0) {
+        this.queryData.orderStatus = orderStatus;
+        this.queryData.pageNum = 1;
+        let res = await this.methods.getList(this, this.queryData);
+        this.listData = res.orderList;
+      } else {
+        this.queryData_jingkuang.status = orderStatus;
+        this.queryData_jingkuang.pageNum = 1;
+        let jk_res = await this.methods.getList_jinkuang(
+          this,
+          this.queryData_jingkuang
+        );
+        this.listData_jk = jk_res.pageBean.list;
+      }
+
+      this.$apply();
+    },
+
+    async changeJK(val, str) {
+      this.queryData_jingkuang.orderType = val;
+      this.queryData_jingkuang.pageNum = 1;
+      this.typeName = str;
+      let jk_res = await this.methods.getList_jinkuang(
+        this,
+        this.queryData_jingkuang
+      );
+      this.listData_jk = jk_res.pageBean.list;
+      this.toggle_type = false;
+      this.$apply();
     },
     getList(_this, obj) {
-      return _this.$parent.queryData('msyApp/queryEnterpriseOrderList.do', {
+      return _this.$parent
+        .queryData('msyApp/queryEnterpriseOrderList.do', {
+          enterpriseId: _this.$parent.globalData.userInfo.id,
+          orderType: obj.orderType,
+          userType: _this.$parent.globalData.userInfo.isSystem ? 2 : 1,
+          pageNum: obj.pageNum,
+          orderStatus: obj.orderStatus
+        })
+        .then(d => {
+          d.orderList.map((v, i) => {
+            d.orderList[i].status = _this.methods.statusToStr(v.status);
+          });
+          return d;
+        });
+    },
+    getList_jinkuang(_this, obj) {
+      return _this.$parent.queryData('msyApp/queryConcentrateApplyPage.do', {
         enterpriseId: _this.$parent.globalData.userInfo.id,
         orderType: obj.orderType,
-        userType: _this.$parent.globalData.userInfo.isSystem ? 1 : 2
+        type: obj.type,
+        userId: _this.$parent.globalData.userInfo.userId,
+        pageNum: obj.pageNum,
+        status: obj.status
       });
+    },
+    statusToStr(val) {
+      let word = new Map([
+        [-2, '无效'],
+        [-1, '删除'],
+        [0, '议价待审核'],
+        [1, '议价不通过'],
+        [2, '议价通过'],
+        [3, '合同审核中'],
+        [4, '合同审核失败'],
+        [5, '合同审核成功'],
+        [6, '合同签署失败'],
+        [7, '合同签署成功'],
+        [8, '现款现货麻蛋申请'],
+        [9, '待支付'],
+        [10, '已线下支付(待平台确认)'],
+        [11, '支付失败'],
+        [12, '支付成功'],
+        [13, '提货申请'],
+        [14, '提货委托书（提货中）'],
+        [15, '提货完成'],
+        [16, '结算中'],
+        [17, '已完成'],
+        [18, '已撤销'],
+        [19, '预付款押金退回']
+      ]);
+      return word.get(val);
     }
   };
 
   async onShow() {
+    let _this = this;
     let res = await this.methods.getList(this, this.queryData);
+    let jk_res = await this.methods.getList_jinkuang(
+      this,
+      this.queryData_jingkuang
+    );
     this.listData = res.orderList;
-    console.log(this.listData);
+    this.listData_jk = jk_res.pageBean.list;
+    console.log(jk_res);
+    // console.log(this.methods.statusToStr(-2));
     this.$apply();
+  }
+  async onPullDownRefresh() {
+    wepy.showLoading({
+      title: '加载中…'
+    });
+    wepy.showNavigationBarLoading();
+    let _this = this;
+    this.queryData.pageNum = 1;
+    this.queryData_jingkuang.pageNum = 1;
+    let res = await this.methods.getList(this, this.queryData);
+    let jk_res = await this.methods.getList_jinkuang(
+      this,
+      this.queryData_jingkuang
+    );
+    this.listData = res.orderList;
+    this.listData_jk = jk_res.pageBean.list;
+    // console.log(this.listData);
+    this.$apply();
+    wepy.hideNavigationBarLoading();
+    wx.stopPullDownRefresh(
+      wepy.showToast({
+        title: '请求成功',
+        icon: 'none'
+      })
+    );
+  }
+  async onReachBottom(event) {
+    //请求更多数据
+    console.log('onReachBottom', event);
+    let res;
+    wepy.showLoading({
+      title: '加载中…'
+    });
+
+    wepy.showNavigationBarLoading();
+    if (this.list_type === 0) {
+      this.queryData.pageNum = this.queryData.pageNum + 1;
+      res = await this.methods.getList(this, this.queryData);
+      this.listData.push(...res.orderList);
+    } else {
+      this.queryData_jingkuang.pageNum = this.queryData_jingkuang.pageNum + 1;
+      res = await this.methods.getList_jinkuang(this, this.queryData_jingkuang);
+      this.listData_jk.push(...res.pageBean.list);
+    }
+
+    this.$apply();
+    wepy.hideNavigationBarLoading();
+    let _list = res.orderList || res.pageBean.list;
+    if (_list.length <= 0) {
+      wepy.showToast({
+        title: '没有更多了',
+        icon: 'none'
+      });
+    } else {
+      wepy.showToast({
+        title: '加载成功',
+        icon: 'none'
+      });
+    }
   }
 }
 </script>

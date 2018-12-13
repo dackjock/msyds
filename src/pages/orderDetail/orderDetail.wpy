@@ -1,0 +1,172 @@
+<template  lang="wxml" minapp="wepy">
+    <view class="container">
+         <view class="header"> <image class="goback" @tap="goback" mode="aspectFit" src="../../assets/images/icon/goback.png" />  订单详情页</view>
+        <view class="top"> <view >湖南马上银工业互联网平台</view> <view class="timer">2017-10-21   10:31:11</view> </view>
+        <!-- 订单信息 -->
+        <view class="table">
+               <view class="tr">
+                    <view class="td">订单编号</view>
+                    <view class="td">{{order_info.order_code}}</view>
+                </view> 
+                <view class="tr">
+                    <view class="td">结算方式</view>
+                    <view class="td">{{order_info.payMethodName}}</view>
+                </view> 
+                 <view class="tr">
+                    <view class="td">状态</view>
+                    <view class="td">{{order_info.goods_name}}</view>
+                </view> 
+                <view class="tr">
+                    <view class="td">品名</view>
+                    <view class="td">{{order_info.goods_name}}</view>
+                    <view class="td">数量</view>
+                    <view class="td">{{order_info.goods_weight}}KG</view>
+                </view>
+                <view class="tr">
+                    <view class="td">总价</view>
+                    <view class="td" style="color:#d7092d">{{order_info.total_price}}元</view>
+                </view> 
+                <view class="tr">
+                    <view class="td">最晚提货时间</view>
+                    <view class="td">{{order_info.last_time}}</view>
+                    
+                </view> 
+        </view>
+
+
+
+        <!-- 其他信息查看 -->
+        <view class="info">
+            <view class="h1"><view class="span">信息查看</view></view>
+
+            <view  class="info_item" @tap="go(0)">
+                <view>
+                    <image class="icon_t" mode="aspectFit" src="../../assets/images/icon/icon-detail.png" />
+                    查看商品详情
+                </view>
+                <image class="icon_you" mode="aspectFit" src="../../assets/images/icon/icon-you.png" />
+            </view>
+            <view  class="info_item"  @tap="change_('changeMD')">
+                <view>
+                    <image class="icon_t" mode="aspectFit" src="../../assets/images/icon/icon-detail.png" />
+                    查看码单({{order_info.single_code_url_size}}个)
+                </view>
+                 <image class="icon_you {{changeMD?'rot':''}}" mode="aspectFit" src="../../assets/images/icon/icon-you.png" />
+            </view>
+
+            <view class="order_madan" wx:if="{{order_info.single_code_url_list.length>0&&changeMD}}" >
+                <view @tap="go({{item.url}})"  class="info_item"  wx:for="{{order_info.single_code_url_list}}" wx:key="index">
+                    <view>
+                     
+                        查看码单({{item.code}})
+                    </view>
+                    <image class="icon_you " mode="aspectFit" src="../../assets/images/icon/icon-you.png" />
+                 </view>
+            </view>
+            <view wx:if="{{order_info.contract_url}}" @tap="go({{order_info.contract_url}})"  class="info_item">
+                <view>
+                    <image class="icon_t" mode="aspectFit" src="../../assets/images/icon/icon-yinz.png" />
+                    查看合同
+                </view>
+                <image class="icon_you" mode="aspectFit" src="../../assets/images/icon/icon-you.png" />
+            </view>
+            <view  class="info_item" @tap="change_('changeWTH')">
+                <view>
+                    <image class="icon_t" mode="aspectFit" src="../../assets/images/icon/icon-detail.png" />
+                    查看委托函({{order_info.proxy_url_size}}个)
+                </view>
+                <image class="icon_you {{changeWTH?'rot':''}}" mode="aspectFit" src="../../assets/images/icon/icon-you.png" />
+            </view>
+            <view class="order_madan" wx:if="{{order_info.proxy_url_list.length>0&&changeWTH}}" >
+            <view  class="info_item" wx:for="{{order_info.proxy_url_list}}" wx:key="index" style="height:auto; padding:15rpx;">
+                <view>
+                    
+                    查看委托函({{item.code}}) {{item.isTihuo?"[提货已完成]":""}}
+                </view>
+                
+                <view class="btn_group">
+                    <view class="btn" @tap="go({{item.url}})">查看委托函</view>
+                    <view class="btn" @tap="renderErweima({{item.id}})">生成二维码</view>
+                </view>
+            </view>
+        </view>
+        </view>
+        <view class="info">
+             <view class="h1"><view class="span">订单明细</view>  <navigator url="../orderDetail2/orderDetail2?id={{order_info.id}}" class="more">更多</navigator></view>
+        </view>
+        <view wx:if="{{index<6}}" wx:for="{{order_log}}" wx:key="index" class="mingxi">{{item.createTime}} {{item.logContent}}</view>
+      
+       
+       <navigator url="../order/order" open-type="redirect" class="black_btn">返回订单中心</navigator>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+export default class orderDetail extends wepy.page {
+  data = {
+    order_info: '',
+    order_log: '',
+    changeMD: true,
+    changeWTH: true
+  };
+  methods = {
+
+    change_(key) {
+      this[key] = !this[key];
+      this.$apply();
+    },
+    goback() {
+      wx.navigateBack();
+    },
+    renderErweima(id) {
+      this.$parent.linkPage(
+        '../orderDetailItem/orderDetailItem?proxyId=' + id,
+        1
+      );
+    },
+
+    go(url) {
+      if (url !== '0') {
+        let $url = encodeURIComponent(url);
+        this.$parent.linkPage(
+          '../orderDetailItem/orderDetailItem?url=' +
+            $url +
+            '&id=' +
+            this.order_info.id,
+          1
+        );
+      } else {
+        this.$parent.linkPage(
+          '../orderDetailItem/orderDetailItem?id=' + this.order_info.id,
+          1
+        );
+      }
+    }
+  };
+  async onLoad(options) {
+    let res = await this.getOrder(options.id, options.contract_id);
+    let log = await this.queryOrderLog(options.id);
+    this.order_info = res.pageMap;
+    this.order_log = log.list;
+    this.$apply();
+  }
+  getOrder(id, hetong_id) {
+    return this.$parent.queryData('msyApp/searchOrderDetail.do', {
+      id: id,
+      contractId: hetong_id
+    });
+  }
+  queryOrderLog(id, type) {
+    return this.$parent.queryData('msyApp/queryOrderLog.do', {
+      orderId: id,
+      type: -1
+    });
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/orderDetail';
+</style>
