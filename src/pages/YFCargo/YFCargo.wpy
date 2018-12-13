@@ -1,5 +1,5 @@
 <template lang="wxml" minapp="wepy">
-  <view class="container pad-bot">
+  <view class="container pad-bot" @tap="hidePayWay">
     <header :title.sync="title"></header>
     <view class="pi-tips">提示：预付款金额可以冲抵最后一次提货金额。</view>
     <view class="pickup-item">
@@ -26,19 +26,19 @@
       <text >可提货数量</text>
       <text>{{goodsInfo.goods_weight}}KG</text>
     </view>
-    <view class="pickup-item">
+    <view class="pickup-item" wx:if="{{cargoNum*1 === goodsInfo.goods_weight*1}}">
       <text >是否使用预付款冲抵货款</text>
       <picker mode="selector" range="{{['使用','不使用']}}" value="{{useIndex}}" bindchange="changeUsed">
-        <view >{{(useIndex === 0 ? '使用' : '不使用') || '请选择'}}</view>
+        <view >{{useIndex*1 === 0 ? '使用' : '不使用'}}</view>
       </picker>
     </view>
     <view class="pickup-item">
       <text >请填写提货数量</text>
-      <input type="number" placeholder="本次提货数量/Kg" />
+      <input type="number" placeholder="本次提货数量/Kg" value="{{cargoNum}}" bindinput="inputNum"/>
     </view>
-    <view class="pickup-item">
+    <view class="pickup-item" wx:if="{{cargoNum*1 === goodsInfo.goods_weight*1}}">
       <text >剩余预付款金额</text>
-      <text>{{}}元</text>
+      <text>{{useIndex*1 === 0 ? '0' : goodsInfo.prepay_price}}元</text>
     </view>
     <view class="pickup-item">
       <text >最晚提货时间</text>
@@ -51,10 +51,31 @@
       </picker>
     </view>
     <view class="pickup-item">
+      <text >本次提货金额</text>
+      <text style="color:#d7092d">{{cargoNum*goodsInfo.price}}元</text>
+    </view>
+    <view class="pickup-item">
       <text >提货仓库</text>
       <text>{{goodsInfo.depotName}}</text>
     </view>
-    <button class="page-btn fix-bot" @tap.stop="subForm">提交</button>
+    <view class="pickup-item" wx:if="{{cargoNum*1 === goodsInfo.goods_weight*1}}">
+      <text >提本次提货所需金额</text>
+      <text style="color:#d7092d">{{cargoNum*goodsInfo.price - (useIndex*1 === 0 ? goodsInfo.prepay_price : 0)}}元</text>
+    </view>
+    <view class="cost-payWay" wx:if="{{payWay}}" @tap.stop="stopThis">
+      <text class="type-tips">请选择支付方式</text>
+      <view class="pay-way">
+        <view class="pay-item">
+          <image src="../../assets/images/icon/pay-safe.png" style="width:76rpx;height:46rpx;"/>
+          <text >平安现货交易通</text>
+        </view>
+        <view class="pay-item" @tap="subForm">
+          <image src="../../assets/images/icon/pay-offline.png" mode="aspectFit" style="width:100%;height:46rpx;"/>
+          <text >线下支付</text>
+        </view>
+      </view>
+    </view>
+    <button class="page-btn fix-bot" @tap.stop="choosePayWay">提交</button>
   </view>
 </template>
 
@@ -74,13 +95,16 @@ export default class pickupGoods extends wepy.page {
     depotListId: '',
     indexs: '',
     again: '',
+    payWay: false,
     pickupType: ['直接提货'],
     startTime: '',
     lastTime: '',
     typeIndex: 0,
     pickupDate: '',
     goodsInfo: {},
-    allData:{}
+    allData: {},
+    useIndex: 1,
+    cargoNum: ''
   };
   methods = {
     changeTime(event) {
@@ -89,43 +113,64 @@ export default class pickupGoods extends wepy.page {
     changeType(event) {
       this.typeIndex = event.detail.value;
     },
-    async subForm() {
-      if (this.typeIndex === '' || this.pickupDate === '') {
+    changeUsed(event) {
+      this.useIndex = event.detail.value;
+    },
+    inputNum(event) {
+      let wgt = this.goodsInfo.goods_weight;
+      this.cargoNum = event.detail.value;
+      this.cargoNum = this.cargoNum * 1 > wgt * 1 ? wgt * 1 : this.cargoNum;
+    },
+    choosePayWay() {
+      this.payWay = true;
+    },
+    hidePayWay() {
+      this.payWay = false;
+    },
+    stopThis() {},
+    subForm() {
+      if (
+        this.typeIndex === '' ||
+        this.pickupDate === '' ||
+        this.cargoNum === ''
+      ) {
         this.$parent.showTip('请完善信息');
         return false;
       }
-      let url = ''
-      if(flagId === 1){
-        url = 'addCashSpotZQCargo.do'
-      }else{
-        url = '/msyApp/addCashSpotCargo.do'
-      }
-      let result = await this.$parent.queryData(url, {
+      let YFCdata = {
         cargoId: this.cargoId,
-        orderId:this.orderId,
-        depotListId:this.depotListId,
-        type: parseInt(this.typeIndex) + 1,
-        cargoTime: this.pickupDate
-      });
-      if (result) {
-        // this.$parent.linkPage(
-        //   '../entrustPickup/entrustPickup?orderId=' +
-        //     this.orderId +
-        //     '&cargoId=' +
-        //     this.cargoId,
-        //   4
-        // );
-      }
-      console.log(result);
+        orderId: this.orderId,
+        depotListId: this.depotListId,
+        index: this.indexs,
+        again: this.allData.again,
+        isAdvance: this.useIndex * 1 === 0 ? 1 : 0,
+        surplusAdvance:
+          this.useIndex * 1 === 0
+            ? this.goodsInfo.total_price - this.goodsInfo.prepay_price < 0
+              ? 0
+              : this.goodsInfo.total_price - this.goodsInfo.prepay_price
+            : this.goodsInfo.prepay_price,
+        type: 1,
+        paytype: 2,
+        prepay_price: this.goodsInfo.prepay_price,
+        prepayPrice:
+          this.cargoNum * this.goodsInfo.price -
+          (this.useIndex * 1 === 0 ? this.goodsInfo.prepay_price : 0),
+        cargoTime: this.pickupDate,
+        cargoNum: this.cargoNum,
+        pay_method_id:this.goodsInfo.pay_method_id
+      };
+      this.$parent.globalData.temporary.YFCdata = YFCdata
+      this.$parent.linkPage('../payOffline/payOffline',1)
     }
   };
   onLoad(e) {
     // console.log(e)
-    this.orderId = e.orderId || 5507;
-    this.cargoId = e.cargoId || 3187;
-    this.depotListId = e.depotListId || 3187;
-    this.indexs = e.index || 1;
-    this.again = e.again || 1;
+    this.orderId = e.orderId || 5511;
+    this.cargoId = e.cargoId || 3191;
+    this.depotListId = e.depotListId || 3191;
+    this.indexs = e.index || 4;
+    this.again = e.again || 0;
     this.take_time = e.take_time || '2018-12-31';
   }
   onShow() {
@@ -144,7 +189,7 @@ export default class pickupGoods extends wepy.page {
         again: this.again
       }
     );
-    this.allData = result
+    this.allData = result;
     this.goodsInfo = result.goodsMap;
     this.flagId = result.pay_method_id;
     let d = new Date();

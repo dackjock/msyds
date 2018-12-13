@@ -12,6 +12,7 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/login/login',
+      'pages/index/index',
       'pages/consigneeChange/consigneeChange',
       'pages/consignee/consignee',
       'pages/negotiateManagement/negotiateManagement',
@@ -47,10 +48,8 @@ export default class extends wepy.app {
       'pages/enterpriseIden3/enterpriseIden3',
       'pages/newDealjk/newDealjk',
       'pages/newDealby/newDealby',
-      'pages/index/index',
       'pages/forgetPass/forgetPass',
       'pages/sign/sign',
-      'pages/mallIndex/mallIndex',
       'pages/authManage/authManage',
       'pages/authManager/authManager',
       'pages/editAuthManager/editAuthManager',
@@ -89,7 +88,8 @@ export default class extends wepy.app {
       goodsData: '',
       goodsStatue: '',
       contractId: '',
-      webView: ''
+      webView: '',
+      YFCdata:''
     }
   };
 

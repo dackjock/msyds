@@ -16,7 +16,7 @@
         <text >线下汇款卡号</text>
         <input name="qy_bank_no" placeholder="请填写线下汇款卡号" value="{{payInfo.buyBankNo}}" />
       </view>
-      <view class="pf-item">
+      <view class="pf-item" wx:if="{{payMethodId === 8}}">
         <text >线下汇款流水</text>
         <input name="tradeNo" placeholder="请填写线下汇款流水" value="" />
       </view>
@@ -48,7 +48,8 @@ export default class payOffline extends wepy.page {
     userInfo: [],
     payPrice: '',
     payInfo: {},
-    payMethodId: ''
+    payMethodId: '',
+    YFCdata: ''
   };
   onLoad(e) {
     // console.log(e)
@@ -56,10 +57,13 @@ export default class payOffline extends wepy.page {
     // this.enterpriseOrderId = 5488;
     this.payPrice = e.price || ''; // 应付金额
     this.settlementId = e.settlementId || '';
+    this.YFCdata = this.$parent.globalData.temporary.YFCdata;
   }
   onShow() {
     this.userInfo = this.$parent.globalData.userInfo;
-    if (this.settlementId === '') {
+    if (this.YFCdata !== '') {
+      this.getYFCInfo();
+    } else if (this.settlementId === '') {
       this.getPaymentInfo();
     } else {
       this.getSettlementInfo();
@@ -73,6 +77,8 @@ export default class payOffline extends wepy.page {
       let formData = event.detail.value;
       if (this.payMethodId === 1) {
         this.payAccountOrder(formData);
+      } else if (this.payMethodId === 2) {
+        this.payYFCOrder(formData);
       } else if (this.settlementId === '') {
         this.sendPayOrder(formData);
       } else {
@@ -108,6 +114,30 @@ export default class payOffline extends wepy.page {
     payInfo['bankName'] = result.enterprise.bankName;
     payInfo['bankNo'] = result.enterprise.bankAccount;
     this.payPrice = result.detail.payPrice;
+    this.payInfo = payInfo;
+    this.$apply();
+    console.log(result);
+  }
+  async getYFCInfo() {
+    let YFCdata = this.YFCdata;
+    let payInfo = {};
+    let result = await this.$parent.queryData(
+      '/msyApp/frontQueryYFCargoInit.do',
+      {
+        enterpriseId: this.userInfo.id,
+        orderId: YFCdata.orderId,
+        cargoId: YFCdata.cargoId,
+        depotListId: YFCdata.depotListId,
+        index: YFCdata.indexs,
+        again: YFCdata.again
+      }
+    );
+    payInfo['buyBankName'] = result.buyBankName;
+    payInfo['buyBankNo'] = result.buyBankNo;
+    payInfo['bankName'] = result.bankName;
+    payInfo['bankNo'] = result.bankNo;
+    this.payPrice = YFCdata.prepayPrice;
+    this.payMethodId = YFCdata.pay_method_id;
     this.payInfo = payInfo;
     this.$apply();
     console.log(result);
@@ -167,6 +197,23 @@ export default class payOffline extends wepy.page {
     );
     if (result.type > 0) {
       this.$parent.showTip('支付成功');
+      // 跳回订单列表
+      // this.$parent.linkPage('', 2);
+    }
+    console.log(result);
+  }
+  async payYFCOrder(formData) {
+    Object.assign(formData, this.YFCdata);
+    formData['enterpriseId'] = this.userInfo.id;
+    console.log(formData);
+    let result = await this.$parent.queryData(
+      'msyApp/addCashSpotYFCargo.do',
+      formData,
+      true,
+      'POST'
+    );
+    if (result.type > 0) {
+      this.$parent.showTip('操作成功');
       // 跳回订单列表
       // this.$parent.linkPage('', 2);
     }
