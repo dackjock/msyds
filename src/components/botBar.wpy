@@ -33,7 +33,7 @@ export default class botBar extends wepy.component {
       },
       {
         name: '订单',
-        link: ''
+        link: '../order/order'
       },
       {
         name: '我的',

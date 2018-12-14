@@ -1,0 +1,139 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container cost-pad">
+    <header :title.sync="title"></header>
+    <block wx:if="{{payMethodId === 1}}">
+      <view class="entrust-info">
+        <text >合同总金额</text>
+        <text >{{pageMap.totalOrderPrice}}元</text>
+      </view>
+      <view class="entrust-info">
+        <text >合同签订日期</text>
+        <text >{{pageMap.contractSingeTime}}</text>
+      </view>
+      <view class="entrust-info">
+        <text >提货日期</text>
+        <text >{{pageMap.cargoTime}}</text>
+      </view>
+      <view class="entrust-info">
+        <text >合同签订的最终单价</text>
+        <text >{{pageMap.orderPrice}}元</text>
+      </view>
+      <view class="entrust-info">
+        <text >年利率</text>
+        <text >{{pageMap.yearRate}}%</text>
+      </view>
+      <view class="entrust-info">
+        <text >合同约定账期</text>
+        <text >{{pageMap.accountDay}}天</text>
+      </view>
+      <view class="entrust-info">
+        <text >实际已累积的自然日</text>
+        <text >{{pageMap.totalAccountDay}}天</text>
+      </view>
+      <view class="entrust-info">
+        <text >订单重量</text>
+        <text >{{pageMap.orderNum}}KG</text>
+      </view>
+      <view class="entrust-info">
+        <text >需要交纳补偿费用</text>
+        <text class="red">{{pageMap.totalAccountPrice}}元</text>
+      </view>
+      <view class="entrust-info">
+        <text >订单总金额</text>
+        <text class="red">{{pageMap.actualOrderPrice}}元</text>
+      </view>
+      <view class="entrust-info">
+        <text >实际应支付金额</text>
+        <text class="red">{{pageMap.totalPayPrice}}元</text>
+      </view>
+    </block>
+    <block wx:if="{{payMethodId === 2}}">
+      <view class="entrust-info">
+        <text >结算方式</text>
+        <text >{{allData.payMethod}}</text>
+      </view>
+      <view class="entrust-info">
+        <text >订单金额</text>
+        <text class="red">{{pageMap.total_price}}元</text>
+      </view>
+      <view class="entrust-info">
+        <text >预付比例</text>
+        <text class="red">{{pageMap.advanceRatio}}%</text>
+      </view>
+      <view class="entrust-info">
+        <text >预付金额</text>
+        <text class="red">{{pageMap.prepayPrice}}元</text>
+      </view>
+      <view class="entrust-info">
+        <text >最晚提货时间</text>
+        <text >{{pageMap.lastTime}}</text>
+      </view>
+    </block>
+    <view class="pay-info bord-top">
+    <text class="type-tips">请选择支付方式</text>
+      <view class="pay-way">
+        <view class="pay-item">
+          <image src="../../assets/images/icon/pay-safe.png" style="width:76rpx;height:46rpx;"/>
+          <text >平安现货交易通</text>
+        </view>
+        <view class="pay-item" @tap="payForOffline">
+          <image src="../../assets/images/icon/pay-offline.png" mode="aspectFit" style="width:100%;height:46rpx;"/>
+          <text >线下支付</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class chargeConfirm extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    title: '费用确认',
+    id: '',
+    orderType: '',
+    pageMap: {},
+    allData:{},
+    payMethodId: ''
+  };
+  methods = {
+    payForOffline() {
+      this.$parent.linkPage('../payOffline/payOffline?id=' + this.id, 4);
+    }
+  };
+  onLoad(e) {
+    console.log('费用确认参数：',e)
+    this.id = e.id;
+    this.orderType = e.orderType;
+  }
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.getChargeInfo();
+  }
+  async getChargeInfo() {
+    let result = await this.$parent.queryData('/msyApp/completePayInit.do', {
+      enterpriseOrderId: this.id,
+      userId: this.userInfo.userId,
+      enterpriseId: this.userInfo.id
+    });
+    if (!result) {
+      this.$parent.linkPage('../order/order', 4);
+    }
+    console.log(result);
+    this.allData = result
+    this.pageMap = result.pageMap;
+    this.payMethodId = result.payMethodId;
+    this.$apply();
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/oderPayment';
+@import '../../assets/style/pickup';
+</style>

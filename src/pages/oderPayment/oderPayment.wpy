@@ -1,0 +1,86 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container pad-bot">
+    <header :title.sync="title"></header>
+    <view class="pay-info">
+      <text class="top-tips">注意：待付款的订单在<text >5小时</text>之内未完成付款，系统自动取消！</text>
+      <text class="top-title">支付金额</text>
+      <text class="price">￥{{payPrice}}元</text>
+      <text class="type-tips">请选择支付方式</text>
+      <view class="pay-way">
+        <view class="pay-item">
+          <image src="../../assets/images/icon/pay-safe.png" style="width:76rpx;height:46rpx;"/>
+          <text >平安现货交易通</text>
+        </view>
+        <view class="pay-item" @tap="payForOffline">
+          <image src="../../assets/images/icon/pay-offline.png" mode="aspectFit" style="width:100%;height:46rpx;"/>
+          <text >线下支付</text>
+        </view>
+      </view>
+    </view>
+    <button class="page-btn fix-bot" @tap.stop="">返回</button>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class oderPayment extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    title: '订单支付',
+    userInfo: [],
+    enterpriseOrderId: '',
+    payPrice: 0
+  };
+  onLoad(e) {
+    // console.log(e)
+    this.enterpriseOrderId = e.id
+    // this.enterpriseOrderId = 5506;
+  }
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.getPaymentInfo();
+  }
+  methods = {
+    payForOffline() {
+      this.$parent.linkPage(
+        '../payOffline/payOffline?id=' +
+          this.enterpriseOrderId +
+          '&price=' +
+          this.payPrice,
+        1
+      );
+    }
+  };
+  async getPaymentInfo() {
+    let result = await this.$parent.queryData('/msyApp/completePayInit.do', {
+      userId: this.userInfo.userId,
+      enterpriseId: this.userInfo.id,
+      enterpriseOrderId: this.enterpriseOrderId
+    });
+    if (result.payMethodId === 8) {
+      this.payPrice = result.pageMap.pay_price;
+    }
+    if (result.payMethodId === 1) {
+      this.payPrice = result.pageMap.totalPayPrice;
+    }
+    if (result.payMethodId === 2 || result.payMethodId === 4) {
+      this.payPrice = result.pageMap.total_price;
+    }
+    if (result.payMethodId === 6 || result.payMethodId === 7) {
+      this.payPrice = result.pageMap.total_price;
+    }
+    this.$apply();
+    console.log(result);
+  }
+}
+</script>
+
+
+<style lang="stylus">
+@import '../../assets/style/oderPayment';
+</style>
+

@@ -1,0 +1,94 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header :title.sync="title"></header>
+    <view wx:if="{{!isBuilded}}" class="code-biulding">
+      <text class="top-tips">说明：当前码单正在制作中，大概1-5分钟。若等待时间过长，请咨询在线客服。</text>
+      <image src="../../assets/images/icon/icon-logo2.png" />
+      <text >码单生成中…</text>
+      <button class="page-btn fix-bot" @tap.stop="">返回订单中心</button>
+    </view>
+    <view wx:else class="code-builded">
+      <image @tap="viewCodeSheet" src="../../assets/images/icon/view-code.png" />
+      <text @tap="viewCodeSheet">点击查看码单</text>
+      <button class="page-btn fix-bot" @tap.stop="confimCode">确认码单</button>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class codesQuery extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    title: '码单生成中',
+    userInfo: [],
+    isBuilded: false,
+    viewUrl: '',
+    cargoDepotListId: '',
+    status: ''
+  };
+  onLoad(e) {
+    this.orderId = e.id
+    // this.orderId = 5506;
+  }
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.queryCode();
+  }
+  methods = {
+    viewCodeSheet() {
+      this.$parent.globalData.temporary.webView = this.viewUrl;
+      this.$parent.linkPage('../webView/webView', 1);
+    },
+    async confimCode() {
+      let result = await this.$parent.queryData(
+        '/msyApp/updateCargoDepotListStatus.do',
+        {
+          userId: this.userInfo.userId,
+          orderId: this.orderId,
+          cargoDepotListId: this.cargoDepotListId,
+          type: 1
+        }
+      );
+      if (result) {
+        // if (result.key === 0) {
+        //   // 跳转至支付页面
+        //   this.$parent.linkPage(
+        //     '../order/order',
+        //     4
+        //   );
+        // } else {
+        //   // 跳转至填写委托函
+          
+        // }
+        this.$parent.linkPage(
+          '../order/order',
+          4
+        );
+      }
+      console.log(result);
+    }
+  };
+  async queryCode() {
+    let result = await this.$parent.queryData('/msyApp/judgeSingleCode.do', {
+      enterpriseId: this.userInfo.id,
+      orderId: this.orderId
+    });
+    this.isBuilded = result.idCreated === 1 ? false : true;
+    this.title = result.idCreated === 1 ? '码单生成中' : '确认码单';
+    this.viewUrl = result.view_url;
+    this.cargoDepotListId = result.cargoDepotListId;
+    this.status = result.status;
+    this.$apply();
+    console.log(result);
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/codesSheet.styl';
+</style>

@@ -5,5 +5,3 @@ login
 app.wpy
 _wepylogs
 .wepycache
-src/app.wpy
-.wepycache

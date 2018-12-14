@@ -82,17 +82,27 @@ export default class goodsItem extends wepy.component {
     date: dateFormater
   };
   methods = {
-    async buyGoods(event){
-      console.log(event.target.dataset)
+    async buyGoods(event) {
+      console.log(event.target.dataset);
       let buyData = event.target.dataset;
       buyData['enterpriseId'] = this.$parent.$parent.globalData.userInfo.id;
-      let result = await this.$parent.$parent.queryData("/msyApp/buyGoodsInit.do",buyData)
-      if(result != ''){
+      let result = await this.$parent.$parent.queryData(
+        '/msyApp/buyGoodsInit.do',
+        buyData
+      );
+      if (result != '') {
         // 将查询参数存到临时容器中
-        this.$parent.$parent.globalData.temporary.goodsData = buyData;
-        this.$parent.$parent.linkPage('../buyGoods1/buyGoods1',1)
+        console.log(buyData);
+        let goodsData = {
+          goods_type: result.goods_type,
+          id: result.goodsId,
+          type: result.type,
+          enableBuy: 1
+        };
+        this.$parent.$parent.globalData.temporary.goodsData = goodsData;
+        this.$parent.$parent.linkPage('../negotiate/negotiate',1)
       }
-      console.log(result)
+      console.log(result);
     }
   };
 }
