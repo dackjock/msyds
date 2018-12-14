@@ -1,7 +1,35 @@
 <template lang="wxml" minapp="wepy">
-  <view class="container pd-bot">
+  <view class="container pd-bot pd-top">
     <header title="审批流程管理"></header>
-    
+    <view class="approval-status">
+      <label >当前状态<switch color="#d7092d" bindchange="changeAll" checked="{{processStatus === 1}}" /></label>
+    </view>
+    <view class="approval-item" wx:for="{{approvalList}}" wx:key="">
+      <view >
+        <text >审批类型：</text>
+        <text >{{item.typeName}}</text>
+      </view>
+      <view >
+        <text >审批流程：</text>
+        <text >{{item.processName}}</text>
+      </view>
+      <view >
+        <text >最后操作时间：</text>
+        <text >{{item.updateTime}}</text>
+      </view>
+      <view >
+        <text >创建时间：</text>
+        <text >{{item.createTime}}</text>
+      </view>
+      <view class="mi-bot">
+        <label >是否启用<switch color="#d7092d" data-id="{{item.id}}" bindchange="changeSwitch" checked="{{item.status === 1 ? true : false}}" /></label>
+        <view >
+          <text class="edit" @tap="editApproval({{item.id}})">编辑</text>
+          <text @tap="delApproval({{item.id}})">删除</text>
+        </view>
+      </view>
+    </view>
+    <button class="page-btn fix-bot" @tap.stop="editApproval('')">新增审批流程</button>
   </view>
 </template>
 
@@ -10,14 +38,120 @@ import wepy from 'wepy';
 import header from '@/components/header';
 
 export default class authApproval extends wepy.page {
-
+  config = {
+    enablePullDownRefresh: true
+  };
   components = {
     header
   };
+  data = {
+    userInfo: [],
+    pageNum: 1,
+    approvalList: [],
+    processStatus: 0
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.pageNum = 1;
+    this.approvalList = [];
+    this.getApprovalList();
+  }
+  methods = {
+    editApproval(id) {
+      this.$parent.linkPage('../editAuthApproval/editAuthApproval?id=' + id, 1);
+    },
+    delApproval(id) {
+      let that = this;
+      wx.showModal({
+        title: '操作提示',
+        content: '是否删除当前审批流程？',
+        confirmColor: '#d7092d',
+        success(res) {
+          console.log(res);
+          if (res.confirm) {
+            that.delAuthApproval(id);
+            that.pageNum = 1;
+            that.approvalList = [];
+            that.$apply();
+            that.getApprovalList();
+          }
+        }
+      });
+    },
+    async changeAll(event) {
+      let result = await this.$parent.queryData(
+        '/msyApp/appUpdateEnterpriseApproval.do',
+        {
+          enterpriseId: this.userInfo.id,
+          approval: event.detail.value ? 1 : 0
+        }
+      );
+      if (result) {
+        this.$parent.showTip('操作成功');
+      }
+    },
+    async changeSwitch(event) {
+      let result = await this.$parent.queryData(
+        '/msyApp/appUpdateApprovalStatus.do',
+        {
+          enterpriseId: this.userInfo.id,
+          enable: event.detail.value ? 1 : 0,
+          ids: event.target.dataset.id
+        }
+      );
+      if (result) {
+        this.pageNum = 1;
+        this.approvalList = [];
+        await this.getApprovalList();
+        this.$parent.showTip('操作成功');
+      }
+    }
+  };
+  async getApprovalList() {
+    let result = await this.$parent.queryData(
+      '/msyApp/appQueryApprovalProcessList.do',
+      {
+        userId: this.userInfo.userId,
+        pageNum: this.pageNum
+      },
+      true
+    );
+    if (result.data.returnMap.type <= 0) {
+      this.$parent.showTip('查询失败');
+    }
+    if (result.data.returnMap.list.length <= 0) {
+      this.$parent.showTip('暂无更多数据');
+    }
+    let returnMap = result.data.returnMap;
+    for (let k in returnMap.list) {
+      this.approvalList.push(returnMap.list[k]);
+    }
+    this.processStatus = returnMap.processStatus;
+    this.$apply();
+    console.log(returnMap);
+  }
+  async delAuthApproval(id) {
+    let result = await this.$parent.queryData(
+      '/msyApp/appDeleteApproval.do',
+      {
+        ids: id
+      }
+    );
+  }
+  onReachBottom() {
+    this.pageNum++;
+    this.getApprovalList();
+  }
+  async onPullDownRefresh() {
+    this.pageNum = 1;
+    this.approvalList = [];
+    await this.getApprovalList();
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
+  }
 }
 </script>
 
 <style lang="stylus">
-
-  
+@import '../../assets/style/authManage.styl';
 </style>

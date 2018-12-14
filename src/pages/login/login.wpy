@@ -35,8 +35,11 @@ export default class Login extends wepy.page {
     this.preToLogin({
       detail: {
         value: {
-          userName: "zwwd_01",
-          pwd: "a123456"
+          userName: 'haha',
+          // userName: 15527105253,
+          pwd: 123456
+          // userName: "zwwd_01",
+          // pwd: "a123456"
         }
       }
     });
@@ -60,6 +63,7 @@ export default class Login extends wepy.page {
       });
       this.$parent.globalData.userInfo = result;
       console.log('*********** 登录成功 ***********');
+      this.$parent.linkPage('',3)
     }
   };
   async preToLogin(even) {
@@ -82,7 +86,7 @@ export default class Login extends wepy.page {
     console.log('*********** 登录成功 ***********');
 
     console.log('用户信息：',result)
-    this.$parent.linkPage('../goodsList/goodsList',1)
+    this.$parent.linkPage('../order/order',4)
   }
 }
 </script>

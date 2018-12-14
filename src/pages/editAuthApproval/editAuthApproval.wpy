@@ -1,0 +1,224 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container pd-bot">
+    <header :title.sync="title"></header>
+    <form bindsubmit="subForm">
+      <view class="approval-line">
+        <text >审批类型：</text>
+        <picker class="type-picker" mode="selector" range="{{typeList}}" range-key="name" value="{{typeCurr}}" bindchange="changeType">
+          <view>{{typeList[typeCurr].name || '请选择'}}</view>
+        </picker>
+      </view>
+      <view class="approval-line" wx:for="{{flowList}}" wx:key="">
+        <text >流程{{index+1}}</text>
+        <view class="pl-picker">
+          <picker wx:for="{{item}}" wx:key="" wx:for-item="child" wx:for-index="idx" data-i="{{index}}" data-j='{{idx}}' mode="selector" range="{{memberList}}" range-key="name_str" value="{{flowList[index][idx]}}" bindchange="changeFlow" >
+            <view >{{memberList[flowList[index][idx]].real_name || '请选择'}}</view>
+          </picker>
+          <text wx:if="{{index<1}}" data-i="{{index}}" @tap="clearFlow">清空</text>
+          <text wx:else data-i="{{index}}" @tap="delFlow">移除</text>
+        </view>
+      </view>
+      <view class="al-bot">
+        <button @tap="addFlow">+ 新增流程</button>
+      </view>
+      <button form-type="submit" class="page-btn fix-bot">保存</button>
+    </form>
+    <view class="approval-info">
+      <view class="ai-title">流程详情</view>
+      <view class="ai-cont">
+        <text >开始</text>
+        <image class="icon-cross" src="../../assets/images/icon/icon-cross.png" />
+        <block wx:for="{{flowList}}" wx:key="">
+          <text wx:if="{{flowList[index][0] != '' || flowList[index][1] != ''}}">{{memberList[flowList[index][0]].real_name || ''}} {{memberList[flowList[index][1]].real_name || ''}}</text>
+          <image wx:if="{{flowList[index][0] != '' || flowList[index][1] != ''}}" class="icon-cross" src="../../assets/images/icon/icon-cross.png" />
+        </block>
+        <text >结束</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class editAuthApproval extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    title: '编辑审批流程',
+    userInfo: [],
+    approvalId: '',
+    typeList: [],
+    typeCurr: 0,
+    memberList: [],
+    flowList: [[0, '']]
+  };
+  methods = {
+    changeType(event) {
+      this.typeCurr = event.detail.value;
+      this.$apply();
+    },
+    changeFlow(event) {
+      console.log(event.currentTarget.dataset);
+      let flowList = this.flowList;
+      let _data = event.currentTarget.dataset;
+      let _val = event.detail.value;
+      for (let i in flowList) {
+        for (let j in flowList[i]) {
+          if (
+            flowList[i][j] == _val &&
+            flowList[i][j] !== '' &&
+            flowList[_data.i][_data.j] != flowList[i][j]
+          ) {
+            this.$parent.showTip(
+              '不能选择重复的审批人：' +
+                this.memberList[flowList[i][j]].real_name
+            );
+            return false;
+          }
+        }
+      }
+      flowList[_data.i][_data.j] = _val;
+      this.flowList = flowList;
+      this.$apply();
+    },
+    clearFlow(event) {
+      let idx = event.currentTarget.dataset.i;
+      let flowList = this.flowList;
+      flowList[idx] = ['', ''];
+      this.flowList = flowList;
+      this.$apply();
+    },
+    delFlow(event) {
+      let idx = event.currentTarget.dataset.i;
+      let flowList = this.flowList;
+      flowList.splice(idx, 1);
+      this.flowList = flowList;
+      this.$apply();
+    },
+    addFlow() {
+      if (this.flowList.length >= 5) {
+        this.$parent.showTip('最多5个流程');
+        return false;
+      }
+      this.flowList.push(['', '']);
+      this.$apply();
+    },
+    async subForm() {
+      let formData = {};
+      let userJson = [];
+      let memberList = this.memberList;
+      let flowList = this.flowList;
+      formData['type'] = this.typeList[this.typeCurr].id;
+      formData['userId'] = this.userInfo.userId;
+      formData['approvalId'] = this.approvalId == '' ? '' : this.approvalId;
+      for (let i = 0; i < flowList.length; i++) {
+        for (let j = 0; j < flowList[i].length; j++) {
+          if (flowList[i][j] !== '') {
+            userJson.push({
+              level: i + 1,
+              userId: memberList[flowList[i][j]].id,
+              depot: memberList[flowList[i][j]].dept_name,
+              name: memberList[flowList[i][j]].real_name
+            });
+          }
+        }
+      }
+      if (userJson.length <= 0) {
+        this.$parent.showTip('最少选择1个流程');
+        return false;
+      }
+      formData['userJson'] = userJson;
+      let result = await this.$parent.queryData(
+        '/msyApp/appAddorUpdateApprovalProcess.do',
+        formData
+      );
+      if(result){
+        this.$parent.linkPage('',3)
+      }
+    }
+  };
+  onLoad(e) {
+    this.approvalId = e.id;
+    if (e.id == '') {
+      this.title = '新增审批流程';
+    }
+  }
+  async onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    await this.queryTypeList();
+    await this.queryMember();
+    if(this.approvalId !== ''){
+      this.updataInit();
+    }
+  }
+  // 获取类型列表
+  async queryTypeList() {
+    let result = await this.$parent.queryData(
+      '/msyApp/queryContractTypeList.do'
+    );
+    if (result) {
+      this.typeList = result.typeList;
+      this.typeCurr = 0;
+      this.$apply();
+    }
+    console.log(result);
+  }
+  // 获取角色列表
+  async queryMember() {
+    let result = await this.$parent.queryData('/msyApp/appQueryMemberPage.do', {
+      memberId: this.userInfo.memberId
+    });
+    let memberList = result.list;
+    for (let k in memberList) {
+      memberList[k]['name_str'] =
+        memberList[k].real_name +
+        '+' +
+        memberList[k].role_name +
+        '+' +
+        memberList[k].dept_name;
+    }
+    this.memberList = memberList;
+    this.$apply();
+    console.log(result);
+  }
+  // 修改初始化
+  async updataInit() {
+    let result = await this.$parent.queryData(
+      '/msyApp/appUpdateApprovalProcessInit.do',
+      {
+        approvalId: this.approvalId,
+        userId: this.userInfo.userId
+      }
+    );
+    let members = this.memberList;
+    let flowList = this.flowList;
+    let typeList = this.typeList;
+    let userList = result.approvalUserList;
+    for (let k = 0; k < userList.length; k++) {
+      flowList[k] = ['', ''];
+      for (let j = 0; j < userList[k].userList.length; j++) {
+        for (let i = 0; i < members.length; i++) {
+          if (userList[k].userList[j].user_id == members[i].id) {
+            flowList[k][j] = i;
+          }
+        }
+      }
+    }
+    for (let i = 0; i < typeList.length; i++) {
+      if (typeList[i].name == result.typeName) {
+        this.typeCurr = i;
+      }
+    }
+    this.flowList = flowList;
+    this.$apply();
+    console.log(result);
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/authManage.styl';
+</style>

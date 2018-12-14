@@ -42,7 +42,7 @@
 import wepy from 'wepy';
 import header from '@/components/header';
 
-export default class enterpriseIden2 extends wepy.page {
+export default class enterpriseIden1 extends wepy.page {
   components = {
     header
   };

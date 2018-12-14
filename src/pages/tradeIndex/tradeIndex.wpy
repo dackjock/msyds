@@ -1,6 +1,6 @@
 <template lang="wxml" minapp="wepy">
   <view class="container" bindtap="hidefix">
-    <header title="企业认证"></header>
+    <header title="商城"></header>
     <view class="trade-index">
       <view class="trade-fix">
         <scroll-view class="goods-type" scroll-x scroll-with-animation scroll-into-view="{{lookType[tabCurr.lookType].key}}">

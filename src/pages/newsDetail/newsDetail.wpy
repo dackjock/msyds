@@ -1,0 +1,56 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="消息详情"></header>
+    <view class="n-dtbx">
+      <view class="n-dttime">{{messageDetail.sendTime}}</view>
+      <rich-text class="n-dtcont" nodes="{{messageDetail.messageContent}}"></rich-text>
+      <view class="tc mb30"><view class="n-dtbtna" bindtap="toFirstp">返回首页</view></view>
+      <view class="tc mb30"><view class="n-dtbtna n-dtbtnb" bindtap="toOrder">返回订单中心</view></view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class newsDetail extends wepy.page {
+  data = {
+    userInfo:'',
+    id: '',
+    messageDetail: '',
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.id = this.$parent.globalData.temporary.contractId
+    this.$parent.globalData.temporary.contractId = ''
+    this.appQueryMessagerDetailById()
+  };
+   async appQueryMessagerDetailById() {
+    let result = await this.$parent.queryData('msyApp/appQueryMessagerDetailById.do', {
+      ids: this.id,
+      userId: this.userInfo.userId,
+    })
+    //console.log('详情', result);
+    this.messageDetail = result.messageDetail
+    this.$apply()
+  };
+  methods = {
+    toFirstp() {
+       this.$parent.linkPage('../index/index',2)
+    },
+    toOrder() {
+       this.$parent.linkPage('../order/order',2)
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/newsDetail';
+  
+</style>

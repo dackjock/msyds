@@ -1,0 +1,82 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="合同查看"></header>
+    <view class="httit">购销合同编号：{{contain.contract_code}}</view>
+    <rich-text class="htcon" nodes="{{contain.content}}"></rich-text>
+    <view class="htbtbig">
+      <view class="htbna"><image class="htbnai" src="../../assets/images/icon/c-edithi.png" />购销合同确认</view>
+      <view class="htxx">
+        <view class="htxxbx">
+          <view class="htxxbxa">需方</view>
+          <view class="htxxbxa" wx:if="{{contain.status == 0}}">待审核</view>
+          <view class="htxxbxa" wx:if="{{contain.status == 1}}">审核不通过</view>
+          <view class="htxxbxa" wx:if="{{contain.status == 2}}">审核通过</view>
+          <view class="htxxbxa" wx:if="{{contain.status == 3}}">已签章</view>
+          <view class="htxxbxb">{{contain.enterpriseName}}</view>
+        </view>
+        <view class="htxxbx">
+          <view class="htxxbxa">供方</view>
+          <view class="htxxbxa" wx:if="{{contain.supplier_status == 0}}">待审核</view>
+          <view class="htxxbxa" wx:if="{{contain.supplier_status == 1}}">审核不通过</view>
+          <view class="htxxbxa" wx:if="{{contain.supplier_status == 2}}">审核通过</view>
+          <view class="htxxbxa" wx:if="{{contain.supplier_status == 3}}">已签章</view>
+          <view class="htxxbxb">{{contain.supplierEnterpriseName}}</view>
+        </view>
+      </view>
+      <view class="htbtnbx"><view class="htbtna" bindtap="backToOrder">返回订单中心</view></view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class contractCheck extends wepy.page {
+  data = {
+    userInfo:'',
+    htcon: '',
+    userType: '',
+    contain: [],
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.htcon = this.$parent.globalData.temporary.goodsData
+    this.$parent.globalData.temporary.goodsData = ''
+    this.userType = this.$parent.globalData.temporary.goodsStatue
+    this.$parent.globalData.temporary.goodsStatue = ''
+    this.addFrontPTContractInit()
+  };
+  //查看合同
+  async addFrontPTContractInit() {
+    let result = await this.$parent.queryData('msyApp/addFrontPTContractInit.do', {
+      tp: 1,
+      userType: this.userType,
+      contractId: this.htcon.id,
+      orderType: this.htcon.orderType,
+      contractStatus: this.htcon.status,
+      supplierStatus: this.htcon.supplierStatus,
+      isReview: this.htcon.isReview,
+      isReviewUser: this.htcon.isReviewUser,
+      enterpriseId:this.userInfo.id,
+    },true)
+    this.contain = result.data.returnMap.pageMap
+    console.log('ht', this.contain);
+    this.$apply()
+  };
+  methods = {
+    backToOrder() {
+      this.$parent.linkPage('../order/order',2)
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/contractCheck';
+  
+</style>

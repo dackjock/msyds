@@ -1,0 +1,166 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header :title.sync="title"></header>
+    <view class="entrust-title">
+      <text class="et-name">最终结算结果</text>
+    </view>
+    <view class="entrust-info">
+      <text >合同编号</text>
+      <text >{{lastInfo.contract_code}}</text>
+    </view>
+    <view class="entrust-info">
+      <text >合同单价</text>
+      <text class="red">{{lastInfo.goods_price}}元/KG</text>
+    </view>
+    <view class="entrust-info">
+      <text >仓库费用</text>
+      <text class="red">{{lastInfo.storehouse_fee}}元</text>
+    </view>
+    <view class="entrust-info">
+      <text >订单重量</text>
+      <text >{{lastInfo.goods_total_weight}}KG</text>
+    </view>
+    <view class="entrust-info">
+      <text >合同金额</text>
+      <text class="red">{{lastInfo.total_price}}元</text>
+    </view>
+    <view class="entrust-info">
+      <text >其他费用</text>
+      <text class="red">{{allData.qy_money}}元</text>
+    </view>
+    <view class="entrust-info">
+      <text >码单重量</text>
+      <text >{{lastInfo.actual_weight}}KG</text>
+    </view>
+    <view class="entrust-info">
+      <text >订单实际金额</text>
+      <text class="red">{{lastInfo.actualPrice}}元</text>
+    </view>
+    <view class="entrust-info">
+      <text >补偿费用</text>
+      <text class="red">{{lastInfo.compensate_price || '0.00'}}元</text>
+    </view>
+    <view class="entrust-info">
+      <text >合计结算应支付金额</text>
+      <text class="red">{{allData.totalPrice}}元</text>
+    </view>
+    <view class="entrust-info">
+      <text >合计已支付金额</text>
+      <text class="red">{{(allData.totalPrice + allData.lastData.refund_price)*1}}元</text>
+    </view>
+    <view class="entrust-info">
+      <text >合计退款金额</text>
+      <text class="red">{{goods_weight.refund_money || 0}}元</text>
+    </view>
+    <block wx:for="{{detailList}}" wx:key="">
+      <view class="entrust-title bord-top">
+        <text class="et-name">第{{item.num}}次结算</text>
+      </view>
+      <view class="entrust-info">
+        <text >结算编号</text>
+        <text >{{item.detail_code}}</text>
+      </view>
+      <view class="entrust-info">
+        <text >订单重量</text>
+        <text >{{lastInfo.goods_total_weight}}KG</text>
+      </view>
+      <view class="entrust-info">
+        <text >码单重量</text>
+        <text >{{lastInfo.actual_weight}}KG</text>
+      </view>
+      <view class="entrust-info">
+        <text >合同单价</text>
+        <text class="red">{{lastInfo.goods_price}}元/KG</text>
+      </view>
+      <view class="entrust-info">
+        <text >合同金额</text>
+        <text class="red">{{lastInfo.total_price}}元</text>
+      </view>
+      <view class="entrust-info">
+        <text >已支付的金额</text>
+        <text class="red">{{lastInfo.pay_money}}元</text>
+      </view>
+      <view class="entrust-info">
+        <text >订单实际金额</text>
+        <text class="red">{{lastInfo.actualPrice}}元</text>
+      </view>
+      <view class="entrust-info">
+        <text >差价</text>
+        <text class="red">{{item.difference || 0}}元</text>
+      </view>
+      <view class="entrust-info">
+        <text >是否支付仓储费</text>
+        <text >{{item.is_pay_storehouse ? '线下已付款' : '线下未付款'}}</text>
+      </view>
+      <view class="entrust-info">
+        <text >仓储费用</text>
+        <text class="red">{{item.storehouse_price}}元</text>
+      </view>
+      <view class="entrust-info">
+        <text >其他费用</text>
+        <text class="red">{{item.other_price}}元</text>
+      </view>
+      <view class="entrust-info">
+        <text >备注</text>
+        <text >{{item.other_remark}}</text>
+      </view>
+      <view class="entrust-info">
+        <text >异议</text>
+        <text >{{item.dissent}}</text>
+      </view>
+      <view class="entrust-info">
+        <text >本次结算合计</text>
+        <text class="red">{{item.pay_price + item.refund_money}}元</text>
+      </view>
+      <view class="entrust-info">
+        <text >本次结算已支付</text>
+        <text class="red">{{item.qy_money}}元</text>
+      </view>
+      <view class="entrust-info">
+        <text >本次结算未支付</text>
+        <text class="red">{{item.pay_price + item.refund_money - item.qy_money}}元</text>
+      </view>
+    </block>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class costInfo extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    title: '结算详情',
+    settlementId: '',
+    detailList: [],
+    lastInfo: [],
+    allData:[]
+  };
+  onLoad(e) {
+    this.settlementId = e.settlementId || 1052;
+  }
+  onShow() {
+    this.getCostInfo();
+  }
+  async getCostInfo() {
+    let result = await this.$parent.queryData(
+      '/msyApp/queryfinalSettlementList.do',
+      {
+        settlementId: this.settlementId
+      }
+    );
+    console.log(result);
+    this.allData = result
+    this.lastInfo = result.orderMap;
+    this.detailList = result.detailList;
+    this.$apply();
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/pickup';
+</style>

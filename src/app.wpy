@@ -11,7 +11,26 @@ import routerBefore from '_mixins/routerBefore.js';
 export default class extends wepy.app {
   config = {
     pages: [
+      'pages/index/index',
       'pages/login/login',
+      'pages/consigneeChange/consigneeChange',
+      'pages/consignee/consignee',
+      'pages/negotiateManagement/negotiateManagement',
+      'pages/invoiceOrderMsg/invoiceOrderMsg',
+      'pages/invoiceAuditManagement/invoiceAuditManagement',
+      'pages/invoiceApply/invoiceApply',
+      'pages/invoiceConfirmList/invoiceConfirmList',
+      'pages/invoiceMessage/invoiceMessage',
+      'pages/invoiceCanApply/invoiceCanApply',
+      'pages/invoiceReturn/invoiceReturn',
+      'pages/invoiceDetail/invoiceDetail',
+      'pages/invoiceManagement/invoiceManagement',
+      'pages/contractAudit/contractAudit',
+      'pages/contractCheck/contractCheck',
+      'pages/contract/contract',
+      'pages/newsDetail/newsDetail',
+      'pages/newsCenter/newsCenter',
+      'pages/capitalDetail/capitalDetail',
       'pages/editAuthDevlop/editAuthDevlop',
       'pages/authDevlop/authDevlop',
       'pages/capitalManagement/capitalManagement',
@@ -33,7 +52,6 @@ export default class extends wepy.app {
       'pages/enterpriseIden3/enterpriseIden3',
       'pages/newDealjk/newDealjk',
       'pages/newDealby/newDealby',
-      'pages/index/index',
       'pages/forgetPass/forgetPass',
       'pages/sign/sign',
       'pages/authManage/authManage',
@@ -44,7 +62,17 @@ export default class extends wepy.app {
       'pages/buyGoods1/buyGoods1',
       'pages/tradeIndex/tradeIndex',
       'pages/platRule/platRule',
-      'pages/mallIndex/mallIndex',
+      'pages/editAuthApproval/editAuthApproval',
+      'pages/codesQuery/codesQuery',
+      'pages/webView/webView',
+      'pages/oderPayment/oderPayment',
+      'pages/payOffline/payOffline',
+      'pages/pickupGoods/pickupGoods',
+      'pages/entrustPickup/entrustPickup',
+      'pages/costConfirm/costConfirm',
+      'pages/costInfo/costInfo',
+      'pages/chargeConfirm/chargeConfirm',
+      'pages/YFCargo/YFCargo',
       'pages/goodsList/goodsList',
       'pages/goodsAdd/goodsAdd'
     ],
@@ -65,6 +93,9 @@ export default class extends wepy.app {
     temporary: {
       goodsData: '',
       goodsStatue: '',
+      contractId: '',
+      webView: '',
+      YFCdata:'',
       contractId: ''
     }
   };

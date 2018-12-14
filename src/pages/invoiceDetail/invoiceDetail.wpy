@@ -1,0 +1,109 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="发票详情"></header>
+    <view class="dtop">
+      <text class="fs24 c9">发票金额：</text>
+      <text class="red fs36">{{total_money}}<text class="fs24">元</text></text>
+    </view>
+    <view class="bgf">
+      <view class="dtli fs24">
+         <view class="c9">发票编号</view>
+         <view>{{dtlist.apply_ticket_code}}</view>
+      </view>
+      <view class="dtli fs24" wx:if="{{dtlist.goods_name}}">
+         <view class="c9">品名</view>
+         <view>{{dtlist.goods_name}}</view>
+      </view>
+      <view class="dtli fs24">
+         <view class="c9">发票状态</view>
+         <view wx:if="{{dtlist.status == -1}}">删除</view>
+         <view wx:if="{{dtlist.status == 0}}">待审核</view>
+         <view wx:if="{{dtlist.status == 1}}">审核不通过</view>
+         <view wx:if="{{dtlist.status == 2}}">审核通过</view>
+         <view wx:if="{{dtlist.status == 3}}">邮寄中</view>
+         <view wx:if="{{dtlist.status == 4}}">
+           <text>已开票</text>
+           <text class="dtbtna" bindtap="tuipiao">申请退票</text>
+         </view>
+         <view wx:if="{{dtlist.status == 5}}">已退票</view>
+         <view wx:if="{{dtlist.status == 6}}">退票成功</view>
+      </view>
+      <view class="dtli fs24">
+         <view class="c9">收件人</view>
+         <view>{{dtlist.receiver_name}}</view>
+      </view>
+      <view class="dtli fs24">
+         <view class="c9">手机号</view>
+         <view>{{dtlist.telephone}}</view>
+      </view>
+      <view class="dtli fs24">
+         <view class="c9">地址</view>
+         <view>{{dtlist.address}}</view>
+      </view>
+      <view class="dtli fs24">
+         <view class="c9">邮寄单号</view>
+         <view>{{dtlist.logistics_number}}</view>
+      </view>
+      <view class="dtli fs24">
+         <view class="c9">收取方式</view>
+         <view>邮寄</view>
+      </view>
+      <view class="dtli fs24">
+         <view class="c9">发票备注</view>
+         <view>{{dtlist.review_reason}}</view>
+      </view>
+      <view class="dtli fs24">
+         <view class="c9">发生时间</view>
+         <view>{{dtlist.opening_time}}</view>
+      </view>
+    </view>
+    <view class="dtbtnbx">
+      <view class="dtbtnb" bindtap="back">返回</view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class invoiceDetail extends wepy.page {
+  data = {
+    aid:'',
+    dtlist:[],
+    total_money:'',
+  };
+  onShow() {
+    this.aid = this.$parent.globalData.temporary.contractId
+    this.$parent.globalData.temporary.contractId = ''
+    this.applyTicketDetail()
+  };
+  async applyTicketDetail() {
+    let result = await this.$parent.queryData('msyApp/applyTicketDetail.do', {
+      id: this.aid,
+    })
+    console.log('发票', result);
+    this.dtlist = result
+    this.total_money = this.dtlist.total_money.toFixed(2)
+    this.$apply()
+  };
+  methods = {
+    tuipiao() {
+      this.$parent.globalData.temporary.contractId = this.aid
+      this.$parent.linkPage('../invoiceReturn/invoiceReturn',1)
+    },
+    back() {
+       this.$parent.linkPage('../invoiceManagement/invoiceManagement',3)
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/invoiceDetail';
+  
+</style>

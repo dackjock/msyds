@@ -31,6 +31,8 @@ export default class authDevlop extends wepy.page {
   };
   onShow() {
     this.userInfo = this.$parent.globalData.userInfo;
+    this.pageNum = 1;
+    this.itemList = [];
     this.getAuthDevlop();
   }
   methods = {

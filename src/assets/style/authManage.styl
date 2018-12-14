@@ -2,9 +2,12 @@
 page
   background: #eee
 
-.container.pd-bot
+.container
   box-sizing: border-box
-  padding-bottom: 120rpx
+  &.pd-bot
+    padding-bottom: 120rpx
+  &.pd-top
+    padding-top: 90rpx
 .auth-menu
   position: relative
   display: flex
@@ -162,6 +165,26 @@ page
     .edit
       color: $theme-color
       margin-right: 30rpx
+.approval-item
+  margin: 20rpx 30rpx 0
+  background: #fff
+  border-radius: 10rpx
+  padding: 0 20rpx
+  font-size: 20rpx
+  line-height: 50rpx
+  >view>text:first-child
+      color: #999
+  >view.mi-bot
+    display: flex
+    justify-content: space-between
+    align-items: center
+    border-top: 2rpx solid #eee
+    line-height: 60rpx
+    switch
+      transform: scale(.5)
+    .edit
+      color: $theme-color
+      margin-right: 30rpx
 .edit-manager
   .em-item
     display: flex
@@ -182,5 +205,82 @@ page
     >switch
       transform: scale(.5)
       margin-right:-30rpx;
+.approval-status
+  position: fixed
+  left: 0
+  right: 0
+  top: 85rpx
+  height: 90rpx
+  display: flex
+  justify-content: flex-end
+  align-items: center
+  background: #fff
+  >label
+    line-height: 60rpx
+    switch
+      transform: scale(.5)
+.approval-line
+  display: flex
+  justify-content: space-between
+  align-items: center
+  height: 90rpx
+  padding: 0 30rpx
+  font-size: 24rpx
+  background: #fff
+  border-bottom: 2rpx solid #eee
+  .type-picker
+    position: relative
+    padding-right: 30rpx
+    moreIcon(0)
+  .pl-picker
+    display: flex
+    align-items: center
+    >text
+      color: $theme-color
+    >picker
+      padding: 10rpx 20rpx
+      border: 2rpx solid #eee
+      border-radius: 10rpx
+      margin-right: 30rpx
+.al-bot
+  padding: 20rpx 0
+  text-align: center
+  background: #fff
+  >button
+    font-size: 28rpx
+    background: $theme-color
+    color: #fff
+    width: 300rpx
+    height: 80rpx
+    line-height: 80rpx
 
-    
+.approval-info
+  position: fixed
+  left: 0
+  right: 0
+  width: 685rpx
+  margin: auto
+  bottom: 120rpx
+  padding: 20rpx
+  box-sizing: border-box
+  background: #fff
+  .ai-title
+    text-align: center
+    margin-bottom: 20rpx
+  .ai-cont
+    display: flex
+    flex-flow: row wrap
+    align-items: center
+    >text
+      padding: 0 20rpx
+      line-height: 50rpx
+      font-size: 24rpx
+      border-radius: 10rpx
+      background: $theme-color
+      color: #fff
+      margin-bottom: 20rpx
+    .icon-cross
+      flex: 0 0 30rpx
+      width: 30rpx
+      height: 21rpx
+      margin: 0 20rpx 20rpx

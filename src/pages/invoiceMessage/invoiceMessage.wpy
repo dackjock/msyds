@@ -1,0 +1,90 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="查看发票信息"></header>
+    <view class="bgf">
+      <view class="fpmsgli">
+        <view>开具类型</view>
+        <view class="c6" wx:if="{{ticketDetail.user_type == 1}}">个人</view>
+        <view class="c6" wx:if="{{ticketDetail.user_type == 2}}">企业</view>
+      </view>
+      <view class="fpmsgli">
+        <view>发票抬头</view>
+        <view class="c6">{{msg.enterprise_name}}</view>
+      </view>
+      <view class="fpmsgli">
+        <view>发票类型</view>
+        <view class="c6" wx:if="{{ticketDetail.ticket_type == 1}}">增值税普通发票</view>
+        <view class="c6" wx:if="{{ticketDetail.ticket_type == 2}}">增值税专用发票</view>
+      </view>
+      <view class="fpmsgli">
+        <view>税务登记证号</view>
+        <view class="c6">{{msg.tax_registration_code}}</view>
+      </view>
+    </view>
+    <view class="kpmsgw"><view class="kpbtwxi"></view>提示：请与贵公司财务人员核实并填写准确的税务登记证号，以免影响您发票后续的使用。</view>
+    <view class="bgf">
+      <view class="fpmsgli">
+        <view>基本开户银行名称</view>
+        <view class="c6">{{msg.bank_name}}</view>
+      </view>
+      <view class="fpmsgli">
+        <view>基本开户账户</view>
+        <view class="c6">{{msg.bank_account}}</view>
+      </view>
+      <view class="fpmsgli">
+        <view>注册场所地址</view>
+        <view class="c6 fpmsglir"><view class="addr">{{msg.address}}</view></view>
+      </view>
+      <view class="fpmsgli">
+        <view>注册场固定电话</view>
+        <view class="c6">{{msg.contact_phone}}</view>
+      </view>
+      <view class="fpmsgli">
+        <view>财务联系人</view>
+        <view class="c6">{{msg.financial_contact}}</view>
+      </view>
+    </view>
+    <view class="fpbtnbx"><view class="fpbtna" bindtap="backFn">返回</view></view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class invoiceMessage extends wepy.page {
+  data = {
+    userInfo:'',
+    ticketDetail: [],
+    msg: [],
+  };
+  onShow() {
+   this.userInfo = this.$parent.globalData.userInfo
+   this.searchTicketInfo()
+  };
+  //查看发票信息
+  async searchTicketInfo() {
+    let result = await this.$parent.queryData('msyApp/searchTicketInfo.do', {
+      enterpriseId: this.userInfo.id,
+    })
+    //console.log('发票信息', result);
+    this.ticketDetail = result.ticketDetail
+    this.msg = result.enterMap2
+    this.$apply()
+  };
+  methods = {
+    backFn() {
+      this.$parent.linkPage('../invoiceCanApply/invoiceCanApply',3)
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/invoiceMessage';
+  
+</style>
