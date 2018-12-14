@@ -11,8 +11,8 @@ import routerBefore from '_mixins/routerBefore.js';
 export default class extends wepy.app {
   config = {
     pages: [
-      'pages/login/login',
       'pages/index/index',
+      'pages/login/login',
       'pages/consigneeChange/consigneeChange',
       'pages/consignee/consignee',
       'pages/negotiateManagement/negotiateManagement',
@@ -73,7 +73,6 @@ export default class extends wepy.app {
       'pages/costInfo/costInfo',
       'pages/chargeConfirm/chargeConfirm',
       'pages/YFCargo/YFCargo',
-      'pages/mallIndex/mallIndex',
       'pages/goodsList/goodsList',
       'pages/goodsAdd/goodsAdd'
     ],
@@ -96,7 +95,7 @@ export default class extends wepy.app {
       goodsStatue: '',
       contractId: '',
       webView: '',
-      YFCdata:''
+      YFCdata:'',
       contractId: ''
     }
   };

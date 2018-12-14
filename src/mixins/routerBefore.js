@@ -1,7 +1,6 @@
 import wepy from 'wepy'
 
 let firewall = [
-  '../mallIndex/mallIndex',
   '../enterpriseIden1/enterpriseIden1',
   '../enterpriseIden2/enterpriseIden2',
   '../enterpriseIden3/enterpriseIden3',

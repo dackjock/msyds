@@ -23,7 +23,7 @@
     </view>
     <view class="pickup-item">
       <text >数量</text>
-      <text>{{goodsInfo.goods_weight}}KG</text>
+      <text>{{goodsWeight}}KG</text>
     </view>
     <view class="pickup-item" wx:if="{{flagId === 1}}">
       <text >当前账期</text>
@@ -81,6 +81,15 @@ export default class pickupGoods extends wepy.page {
     pickupDate: '',
     goodsInfo: {}
   };
+  computed = {
+    goodsWeight() {
+      if (this.flagId == 8) {
+        return this.goodsInfo.goods_total_weight;
+      } else {
+        return this.goodsInfo.goods_weight;
+      }
+    }
+  };
   methods = {
     changeTime(event) {
       this.pickupDate = event.detail.value;
@@ -93,39 +102,42 @@ export default class pickupGoods extends wepy.page {
         this.$parent.showTip('请完善信息');
         return false;
       }
-      let url = ''
-      if(flagId === 1){
-        url = 'addCashSpotZQCargo.do'
-      }else{
-        url = '/msyApp/addCashSpotCargo.do'
+      let url = '';
+      if (this.flagId === 1) {
+        url = '/msyApp/addCashSpotZQCargo.do';
+      } else {
+        url = '/msyApp/addCashSpotCargo.do';
       }
       let result = await this.$parent.queryData(url, {
         cargoId: this.cargoId,
-        orderId:this.orderId,
-        depotListId:this.depotListId,
+        orderId: this.orderId,
+        depotListId: this.depotListId,
         type: parseInt(this.typeIndex) + 1,
         cargoTime: this.pickupDate
       });
       if (result) {
-        // this.$parent.linkPage(
-        //   '../entrustPickup/entrustPickup?orderId=' +
-        //     this.orderId +
-        //     '&cargoId=' +
-        //     this.cargoId,
-        //   4
-        // );
+        if (this.flagId === 1) {
+          this.$parent.linkPage('../order/order', 4);
+        }
+        this.$parent.linkPage(
+          '../entrustPickup/entrustPickup?orderId=' +
+            this.orderId +
+            '&cargoId=' +
+            this.cargoId,
+          4
+        );
       }
       console.log(result);
     }
   };
   onLoad(e) {
-    // console.log(e)
-    this.orderId = e.orderId || 5506;
-    this.cargoId = e.cargoId || 3185;
-    this.depotListId = e.depotListId || 3184;
-    this.indexs = e.index || -1;
-    this.again = e.again || 1;
-    this.take_time = e.take_time || '2018-12-31';
+    console.log(e);
+    this.orderId = e.orderId;
+    this.cargoId = e.cargoId;
+    this.depotListId = e.depotListId;
+    this.indexs = e.index;
+    this.again = e.again;
+    this.take_time = e.take_time;
   }
   onShow() {
     this.userInfo = this.$parent.globalData.userInfo;

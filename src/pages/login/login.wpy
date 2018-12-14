@@ -63,6 +63,7 @@ export default class Login extends wepy.page {
       });
       this.$parent.globalData.userInfo = result;
       console.log('*********** 登录成功 ***********');
+      this.$parent.linkPage('',3)
     }
   };
   async preToLogin(even) {

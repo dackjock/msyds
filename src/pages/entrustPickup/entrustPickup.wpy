@@ -154,8 +154,8 @@ export default class entrustPickup extends wepy.page {
   };
   onLoad(e) {
     // console.log(e)
-    this.orderId = e.orderId || 5506;
-    this.cargoId = e.cargoId || 3185;
+    this.orderId = e.orderId;
+    this.cargoId = e.cargoId;
   }
   onShow() {
     this.getEntrustInfo();
@@ -266,7 +266,7 @@ export default class entrustPickup extends wepy.page {
     this.pageMap = result.pageMap;
     this.$apply();
     if(!result){
-      this.$parent.linkPage('',3)
+      this.$parent.linkPage('../order/order', 4);
     }
     console.log(result);
   }
