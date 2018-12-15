@@ -12,6 +12,11 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/login/login',
+      'pages/invoiceExpressManagement/invoiceExpressManagement',
+      'pages/addresseeChange/addresseeChange',
+      'pages/addressee/addressee',
+      'pages/driverChange/driverChange',
+      'pages/driver/driver',
       'pages/consigneeChange/consigneeChange',
       'pages/consignee/consignee',
       'pages/negotiateManagement/negotiateManagement',

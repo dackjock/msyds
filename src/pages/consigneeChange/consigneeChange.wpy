@@ -91,8 +91,6 @@ export default class consigneeChange extends wepy.page {
     }else{
       this.thrtitle = '新增提货人'
     }
-    console.log(this.item)
-    console.log('this.picUpload',this.picUpload)
     
   };
   //上传照片
