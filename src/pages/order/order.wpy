@@ -464,4 +464,5 @@ export default class Order extends wepy.page {
 
 <style lang="stylus">
 @import '../../assets/style/order';
+
 </style>
