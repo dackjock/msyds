@@ -1,0 +1,248 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+      <view class="order_header">
+        <image @tap="goback" src="../../assets/images/icon/goback.png"  mode="aspectFit"  />
+         采购大厅
+        <view class="kefu">有疑问    <image @tap="goback" src="../../assets/images/icon/yiwen.png"  mode="aspectFit"  /> </view>
+      </view>
+
+      <view class="screen_opiotn">
+          <view class="input_box">
+              <input type="text" placeholder="品名，品牌，企业"  value="{{querydata.keyword}}"  @input="changeKeyWord"   />
+              <image src="http://d7.cto.shovesoft.com/msywap/images/icon/c-searcha.png" @tap="search" />
+          </view>
+          <view @tap="showPanel" class="option_btn">筛选<image src="http://d7.cto.shovesoft.com/msywap/images/icon/saixuan.png" mode="aspectFit" /></view>
+      </view>
+
+
+      <view class="hallList_cont">
+          <view class="item" wx:for="{{list_main}}" wx:key="{{index}}">
+              <view class="left_cont">
+                  <view class="p_item">
+                      <view class="">{{item.goods_name}}/{{item.goods_spec}}/{{item.goods_attr}}</view>
+                      <view class="">{{item.goods_total_weight}}KG</view>
+                  </view>
+                   <view class="p_item big">
+                      <view class="">{{item.price_type}} <view class="{{item.main_price>0?'red':'lv'}} inline">{{item.main_price>0?'+':'-'}} {{item.main_price}}</view></view>
+                      <view class="f30">{{item.storehouse}}</view>
+                  </view>
+                      <view class="p_item">
+                      <view class="c9">{{item.payMethods}}</view>
+                      <view class="c9">{{item.enterprise_name}}</view>
+                  </view>
+              </view>
+              <view class="btn">
+                  <view class="red_b">购买</view> 
+              </view>
+          </view>
+      </view>
+
+
+
+        <!-- 筛选面板 -->
+    <view class="select_panel {{show?'show':''}}">
+      <view class="layer_gary " @tap="close"></view>
+      <view class="layer_main">
+        <view class="h3" >品牌</view>
+        <view class="flex_box">
+        
+            <view class="item_span {{item.cur?'cur':''}}" @tap="chose('brank',{{item.id}})" wx:for="{{brankList}}"  wx:key="{{index}}">{{item.name}}</view>
+           
+          
+          </view>
+        <view class="h3">产品分类</view>
+        <view class="flex_box">
+          
+            <view class="item_span {{item.cur?'cur':''}}"  @tap="chose('goodsType',{{item.id}})" wx:for="{{goodsTypeList}}"  wx:key="{{index}}">{{item.name}}</view>
+            
+        </view>
+        <view class="h3">结算方式</view>
+        <view class="flex_box">
+         
+            <view class="item_span {{item.cur?'cur':''}}"  @tap="chose('payMethod',{{item.id}})"  wx:for="{{payMethodList}}" style="width:auto;padding:0 10rpx" wx:key="{{index}}">{{item.name}}</view>
+            
+        </view>
+        <view class="h3">开票明细</view>
+        <view class="flex_box">
+            <view class="item_span {{item.cur?'cur':''}}"   @tap="chose('openTicket',{{item.id}})"  wx:for="{{openTicketList}}"  wx:key="{{index}}">{{item.name}}</view>
+        </view>
+          
+         
+        
+          <view class="btn_group_s">
+            <view @tap="reset" class="btn">重置</view>
+            <view @tap="search" class="btn red">完成</view>
+          </view>
+
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import botBar from '@/components/botBar';
+
+export default class Index extends wepy.page {
+  config = {
+    enablePullDownRefresh: true
+  };
+  data = {
+    show: false,
+    // 初始化数据
+    brankList: [],
+    goodsTypeList: [],
+    payMethodList: [],
+    openTicketList: [
+      { name: '全部', id: '0', cur: true },
+      { name: '当月开票', id: '1', cur: false },
+      { name: '非当月开票', id: '2', cur: false }
+    ],
+    //采购数据
+    list_main: [],
+    //采购列表请求数据
+    queryData: {
+      pageNum: 1,
+      brank: 0,
+      payMethod: 0,
+      goodsType: 0,
+      openTicket: 0,
+      orderBy: '',
+      orderStyle: '',
+      keyword: ''
+    }
+  };
+  methods = {
+    close() {
+      this.show = false;
+    },
+    showPanel() {
+      this.show = true;
+    },
+    chose(key,val) {
+      console.log(val)
+      this[key + 'List'].map((v, i) => {
+        if (v.id == val) {
+          this[key + 'List'][i]['cur'] = true;
+        } else {
+          this[key + 'List'][i]['cur'] = false;
+        }
+      });
+      this.queryData[key] = val;
+    },
+    changeKeyWord(e){
+      this.queryData.keyword=e.detail.value;
+      this.$apply();
+    },
+    reset(){
+      this.queryData= {
+        pageNum: 1,brank: 0, payMethod: 0,goodsType: 0, openTicket: 0, orderBy: '',orderStyle: '',keyword:this.queryData.keyword
+      };
+      let initArr=['goodsTypeList','payMethodList','openTicketList','brankList'];
+      initArr.map((v,i)=>{
+        this[v].map((v_v,i_i)=>{
+          if(v_v.id=="0"){
+
+             this[v][i_i]['cur']=true;
+          }else{
+            this[v][i_i]['cur']=false;
+          }
+        });
+      });
+      this.$apply();
+    },
+    search(){
+       this.show = false;
+      this.onPullDownRefresh();
+    }
+  };
+  async onLoad() {
+    await this.PurchaseGoodsInit();
+    this.list_main = await this.PurchaseGoodsList();
+    this.$apply();
+  }
+  //初始化查询条件
+  PurchaseGoodsInit() {
+    return this.$parent
+      .queryData(
+        'msyApp/appQueryPurchaseGoodsInit.do',
+        {
+          enterpriseId: this.$parent.globalData.userInfo.enterpriseId
+        },
+        true
+      )
+      .then(res => {
+        if (res.data.type >= 0) {
+          let data = res.data.returnMap;
+          for (let key in data) {
+            if (this[key]) {
+              this[key] = data[key].map((v, i) => {
+                v.cur = false;
+                return v;
+              });
+              this[key].unshift({ name: '全部', id: '0', cur: true });
+            }
+          }
+        }
+      });
+  }
+  //请求采购数据
+  PurchaseGoodsList() {
+    return this.$parent
+      .queryData('msyApp/appQueryPurchaseGoodsList.do', this.queryData)
+      .then(res => {
+        res.list.map((v, i) => {
+          switch (v.price_type) {
+            case 1:
+              res.list[i].price_type = 'TD';
+              break;
+            case 2:
+              res.list[i].price_type = '沪银主力';
+              break;
+            case 3:
+              res.list[i].price_type = res.list[i].goods_price;
+              break;
+          }
+        });
+        return res.list;
+      });
+  }
+  async onPullDownRefresh() {
+    wepy.showLoading({
+      title: '加载中…'
+    });
+    wepy.showNavigationBarLoading();
+    let _this = this;
+    this.queryData.pageNum = 1;
+    await this.PurchaseGoodsList();
+    wepy.hideNavigationBarLoading();
+    wx.stopPullDownRefresh();
+  }
+  async onReachBottom(event) {
+    wepy.showLoading({
+      title: '加载中…'
+    });
+    this.queryData.pageNum = this.queryData.pageNum + 1;
+    let res = await this.PurchaseGoodsList();
+    this.list_main.push(...res);
+    this.$apply();
+    wepy.hideNavigationBarLoading();
+    let _list = res;
+    if (_list.length <= 0) {
+      wepy.showToast({
+        title: '没有更多了',
+        icon: 'none'
+      });
+    } else {
+      wepy.showToast({
+        title: '加载成功',
+        icon: 'none'
+      });
+    }
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/purchasingHall';
+</style>

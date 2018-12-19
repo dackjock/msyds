@@ -1,0 +1,201 @@
+.order_header
+    height: 85rpx
+    background: #d7092d
+    padding:0 30rpx
+    line-height: 85rpx
+    font-size: 30rpx
+    color: #fff
+    text-align: center
+    position: relative
+    position: fixed;
+    left:0;
+    right 0;
+    top:0;
+    z-index:99
+    >image
+        width: 38rpx;
+        height: 39rpx;
+        position: absolute;
+        left 30rpx;
+        top: 21rpx;
+    .kefu
+        position: absolute;
+        top: 0;
+        right: 30rpx;
+        font-size: 24rpx;
+        image
+            height: 24rpx;
+            width: 30rpx;
+page 
+   background: #f7f7f7;
+
+.screen_opiotn
+    height: 80rpx;
+    background: #fff;
+    position: fixed
+    top: 85rpx;
+    left :0;
+    right :0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20rpx;
+    align-items: center;
+    .input_box
+        position: relative;
+        width: 460rpx;
+        height: 50rpx;
+        padding: 0 20rpx;
+        display: flex;
+        border-radius: 24rpx;
+        background-color: #eee;
+        align-items: center;
+        input 
+            flex: 1;
+            height: 100%;
+        image
+            width :30rpx;
+            height: 30rpx;
+    .option_btn
+        color: #d7092d
+        image
+            width 30rpx;
+            height 30rpx;
+            vertical-align: middle;
+            margin-left: 10rpx;
+
+.hallList_cont
+    padding: 180rpx 10rpx 10rpx 10rpx;
+   
+    
+    .item
+        padding: 20rpx 10rpx;
+        display: flex;
+        background-color: #fff;
+        align-items: center;
+        margin-bottom: 10rpx;
+        .left_cont
+            flex: 1;
+        .btn
+            width: 130rpx;
+            text-align: center;
+            .red_b
+                width: 100rpx;
+                text-align: center;
+                display: inline-block;
+                color: #fff;
+                background-color: #d7002d;
+                border-radius: 10rpx;
+                height:40rpx;
+                line-height: 40rpx;
+                font-size: 20rpx;
+        .p_item
+            display: flex;
+            flex: 1;
+            font-size: 23rpx;
+            justify-content: space-between;
+            .inline
+                display: inline;
+                &.red
+                    color: #d7092d;
+                &.lv
+                    color: #80c269;
+            &.big
+                margin:15rpx 0;
+                font-size: 36rpx;
+                line-height: 36rpx;
+                .f30
+                    font-size: 24rpx;
+.select_panel
+    &.show .layer_gary
+        display: block;
+     &.show .layer_main
+        transform: translateX(0);
+    .layer_gary
+        position: fixed;
+        top: 0;
+        right 0;
+        left 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        z-index :99;
+        display: none;
+    .layer_main
+        position: fixed;
+        color: #333;
+        width:70%;
+        top:0;
+        bottom: 0;
+        z-index 100;
+        right: 0;
+        background-color: #fff;
+        transform: translateX(100%);
+        transition: all .3s
+        .h3
+            height: 50rpx;
+            line-height: 50rpx;
+            padding: 0 25rpx;
+            font-size: 24rpx;
+        .flex_box
+            display: flex;
+            padding: 0 30rpx;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+            .item_span
+                width: 128rpx;
+                height : 45rpx;
+                line-height: 45rpx;
+                text-align: center;
+                border: 1px solid #ddd;
+                border-radius: 10rpx;
+                font-size: 24rpx;
+                margin-right: 25rpx;
+                margin-bottom: 15rpx;
+                &:nth-child(3n)
+                    margin-right: 0;
+                &.cur
+                    background-color: #d7092d;
+                    color: #fff;
+        .input_box
+            padding: 0 25rpx 15rpx 25rpx;
+            border-bottom: 1px solid #eee;
+            input 
+                width 100%;
+                height:60rpx;
+                padding: 0 20rpx;
+                background-color: #eee;
+                box-sizing: border-box;
+                border-radius: 8rpx;
+                font-size:.24rpx;
+            .input_inline
+                width: 200rpx;
+                display: inline-block;
+                vertical-align: middle;
+                position relative;
+                input 
+                    font-size: 24rpx;
+                .rli
+                    position: absolute;
+                    right: 10rpx;
+                    top: 15rpx;
+                    height 30rpx;
+                    width : 30rpx;
+            .space_code
+                margin: 0 20rpx;
+                display: inline-block;
+                vertical-align: middle;
+.btn_group_s
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0
+    .btn
+        width 50%;
+        text-align: center;
+        height: 60rpx;
+        line-height: 60rpx;
+        background: #666;
+        color: #fff;
+        font-size: 24rpx;
+        &.red
+            background-color: #d7092d;
