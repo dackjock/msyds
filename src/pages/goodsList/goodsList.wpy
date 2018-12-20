@@ -59,7 +59,7 @@
             </view>
              <view class="top goods_btn" >
                 <view wx:if="{{item.status===0&&!item.singleCodeId}}" class="btn_small" @tap="showLayer">填写码单</view>
-                <view wx:if="{{item.status!=1&&item.singleCodeId}}" class="btn_small" @tap="showLayer">查看码单</view>
+                <view wx:if="{{item.status!=1&&item.singleCodeId}}" class="btn_small border" @tap="showLayer">查看码单</view>
                 
                 <view class="btn_small"  wx:if="{{item.status===0}}" @tap="edit({{item}})">编辑</view>
                 <view class="btn_small"  wx:if="{{item.status===0}}" @tap="del({{item}})" >删除</view>
@@ -124,7 +124,7 @@ export default class goodsList extends wepy.page {
       if (!this.edit_status) {
         return;
       }
-      if (this.listData[index].status == 1) {
+      if (this.listData[index].status != 0) {
         return;
       }
       this.listData[index].editD = !this.listData[index].editD;
