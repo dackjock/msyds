@@ -1,0 +1,160 @@
+page 
+    background-color: #f4f4f4
+
+
+.container
+    padding-bottom: 100rpx;
+.top
+    font-size: 24rpx;
+    height: 50rpx;
+    line-height: 50rpx;
+    padding: 0 30rpx;
+    display: flex;
+    justify-content: space-between;
+    background-color: #fff;
+    .timer
+        font-size: 18rpx;
+.table
+    background-color: #fff;
+    .tr
+        display: flex;
+        .td
+            flex: 1;
+            height: 60rpx;
+            line-height: 60rpx;
+            text-align: center;
+            border-top: 1px solid #eee;
+            border-right: 1px solid #eee;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            font-size: 24rpx;
+            &:first-child
+                color: #999;
+                width 200rpx;
+                flex: 0 1 auto;
+            &:nth-child(3)
+                color: #999;
+.info
+    background-color: #fff;
+    margin-top: 15rpx;
+    font-size: 26rpx;
+    .h1
+        font-size: 30rpx;
+        padding:0 30rpx;
+        height: 80rpx;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+        justify-content: space-between;
+        .span
+            line-height: 1em;
+            padding-left: 10rpx;
+            border-left: 1px solid #d7092d;
+    .info_item
+        padding: 0 30rpx;
+        display: flex;
+        justify-content: space-between;
+        height: 90rpx;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+        flex-wrap: wrap;
+        .icon_t
+            width: 30rpx;
+            height 30rpx;
+            vertical-align: middle;
+        .icon_you
+            width: 20rpx;
+            height 20rpx;
+            transition: all .3s;
+            &.rot
+                transform: rotate(90deg);
+.mingxi
+    padding: 10rpx 0;
+    line-height: 1.5em
+    font-size: 24rpx;
+    line-height: 40rpx;
+    border-bottom: 1px solid #ccc;
+    margin:  0 30rpx;
+
+
+.more
+    font-size: 24rpx;
+
+.black_btn
+    height: 80rpx;
+    position: fixed;
+    bottom: 10rpx;
+    left: 30rpx;
+    right:30rpx;
+    background-color: #d7092d;
+    text-align: center;
+    line-height: 80rpx;
+    color: #fff;
+    border-radius: 8rpx;
+.order_madan
+    padding: 10rpx;
+    background: #f4f4f4;
+    .info_item
+        font-size: 24rpx;
+        height:70rpx;
+        background: #fff;
+        border-radius: 20rpx;
+        +.info_item
+            margin-top: 10rpx;
+
+.header
+    height: 85rpx;
+    line-height: 85rpx;
+    text-align: center;
+    position: relative ;
+    background-color: #d7092d;
+    color: #fff;
+    .goback
+        position: absolute;
+        top: 25rpx;
+        left: 30rpx;
+        width 20rpx;
+        height 35rpx;
+
+.btn_group
+    width 100%;
+    margin-top: 15rpx;
+    .btn
+        height: 40rpx;
+        line-height: 40rpx;
+        background-color: #d7092d;
+        color: #fff;
+        padding: 0 15rpx;
+        border-radius: 6rpx;
+        display: inline-block;
+        +.btn
+            margin-left: 15rpx;
+
+
+.type_order_con
+    position: fixed
+    top: 0
+    width:100%
+    box-shadow: 0 2rpx 6rpx 0 rgba(13, 17, 41, 0.2);
+
+
+
+.type_order
+    display: flex
+    height: 90rpx
+    background: #fff
+    line-height: 86rpx
+    color: #666666
+    &.jk
+        .cur text
+            width: auto
+    .cur text
+        border-bottom: 2px solid #d7092d
+        width:70%
+        display:inline-block
+        color: #d7092d
+
+    view 
+        flex: 1
+        text-align: center

@@ -1,0 +1,179 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+      
+
+      <!-- 查看商品详情 -->
+      <view wx:if="{{!add_src&&!proxy}}">
+        <view class="header" > <image class="goback" @tap="goback" mode="aspectFit" src="../../assets/images/icon/goback.png" /> 查看商品详情</view>
+        <view class="good_container" >
+
+            <view class="good_info">
+                <view class="info_item"><view class="gary">产品编号:</view> {{good_info.pageMap.goods_code}}   </view>
+                <view class="info_item"><view class="gary">产品名称:</view>  {{good_info.pageMap.goods_name}}   </view>
+            </view>
+            <view class="good_info">
+                <view class="info_item"><view class="gary">规格:</view>  {{good_info.pageMap.goods_spec}}    </view>
+                <view class="info_item"><view class="gary">单价（元/KG）:</view>  {{good_info.pageMap.goods_price}}   </view>
+            </view>
+            <view class="good_info">
+                <view class="info_item"><view class="gary">开票明细:</view>   {{good_info.pageMap.month_ticket_status===1?'当月开票':'非当月开票'}}  </view>
+                <view class="info_item"><view class="gary">数量（KG）:</view> {{good_info.pageMap.goods_weight}}   </view>
+            </view>
+            <view class="good_info">
+                <view class="info_item"><view class="gary">品牌:</view>{{good_info.pageMap.brand_name}}    </view>
+                <view class="info_item"><view class="gary">仓库位置:</view>   {{good_info.pageMap.depot_address}} </view>
+            </view>
+            <view class="good_info">
+                <view class="info_item"><view class="gary">单价类型:</view>  {{good_info.goods.priceType}}    </view>
+                <view class="info_item"><view class="gary">升贴水:</view> {{good_info.goods.mainPrice}}    </view>
+            </view>
+            <view class="good_info">
+                <view class="info_item"><view class="gary">商品属性:</view> {{good_info.goods.goodsAttr}}     </view>
+                <view class="info_item"><view class="gary">产品类型:</view> {{good_info.goods.goodsType}}     </view>
+            </view>
+            <view class="good_info">
+                <view class="info_item"><view class="gary">分类:</view> {{good_info.pageMap.goods_name}}     </view>
+                <view class="info_item"><view class="gary">是否生成仓库:</view>   {{good_info.goods.isDepot===1?'不生成仓单':'生成仓单'}}    </view>
+            </view>
+              <view class="good_info">
+                <view class="info_item"><view class="gary">最早提货时间:</view>  {{good_info.goods.earliestTime}}     </view>
+                <view class="info_item"><view class="gary">最晚提货时间:</view>  {{good_info.goods.lastTime}}   </view>
+            </view>
+            <view class="good_info">
+                <view class="info_item"><view class="gary">结算方式:</view>  {{good_info.pageMap.payMethodName}}    </view>
+            </view>
+            <navigator url="../order/order" open-type="redirect" class="black_btn">返回订单中心</navigator>
+        </view>
+      </view>
+   
+
+
+    <!-- 查看二维码 -->
+    <view class="erweima" wx:if="{{proxy}}">
+       <view class="header"> <image class="goback" mode="aspectFit" src="../../assets/images/icon/goback.png" />  委托函二维码</view>
+
+       <view class="erweima_cont">
+          <view class="p1">1、点击“保存”，自动保存到系统相册；</view>
+          <view class="p1">2、点击“分享”，可以转发到微信、钉钉和QQ；</view>
+          <view class="p1">3、最晚提货时间：{{proxy.last_time}}</view>
+          <image class="erweima" @tap="showImg" mode="aspectFit" src="{{proxy.qrcode_url}}" />
+          <view class="p1 center">（点击二维码图片可保存到手机）</view>
+          <view class="p1 center">二维码有效期：{{proxy.last_time}}</view>
+       </view>
+       <view class="share_cont">
+         <view class="h2">  <view class="span">分享到</view> </view>
+         <view  class="flex_box">
+          <view class="shara_item" @tap="share">
+            <image src="../../assets/images/icon/wxIcon.png" />
+            微信
+            
+          <button open-type="share"></button>
+          </view>
+         </view>
+       </view>
+    </view>
+
+    <!-- 图片查看 -->
+    <view class="img_swiper" wx:if="{{add_src}}">
+      <web-view src="{{add_src}}"></web-view>
+    </view>
+
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+export default class Index extends wepy.page {
+  data = {
+    good_info: '',
+    tit_name: '商品详情页',
+    add_src: false,
+    proxy: false,
+    proxyId: ''
+  };
+  methods = {
+    showImg() {
+      wx.previewImage({
+        current: this.proxy.qrcode_url,
+        urls: [this.proxy.qrcode_url]
+      });
+    },
+    goback() {
+      wx.navigateBack();
+    }
+  };
+  onShareAppMessage() {
+    let _this = this;
+    return {
+      title: '委托函',
+      path: 'pages/orderDetailItem/orderDetailItem?proxyId=' + _this.proxyId,
+      success: res => {
+        wepy.showToast({
+          title: '分享成功',
+          icon: 'success_no_circle'
+        });
+      },
+      fail: function(res) {
+        wepy.showToast({
+          title: '分享失败',
+          icon: 'none'
+        });
+        console.log(res);
+      }
+    };
+  }
+  async onLoad(options) {
+    if (options.proxyId) {
+      this.proxyId = options.proxyId;
+      this.proxy = await this.addQrcodeUrlInfo(options.proxyId);
+      this.$apply();
+      return;
+    }
+    if (!options.url) {
+      this.good_info = await this.getGoodInfo(options.id);
+    } else {
+      this.add_src = decodeURIComponent(options.url);
+    }
+
+    this.$apply();
+  }
+  Dictionaries(val) {
+    let Dictionaries = new Map();
+    Dictionaries.set('priceType', {
+      '0': '未知',
+      '1': '现货',
+      '2': '期货',
+      '3': '单价'
+    });
+    Dictionaries.set('goodsType', {
+      '0': '企业',
+      '1': '自营热门',
+      '2': '预售',
+      '3': '一口价',
+      '4': '定价现买'
+    });
+    return Dictionaries.get(val);
+  }
+  getGoodInfo(id) {
+    return this.$parent
+      .queryData('msyApp/searchOrderGoodsDetail.do', {
+        id: id
+      })
+      .then(d => {
+        d.goods.goodsType = this.Dictionaries('goodsType')[d.goods.goodsType];
+        d.goods.priceType = this.Dictionaries('priceType')[d.goods.priceType];
+        return d;
+      });
+  }
+  addQrcodeUrlInfo(proxyId) {
+    return this.$parent.queryData('msyApp/addQrcodeUrlInfo.do', {
+      proxyId: proxyId
+    });
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/orderDetailItem';
+</style>

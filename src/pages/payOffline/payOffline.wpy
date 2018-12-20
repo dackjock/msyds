@@ -1,0 +1,227 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container pad-bot">
+    <header :title.sync="title"></header>
+    <view class="plat-info">
+      <text>· 当前订单金额需付{{payPrice}}元，请及时支付!</text>
+      <text>· 平台银行信息</text>
+      <text>· 开户银行：{{payInfo.bankName}}</text>
+      <text>· 账号：{{payInfo.bankNo}}</text>
+    </view>
+    <form class="pay-form" bindsubmit="subForm">
+      <view class="pf-item">
+        <text >线下汇款银行</text>
+        <input name="qy_bank_name" placeholder="请填写线下汇款银行" value="{{payInfo.buyBankName}}" />
+      </view>
+      <view class="pf-item">
+        <text >线下汇款卡号</text>
+        <input name="qy_bank_no" placeholder="请填写线下汇款卡号" value="{{payInfo.buyBankNo}}" />
+      </view>
+      <view class="pf-item" wx:if="{{payMethodId === 8}}">
+        <text >线下汇款流水</text>
+        <input name="tradeNo" placeholder="请填写线下汇款流水" value="" />
+      </view>
+      <view class="pf-item">
+        <text >线下汇款金额</text>
+        <input name="qy_money" disabled placeholder="请填写线下汇款金额" value="{{payPrice}}"/>
+      </view>
+      <view class="pf-tips">请填写以上信息并且在已经付款完成的情况下点击完成线下支付按钮</view>
+      <view class="pf-btn">
+        <button class="cancel" @tap="backLink">返回</button>
+        <button class="confirm" form-type="submit">我已完成线下支付</button>
+      </view>
+    </form>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class payOffline extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    title: '线下支付',
+    settlementId: '',
+    enterpriseOrderId: '',
+    userInfo: [],
+    payPrice: '',
+    payInfo: {},
+    payMethodId: '',
+    YFCdata: ''
+  };
+  onLoad(e) {
+    // console.log(e)
+    this.enterpriseOrderId = e.id || ''; // 订单id
+    // this.enterpriseOrderId = 5488;
+    this.payPrice = e.price || ''; // 应付金额
+    this.settlementId = e.settlementId || '';
+    this.YFCdata = this.$parent.globalData.temporary.YFCdata;
+  }
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo;
+    if (this.YFCdata !== '') {
+      this.getYFCInfo();
+    } else if (this.settlementId === '') {
+      this.getPaymentInfo();
+    } else {
+      this.getSettlementInfo();
+    }
+  }
+  methods = {
+    backLink() {
+      this.$parent.linkPage('', 3);
+    },
+    subForm(event) {
+      let formData = event.detail.value;
+      if (this.payMethodId === 1) {
+        this.payAccountOrder(formData);
+      } else if (this.payMethodId === 2) {
+        this.payYFCOrder(formData);
+      } else if (this.settlementId === '') {
+        this.sendPayOrder(formData);
+      } else {
+        this.sendSettlement(formData);
+      }
+    }
+  };
+  async getPaymentInfo() {
+    let result = await this.$parent.queryData('/msyApp/completePayInit.do', {
+      userId: this.userInfo.userId,
+      enterpriseId: this.userInfo.id,
+      enterpriseOrderId: this.enterpriseOrderId
+    });
+    this.payInfo = result;
+    this.payMethodId = result.payMethodId;
+    if (result.payMethodId === 1) {
+      this.payPrice = result.pageMap.totalPayPrice;
+    }
+    if (result.payMethodId === 2) {
+      this.payPrice = result.pageMap.prepayPrice;
+    }
+    this.$apply();
+    console.log(result);
+  }
+  async getSettlementInfo() {
+    let result = await this.$parent.queryData('/msyApp/doOfflinePayInit.do', {
+      settlementId: this.settlementId,
+      enterpriseId: this.userInfo.id
+    });
+    let payInfo = {};
+    payInfo['buyBankName'] = result.bankName;
+    payInfo['buyBankNo'] = result.bankAccount;
+    payInfo['bankName'] = result.enterprise.bankName;
+    payInfo['bankNo'] = result.enterprise.bankAccount;
+    this.payPrice = result.detail.payPrice;
+    this.payInfo = payInfo;
+    this.$apply();
+    console.log(result);
+  }
+  async getYFCInfo() {
+    let YFCdata = this.YFCdata;
+    let payInfo = {};
+    let result = await this.$parent.queryData(
+      '/msyApp/frontQueryYFCargoInit.do',
+      {
+        enterpriseId: this.userInfo.id,
+        orderId: YFCdata.orderId,
+        cargoId: YFCdata.cargoId,
+        depotListId: YFCdata.depotListId,
+        index: YFCdata.indexs,
+        again: YFCdata.again
+      }
+    );
+    payInfo['buyBankName'] = result.buyBankName;
+    payInfo['buyBankNo'] = result.buyBankNo;
+    payInfo['bankName'] = result.bankName;
+    payInfo['bankNo'] = result.bankNo;
+    this.payPrice = YFCdata.prepayPrice;
+    this.payMethodId = YFCdata.pay_method_id;
+    this.payInfo = payInfo;
+    this.$apply();
+    console.log(result);
+  }
+  async sendPayOrder(formData) {
+    formData['orderId'] = this.enterpriseOrderId;
+    formData['orderType'] = this.payInfo.orderType;
+    formData['paytype'] = 2;
+    formData['enterpriseId'] = this.userInfo.id;
+    formData['userId'] = this.userInfo.userId;
+    formData['cargoTime'] =
+      this.payInfo.pageMap.cargoTime || this.payInfo.pageMap.lastTime || '';
+
+    let result = await this.$parent.queryData(
+      '/msyApp/payOrder.do',
+      formData,
+      true
+    );
+    if (result.type > 0) {
+      this.$parent.showTip('支付成功');
+      // 跳回订单列表
+      // this.$parent.linkPage('', 2);
+    }
+    console.log(result);
+  }
+  async sendSettlement(formData) {
+    console.log(formData);
+    formData['id'] = this.settlementId || this.enterpriseOrderId;
+    formData['qyBankName'] = formData['qy_bank_name'];
+    formData['qyBankNo'] = formData['qy_bank_no'];
+    formData['qyMoney'] = this.payPrice;
+    formData['userId'] = this.userInfo.id;
+    formData['isConfirm'] = 1;
+
+    let result = await this.$parent.queryData(
+      '/msyApp/updateFinalSettlementByOffline.do',
+      formData,
+      true
+    );
+    if (result.type > 0) {
+      this.$parent.showTip('支付成功');
+      // 跳回订单列表
+      // this.$parent.linkPage('', 2);
+    }
+    console.log(result);
+  }
+  async payAccountOrder(formData) {
+    console.log(formData);
+    formData['orderId'] = this.enterpriseOrderId;
+    formData['userId'] = this.userInfo.id;
+    formData['paytype'] = 2;
+
+    let result = await this.$parent.queryData(
+      '/msyApp/payAccountOrder.do',
+      formData,
+      true
+    );
+    if (result.type > 0) {
+      this.$parent.showTip('支付成功');
+      // 跳回订单列表
+      // this.$parent.linkPage('', 2);
+    }
+    console.log(result);
+  }
+  async payYFCOrder(formData) {
+    Object.assign(formData, this.YFCdata);
+    formData['enterpriseId'] = this.userInfo.id;
+    console.log(formData);
+    let result = await this.$parent.queryData(
+      'msyApp/addCashSpotYFCargo.do',
+      formData,
+      true,
+      'POST'
+    );
+    if (result.type > 0) {
+      this.$parent.showTip('操作成功');
+      // 跳回订单列表
+      // this.$parent.linkPage('', 2);
+    }
+    console.log(result);
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/oderPayment';
+</style>

@@ -1,0 +1,265 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+      <view class="order_header">
+        <image @tap="goback" src="../../assets/images/icon/goback.png"  mode="aspectFit"  />
+          商品列表
+          <navigator url="../goodsAdd/goodsAdd" open-type='navigate' wx:if="{{!edit_status}}" class="g_btn">去挂单</navigator>
+          <view @tap="editList" class="edit">{{edit_status?'完成':'编辑'}}  <image wx:if="{{!edit_status}}" class="edit_img" src="../../assets/images/icon/bixiugai.png" mode="aspectFit" /></view>
+      </view>
+        
+      <view class="order_main {{edit_status?'pd_80':''}}">
+        <block  wx:for="{{listData}}"  wx:key="{{item.index}}">
+          <view @tap="curChange({{index}})" class="order_item {{item.editD?'cur':''}}">
+           
+            <view class="main_cont">
+
+           
+              <view class="pro_name">
+                <view style="font-size:40rpx;text-align:center;"> {{item.price_type}} 
+                  <view wx:if="{{item.main_price>=0}}" style="display:inline;color:#d7092d;">+{{item.main_price}}</view>
+                  <view wx:else style="display:inline;color:#80c269;">{{item.main_price}}</view>
+                </view>
+                <view style="color:#d7092d">  {{item.goods_price}}元/KG</view>
+                <view >  品名：{{item.goods_name}}</view>
+               
+            
+             
+              </view>
+
+              <view class="right_cont">
+                <view class="flex_box">
+                  <view class="w134">规格</view>
+                  <view class="w186">{{item.goods_spec}}</view>
+                   <view class="w85">数量</view>
+                    <view class="flex_1">{{item.goods_total_weight}}kg</view>
+                </view>
+         
+                <view class="flex_box">
+                  <view class="w134">商品属性</view>
+                  <view class="w186">{{item.goods_attr}}</view>
+                  <view class="w85" style="line-height:1em;padding-top:6rpx;"> <text>结算\n方式</text></view>
+                  <view class="flex_1 max120">{{item.payMethods}}</view>
+                </view>
+                <view class="flex_box">
+                  <view class="w134">交货地</view>
+                  <view class="w186">{{item.city_name}}</view>
+                  <view class="w85">仓库</view>
+                  <view class="flex_1">{{item.storehouse}}</view>
+                </view>
+                <view class="flex_box">
+                    <view class="w134">是否上架</view>
+                    <view class="w186">{{item.Status==1?'是':'否'}}</view>
+                    <view class="w85">挂单人</view>
+                    <view class="flex_1">{{item.createName}}</view>
+                  </view>
+                <view class="flex_box " style="padding-left:25rpx;">
+                   最晚提货时间：{{item.last_time}}
+                </view>
+              </view>
+            </view>
+             <view class="top goods_btn" >
+                <view wx:if="{{item.status==0}}" class="btn_small" @tap="showLayer">填写码单</view>
+                <view class="btn_small" @tap="edit({{item}})">编辑</view>
+                <view class="btn_small" @tap="del({{item}})" >删除</view>
+                <view class="btn_small" @tap="upDownGood({{item}})">{{item.status==0?'上架':'下架'}}</view>
+            </view>
+
+          </view>
+        </block>
+      </view>
+
+      <!-- 编辑商品 -->
+      <view wx:if="{{edit_status}}" @tap="piliang" class="btn_bottom {{curItem.ids?'red':''}}">{{curItem.ids?'上架':'请选择商品'}}</view>
+      <!-- 内容弹窗 -->
+      <view class="goods_layer {{showLayer?'show':''}}">
+        <view class="layer_gary"></view>
+        <view class="layer_main">
+          <view class="h1">温馨提示</view>
+          <view class="info">{{layerText}}</view>
+          <view class="btn_group">
+            <view class="btn_layer" @tap="success">确认</view>
+            <view class="btn_layer cancel" @tap="cancel">取消</view>
+          </view>
+        </view>
+      </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+export default class goodsList extends wepy.page {
+  data = {
+    listData: [],
+    pageNum: 1,
+    showLayer: false,
+    layerEvent: '',
+    layerText: '',
+    curItem: { ids: '' },
+    edit_status: false
+  };
+  watch = {
+    listData(newValue, oldValue) {
+      let arr = [];
+      newValue.map((v, i) => {
+        if (v.editD) {
+          arr.push(v.id);
+        }
+      });
+      this.curItem.ids = arr.join(',');
+    }
+  };
+  methods = {
+    edit(obj) {
+      console.log(obj);
+      
+      wx.navigateTo({url:'../goodsAdd/goodsAdd?id=' + obj.id});
+    },
+    curChange(index) {
+      if (!this.edit_status) {
+        return;
+      }
+      if (this.listData[index].status == 1) {
+        return;
+      }
+      this.listData[index].editD = !this.listData[index].editD;
+    },
+    async piliang() {
+      this.edit_status = false;
+      this.layerText = '您确定上架当前挂单信息？';
+      this.curItem.status = 1;
+      this.curItem.userId = this.$parent.globalData.userInfo.userId;
+      await this.upDownGoods(this.curItem);
+      this.listData.map((v, i) => {
+        v.editD = false;
+      });
+      this.$apply();
+    },
+    editList() {
+      this.edit_status = !this.edit_status;
+      this.listData.map((v, i) => {
+        v.editD = false;
+      });
+      this.$apply();
+    },
+    goback() {
+      wx.navigateBack();
+    },
+    cancel() {
+      this.showLayer = false;
+    },
+    showLayer() {
+      this.showLayer = 'madan';
+      this.layerText = '如需上传码单信息，请在PC端下载Excel表格后在PC端上传';
+    },
+    upDownGood(item) {
+      this.showLayer = 'upDownGood';
+      this.layerText =
+        '您确定' + (item.status == 1 ? '下架' : '上架') + '当前挂单信息？';
+      this.curItem = {
+        ids: item.id + '',
+        status: item.status == 1 ? '0' : '1',
+        userId: this.$parent.globalData.userInfo.userId
+      };
+    },
+    del(item) {
+      this.showLayer = 'delete';
+      this.layerText = '您确定删除当前挂单信息？';
+      this.curItem = {
+        ids: item.id + '',
+        userId: this.$parent.globalData.userInfo.userId
+      };
+    },
+    success() {
+      let evenMap = new Map([
+        [
+          'madan',
+          () => {
+            this.showLayer = false;
+          }
+        ],
+        [
+          'upDownGood',
+          () => {
+            this.upDownGoods(this.curItem);
+          }
+        ],
+        [
+          'delete',
+          () => {
+            this.deleteGoods(this.curItem);
+          }
+        ]
+      ]);
+      evenMap.get(this.showLayer)();
+    }
+  };
+  async onLoad() {
+    let res = await this.QueryGoodsListFor(this.pageNum);
+    this.listData = res.list;
+    this.$apply();
+  }
+  QueryGoodsListFor(pageNum) {
+    return this.$parent
+      .queryData('msyApp/appQueryGoodsListForEnt.do', {
+        enterpriseId: this.$parent.globalData.userInfo.id,
+        userId: this.$parent.globalData.userInfo.userId,
+        pageNum: pageNum
+      })
+      .then(d => {
+        d.list.map((v, i) => {
+          d.editD = false;
+          if (v.price_type == 3) {
+            v.price_type = v.goods_price;
+          } else {
+            v.price_type = v.price_type == 1 ? 'TD' : '沪银主力';
+          }
+        });
+        return d;
+      });
+  }
+  upDownGoods(obj) {
+    return this.$parent.queryData('msyApp/upDownGoods.do', obj).then(res => {
+      this.showLayer = false;
+      if (!res) {
+        return;
+      }
+      let idArr = obj.ids.split(',');
+      idArr.map((id, index) => {
+        this.listData.map((v, i) => {
+          if (v.id == id) {
+            this.listData[i].status = obj.status;
+          }
+        });
+      });
+
+      this.$apply();
+    });
+  }
+  deleteGoods(obj) {
+    return this.$parent
+      .queryData('msyApp/deleteGoodsDataForEnt.do', obj)
+      .then(res => {
+        this.showLayer = false;
+        if (!res) {
+          return;
+        }
+        let idArr = obj.ids.split(',');
+        idArr.map((id, index) => {
+          this.listData.map((v, i) => {
+            if (v.id == id) {
+              this.listData.splice(i, 1);
+            }
+          });
+        });
+
+        this.$apply();
+      });
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/order';
+@import '../../assets/style/goodsList';
+</style>
