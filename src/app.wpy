@@ -11,11 +11,12 @@ import routerBefore from '_mixins/routerBefore.js';
 export default class extends wepy.app {
   config = {
     pages: [
+      
+      'pages/index/index',
       'pages/login/login',
       'pages/purchasingHall/purchasingHall',
       'pages/purchasingGoods/purchasingGoods',
 
-      'pages/index/index',
       'pages/consigneeChange/consigneeChange',
       'pages/consignee/consignee',
       'pages/negotiateManagement/negotiateManagement',

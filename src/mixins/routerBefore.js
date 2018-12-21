@@ -7,7 +7,8 @@ let firewall = [
   '../negotiate/negotiate',
   '../tradeIndex/tradeIndex',
   '../order/order',
-  '../accountIndex/accountIndex'
+  '../accountIndex/accountIndex',
+  '../goodsAdd/goodsAdd'
 ]
 
 let actionType = 1

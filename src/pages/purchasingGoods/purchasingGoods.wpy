@@ -48,7 +48,7 @@
             </view>
 
 <!-- 按钮 -->
-<view class="bottom_btn">提交报价</view>
+<view class="bottom_btn" @tap="tijiao">提交报价</view>
       <!-- 小键盘 -->
     
     
@@ -72,7 +72,9 @@ export default class Index extends wepy.page {
     //升贴水最大最小
     main_priceName: '平水0',
     p_min: '',
-    p_max: ''
+    p_max: '',
+    //商品ID
+    goodsId: ''
   };
   watch = {
     goodInfo(newValue, oldValue) {
@@ -89,6 +91,26 @@ export default class Index extends wepy.page {
     }
   };
   methods = {
+    //提交报价
+    tijiao() {
+      let price =
+        parseInt(this.goodInfo.main_price) +
+        parseInt(this.goodInfo.goods_price);
+      this.$parent
+        .queryData('msyApp/appAddPurchaseOrder.do', {
+          goodsId: this.goodsId,
+          userId: this.$parent.globalData.userInfo.userId,
+          enterpriseId: this.$parent.globalData.userInfo.id,
+          mainPrice: this.goodInfo.main_price,
+          price: price
+        })
+        .then(res => {
+          if (!res) {
+            return;
+          }
+          this.$parent.linkPage('../purchasingHall/purchasingHall', 2);
+        });
+    },
     add() {
       this.goodInfo.main_price = parseFloat(this.goodInfo.main_price) + 1;
       this.$apply();
@@ -124,10 +146,12 @@ export default class Index extends wepy.page {
   };
   async onLoad(option) {
     console.log(option);
+    this.goodsId = option.id;
     let res = await this.PurchaseGoodsInit(option.id);
     this.goodInfo = res.pageMap;
     this.p_min = res.minAgio;
     this.p_max = res.maxAgio;
+
     this.$apply();
   }
   PurchaseGoodsInit(id) {
