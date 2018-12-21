@@ -22,7 +22,11 @@
         <image src="{{imgUrl + 'icon/cmenu_yjb.png'}}"></image>
         <p>商城</p>
       </navigator>
-      <view  @tap="goGuadan"> 
+      <view wx:if="{{isSystem}}"  @tap="goGuadan(1)"> 
+        <image src="{{imgUrl +'icon/cmenu_cg.png'}}" ></image>
+        <p>采购大厅</p>
+      </view>
+      <view wx:else @tap="goGuadan(2)"> 
         <image src="{{imgUrl +'icon/cmenu_gd.png'}}" ></image>
         <p>我要挂单</p>
       </view>
@@ -352,96 +356,117 @@ export default class Index extends wepy.page {
     duration: 500, // 滑动动画时长
     imgUrls: [], // 轮播图
     hqxximg: '', //行情信息图片url
-    scimg: '',//商城图片url
-    wygdimg: '',//我要挂单图片url
-    addrimg: '',//地址小图标url
-    indexfore: {},//白银价格
-    zxTxt: [],//咨询
-    zyHot: [],//自营-按提货地点
-    byItem: [],//自营-最新热门(白银)
+    scimg: '', //商城图片url
+    wygdimg: '', //我要挂单图片url
+    addrimg: '', //地址小图标url
+    indexfore: {}, //白银价格
+    zxTxt: [], //咨询
+    zyHot: [], //自营-按提货地点
+    byItem: [], //自营-最新热门(白银)
     jkItem: [], // 自营-最新热门精矿
     cnItem: [], // 自营-产能预售
     cjbyItem: [], // 最新成交信息（白银）
     cjjkItem: [], // 最新成交信息（精矿）
     statueTxt: 'TD', // TD 沪银主力
     zzDan: 1, // 精矿整单子单切换
-    userInfo:'',
-    imgUrl:'',
-    statue: 1, // TD 期货 
-    enterpriseId:'',//企业id
-    userId:'',//企业id
+    userInfo: '',
+    imgUrl: '',
+    statue: 1, // TD 期货
+    enterpriseId: '', //企业id
+    userId: '', //企业id
     isChecked: false,
     rightTipsBoole: false,
     isKai: 1, // 开闭市
     closetime: '', // 闭市结束时间
     openTime: '', // 闭市开始时间
-    closeName: '', // 闭市name 判断是否节假日
-  }
-  methods={
-
+    closeName: '' ,// 闭市name 判断是否节假日
+       
+    isSystem: false, //判断是是否为平台
+  };
+  methods = {
     //跳转去挂单
-    goGuadan(){
-      this.$parent.linkPage('../goodsAdd/goodsAdd',1);
+    goGuadan(val) {
+      val==2?
+      this.$parent.linkPage('../goodsAdd/goodsAdd', 1):
+      this.$parent.linkPage('../purchasingHall/purchasingHall', 1);
     },
     //一口价
     yikoujia() {
-      if (this.userInfo !== '') { // 判断是否登录
-        if (this.isKai === 0) { // 闭市
-          this.isOpend(this.isKai, this.closeName, this.openTime, this.closetime)
-        } else { // 开市
-          
-           console.log('跳转到商城')
+      if (this.userInfo !== '') {
+        // 判断是否登录
+        if (this.isKai === 0) {
+          // 闭市
+          this.isOpend(
+            this.isKai,
+            this.closeName,
+            this.openTime,
+            this.closetime
+          );
+        } else {
+          // 开市
+
+          console.log('跳转到商城');
         }
       } else {
-        this.$parent.linkPage('../login/login',1)
+        this.$parent.linkPage('../login/login', 1);
       }
     },
     // 自营最新热门白银
     byGotoBuy(isbuy, idx) {
-       if (this.userInfo !== '') { // 判断是否登录
-        if (this.userInfo.userType === 1) { // 个人用户
+      if (this.userInfo !== '') {
+        // 判断是否登录
+        if (this.userInfo.userType === 1) {
+          // 个人用户
           wx.showModal({
             title: '温馨提示',
             content: '当前需要升级企业用户，方可继续操作',
             confirmText: '前往升级',
             confirmColor: '#d7092d',
-            success (res) {
+            success(res) {
               if (res.confirm) {
-                console.log('用户点击确定')
+                console.log('用户点击确定');
               } else if (res.cancel) {
-                console.log('用户点击取消')
+                console.log('用户点击取消');
               }
             }
-          })
-        } else { // 企业用户
-          if (this.isKai === 0) { // 闭市
-            this.isOpend(this.isKai, this.closeName, this.openTime, this.closetime)
-          } else { // 开市
-            if (idx === '1') { // 能买 // 白银
-              let enbuy = isbuy.enableBuy
-              if(enbuy === 1){
+          });
+        } else {
+          // 企业用户
+          if (this.isKai === 0) {
+            // 闭市
+            this.isOpend(
+              this.isKai,
+              this.closeName,
+              this.openTime,
+              this.closetime
+            );
+          } else {
+            // 开市
+            if (idx === '1') {
+              // 能买 // 白银
+              let enbuy = isbuy.enableBuy;
+              if (enbuy === 1) {
                 this.$parent.globalData.temporary.goodsData = isbuy;
                 this.$parent.globalData.temporary.goodsStatue = this.statue;
-                this.$parent.linkPage('../negotiate/negotiate',1)
-                
+                this.$parent.linkPage('../negotiate/negotiate', 1);
               }
-              
             } else if (isbuy === 'true') {
-              if (idx === '2') { // 精矿
-              this.$parent.showTip('精矿满足条件、能购买（未开发）')
-               
-              } else if (idx === '3') { // 产能预售
-              this.$parent.showTip('产能满足条件、能购买（未开发）')
-               
+              if (idx === '2') {
+                // 精矿
+                this.$parent.showTip('精矿满足条件、能购买（未开发）');
+              } else if (idx === '3') {
+                // 产能预售
+                this.$parent.showTip('产能满足条件、能购买（未开发）');
               }
-            } else { // 不能买
+            } else {
+              // 不能买
               if (this.userInfo.isMainLogin === 2) {
                 // 企业用户
-                this.$parent.showTip('用户信用等级无法按照此方式购买')
-               
+                this.$parent.showTip('用户信用等级无法按照此方式购买');
               } else if (this.userInfo.isMainLogin === 3) {
-                this.$parent.showTip('当前用户权限等级限制，如需操作，请联系总账户！')
-            
+                this.$parent.showTip(
+                  '当前用户权限等级限制，如需操作，请联系总账户！'
+                );
               }
             }
             // console.log('开市可以购买')
@@ -449,66 +474,68 @@ export default class Index extends wepy.page {
         }
       } else {
         // 没登录、跳转到登录
-        this.$parent.linkPage('../login/login',1)
+        this.$parent.linkPage('../login/login', 1);
       }
     },
-    switch1Change (e) {
+    switch1Change(e) {
       // e.detail.value
       if (e.detail.value) {
-        this.zzDan = 2
-        this.isChecked = true
+        this.zzDan = 2;
+        this.isChecked = true;
       } else {
-        this.zzDan = 1
-        this.isChecked = false
+        this.zzDan = 1;
+        this.isChecked = false;
       }
-      this.$apply()
-      this.getchangeZhengOrZi()
+      this.$apply();
+      this.getchangeZhengOrZi();
     },
     tdTab() {
       if (this.statue === 1) {
-        this.statue = 2
-        this.statueTxt = '沪银主力'
+        this.statue = 2;
+        this.statueTxt = '沪银主力';
       } else {
-        this.statue = 1
-        this.statueTxt = 'TD'
+        this.statue = 1;
+        this.statueTxt = 'TD';
       }
-      this.$apply()
-      this.getData()
+      this.$apply();
+      this.getData();
     },
     rightTips() {
-      this.rightTipsBoole = !this.rightTipsBoole
-      this.$apply()
+      this.rightTipsBoole = !this.rightTipsBoole;
+      this.$apply();
     }
-  }
+  };
   onShow() {
-    this.userInfo = this.$parent.globalData.userInfo
-    this.imgUrl = this.$parent.globalData.picPath
-    this.getData()
-    if(this.userInfo !== ''){
-      this.enterpriseId = this.userInfo.id
-      this.userId = this.userInfo.userId
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.imgUrl = this.$parent.globalData.picPath;
+
+    //新增判断平台
+    this.$parent.globalData.userInfo.isSystem === 1 && (this.isSystem = true);
+    this.getData();
+    if (this.userInfo !== '') {
+      this.enterpriseId = this.userInfo.id;
+      this.userId = this.userInfo.userId;
     }
     //console.log('this.userInfo',this.userInfo)
-    
   }
 
   //判断开闭市
-  isOpend (isKai, closeName, openTime, closetime) {
+  isOpend(isKai, closeName, openTime, closetime) {
     if (isKai === 0) {
       if (closeName !== null && closeName !== '') {
-        this.$parent.showTip('节假日闭市')
+        this.$parent.showTip('节假日闭市');
       } else {
         wepy.showToast({
           title: '当前白银市场已闭市：' + openTime + '-' + closetime,
           icon: 'none'
         });
       }
-      return true
+      return true;
     } else {
-      return false
+      return false;
     }
   }
-  //获取首页信息 
+  //获取首页信息
   async getData() {
     let result = await this.$parent.queryData('app/index.do', {
       enterpriseId: this.enterpriseId,
@@ -516,64 +543,71 @@ export default class Index extends wepy.page {
       type: this.statue
     });
     console.log(result);
-    let that = this
+    let that = this;
     // 开闭市
-      that.isKai = result.isopen
-      that.closetime = result.closetime
-      that.openTime = result.openTime
-      that.closeName = result.closeName
-      
+    that.isKai = result.isopen;
+    that.closetime = result.closetime;
+    that.openTime = result.openTime;
+    that.closeName = result.closeName;
+
     //轮播图
-    that.imgUrls = []
-    for (let i=0; i < result.bannerList.length; i++) {
-      that.imgUrls.push(result.bannerList[i].image)
+    that.imgUrls = [];
+    for (let i = 0; i < result.bannerList.length; i++) {
+      that.imgUrls.push(result.bannerList[i].image);
     }
     //今日成交均价
-    let tPrice = {}
-    if(result.todayPrice !== 0){
-      tPrice.junjia = result.todayPrice 
-    }else {
-      if(result.lastAvgPrice !== 0){
-        tPrice.junjia = result.lastAvgPrice
-      }else{
-        tPrice.junjia = result.averagePrice
+    let tPrice = {};
+    if (result.todayPrice !== 0) {
+      tPrice.junjia = result.todayPrice;
+    } else {
+      if (result.lastAvgPrice !== 0) {
+        tPrice.junjia = result.lastAvgPrice;
+      } else {
+        tPrice.junjia = result.averagePrice;
       }
     }
     //白银价格
-    tPrice.timePrice = result.timePrice // 现货
-    tPrice.differencePrice = result.differencePrice // 白银现货差价
-    tPrice.differenceRate = result.differenceRate // 白银现货差价百分比
-    tPrice.timePriceF = result.timePriceF // 期货
-    tPrice.differencePriceF = result.differencePriceF // 白银期货差价
-    tPrice.differenceRateF = result.differenceRateF // 白银期货差价百分比
-    that.indexfore = tPrice
+    tPrice.timePrice = result.timePrice; // 现货
+    tPrice.differencePrice = result.differencePrice; // 白银现货差价
+    tPrice.differenceRate = result.differenceRate; // 白银现货差价百分比
+    tPrice.timePriceF = result.timePriceF; // 期货
+    tPrice.differencePriceF = result.differencePriceF; // 白银期货差价
+    tPrice.differenceRateF = result.differenceRateF; // 白银期货差价百分比
+    that.indexfore = tPrice;
     //资讯
-    that.zxTxt =[]
-    for(let zx = 0; zx<result.consultList.length; zx++){
-      that.zxTxt.push(result.consultList[zx].name)
+    that.zxTxt = [];
+    for (let zx = 0; zx < result.consultList.length; zx++) {
+      that.zxTxt.push(result.consultList[zx].name);
     }
     //自营-按提货地点
-    that.zyHot = []
-    for(let zy =0; zy<result.deliveryGoodsList.length; zy++){
+    that.zyHot = [];
+    for (let zy = 0; zy < result.deliveryGoodsList.length; zy++) {
       that.zyHot.push({
         goods_name: result.deliveryGoodsList[zy].goods_name,
         main_price: result.deliveryGoodsList[zy].main_price,
         depot_name: result.deliveryGoodsList[zy].depot_name,
-        goods_total_weight: result.deliveryGoodsList[zy].goods_total_weight.toFixed(4),
+        goods_total_weight: result.deliveryGoodsList[
+          zy
+        ].goods_total_weight.toFixed(4),
         buy_weight: result.deliveryGoodsList[zy].buy_weight.toFixed(4),
-        create_time: result.deliveryGoodsList[zy].create_time,
-      })
+        create_time: result.deliveryGoodsList[zy].create_time
+      });
     }
     //最新成交信息（精矿）
-    that.cjjkItem = []
-    let cjjklist = result.dealConcentrateList
-    let specListJk = ''
-    for(let i =0; i<cjjklist.length; i++){
-      for(let j =0; j<cjjklist[i].specList.length; j++){
-        if(j === 0){
-          specListJk += cjjklist[i].specList[j].specName + cjjklist[i].specList[j].specValue
+    that.cjjkItem = [];
+    let cjjklist = result.dealConcentrateList;
+    let specListJk = '';
+    for (let i = 0; i < cjjklist.length; i++) {
+      for (let j = 0; j < cjjklist[i].specList.length; j++) {
+        if (j === 0) {
+          specListJk +=
+            cjjklist[i].specList[j].specName +
+            cjjklist[i].specList[j].specValue;
         } else {
-          specListJk += ( '、' + cjjklist[i].specList[j].specName + cjjklist[i].specList[j].specValue)
+          specListJk +=
+            '、' +
+            cjjklist[i].specList[j].specName +
+            cjjklist[i].specList[j].specValue;
         }
       }
       that.cjjkItem.push({
@@ -587,65 +621,68 @@ export default class Index extends wepy.page {
         totalturnoverMoney: cjjklist[i].totalturnoverMoney,
         turnover_money: cjjklist[i].turnover_money,
         specList: specListJk
-      })
+      });
     }
-    this.$apply()
+    this.$apply();
     //自营-最新热门(白银)
-    that.getQueryHotGoodsList()
+    that.getQueryHotGoodsList();
     //自营-最新热门(精矿)
-    that.getchangeZhengOrZi()
+    that.getchangeZhengOrZi();
     //自营-产能预售
-    that.getQueryPresell()
+    that.getQueryPresell();
     //最新成交信息（白银）
-    that.getQueryNewOrderList()
-    
-  };
+    that.getQueryNewOrderList();
+  }
   //自营-最新热门(白银)
   async getQueryHotGoodsList() {
     let result = await this.$parent.queryData('app/appQueryHotGoodsList.do', {
       enterpriseId: this.enterpriseId,
       type: this.statue
-    })
+    });
     //console.log('白银', result);
-    let that = this
-    let bylist = result.list
-    that.byItem = []
-    for(let i = 0;i<bylist.length; i++){
+    let that = this;
+    let bylist = result.list;
+    that.byItem = [];
+    for (let i = 0; i < bylist.length; i++) {
       that.byItem.push({
         goods_name: bylist[i].goods_name, // 名称
-          goods_spec: bylist[i].goods_spec, // 规格
-          main_price: bylist[i].main_price, // 升贴水
-          goods_price: bylist[i].goods_price, // 单价
-          month_ticket_status: bylist[i].month_ticket_status, // 开票状态1为当月开票0为非当月开票
-          goods_total_weight: bylist[i].goods_total_weight.toFixed(4), // 商品重量
-          brandName: bylist[i].brandName, // 品牌名称
-          depotName: bylist[i].depotName, // 仓库名称
-          goodsTypeName: bylist[i].goodsTypeName, // 商品类型名称
-          id: bylist[i].id, // 商品id（点击购买时用）
-          enableBuy: bylist[i].enableBuy, // 是否购买0否1是（点击购买时用）
-          goods_type: bylist[i].goods_type, // 商品类型0企业 1自营热门2预售 3一口价 4定价现买（点击购买时用）
-          create_time: bylist[i].create_time // 创建时间
-      })
+        goods_spec: bylist[i].goods_spec, // 规格
+        main_price: bylist[i].main_price, // 升贴水
+        goods_price: bylist[i].goods_price, // 单价
+        month_ticket_status: bylist[i].month_ticket_status, // 开票状态1为当月开票0为非当月开票
+        goods_total_weight: bylist[i].goods_total_weight.toFixed(4), // 商品重量
+        brandName: bylist[i].brandName, // 品牌名称
+        depotName: bylist[i].depotName, // 仓库名称
+        goodsTypeName: bylist[i].goodsTypeName, // 商品类型名称
+        id: bylist[i].id, // 商品id（点击购买时用）
+        enableBuy: bylist[i].enableBuy, // 是否购买0否1是（点击购买时用）
+        goods_type: bylist[i].goods_type, // 商品类型0企业 1自营热门2预售 3一口价 4定价现买（点击购买时用）
+        create_time: bylist[i].create_time // 创建时间
+      });
     }
-    this.$apply() 
+    this.$apply();
   }
   //自营-最新热门(精矿)
   async getchangeZhengOrZi() {
     let result = await this.$parent.queryData('app/changeZhengOrZi.do', {
       enterpriseId: this.enterpriseId,
       contractType: this.zzDan
-    })
+    });
     //console.log('精矿', result);
-    let that = this
-    let specList = []
-    let jklist = result.list
-    that.jkItem = []
-    for(let j = 0;j <jklist.length; j++){
-      for(let i = 0; i<jklist[j].specList.length;i++){
-        if(i ===0){
-          specList += jklist[j].specList[i].specName + jklist[j].specList[i].specValue
+    let that = this;
+    let specList = [];
+    let jklist = result.list;
+    that.jkItem = [];
+    for (let j = 0; j < jklist.length; j++) {
+      for (let i = 0; i < jklist[j].specList.length; i++) {
+        if (i === 0) {
+          specList +=
+            jklist[j].specList[i].specName + jklist[j].specList[i].specValue;
         } else {
-          specList += ('、' + jklist[j].specList[i].specName + jklist[j].specList[i].specValue )
+          specList +=
+            '、' +
+            jklist[j].specList[i].specName +
+            jklist[j].specList[i].specValue;
         }
       }
       that.jkItem.push({
@@ -658,61 +695,65 @@ export default class Index extends wepy.page {
         supply_start_time: jklist[j].supply_start_time,
         resultType: jklist[j].resultType,
         type: jklist[j].type
-      })
+      });
     }
-    this.$apply() 
+    this.$apply();
   }
   //自营-产能预售
   async getQueryPresell() {
-    let result = await this.$parent.queryData('app/appQueryPresellGoodsList.do', {
-      enterpriseId: this.enterpriseId,
-      contractType: this.zzDan
-    })
-    //console.log('产能', result);
-    let that = this
-    let cnlist = result.list
-    that.cnItem = []
-    for (let i = 0; i < cnlist.length; i++) {
-        that.cnItem.push({
-          goods_name: cnlist[i].goods_name,
-          goods_spec: cnlist[i].goods_spec,
-          main_price: cnlist[i].main_price,
-          goods_price: cnlist[i].goods_price,
-          month_ticket_status: cnlist[i].month_ticket_status,
-          goods_total_weight: cnlist[i].goods_total_weight.toFixed(4),
-          brandName: cnlist[i].brandName,
-          depotName: cnlist[i].depotName,
-          create_time: cnlist[i].create_time.substring(0, 10),
-          goodsTypeName: cnlist[i].goodsTypeName
-        })
+    let result = await this.$parent.queryData(
+      'app/appQueryPresellGoodsList.do',
+      {
+        enterpriseId: this.enterpriseId,
+        contractType: this.zzDan
       }
-      this.$apply() 
+    );
+    //console.log('产能', result);
+    let that = this;
+    let cnlist = result.list;
+    that.cnItem = [];
+    for (let i = 0; i < cnlist.length; i++) {
+      that.cnItem.push({
+        goods_name: cnlist[i].goods_name,
+        goods_spec: cnlist[i].goods_spec,
+        main_price: cnlist[i].main_price,
+        goods_price: cnlist[i].goods_price,
+        month_ticket_status: cnlist[i].month_ticket_status,
+        goods_total_weight: cnlist[i].goods_total_weight.toFixed(4),
+        brandName: cnlist[i].brandName,
+        depotName: cnlist[i].depotName,
+        create_time: cnlist[i].create_time.substring(0, 10),
+        goodsTypeName: cnlist[i].goodsTypeName
+      });
+    }
+    this.$apply();
   }
   //最新成交信息（白银）
   async getQueryNewOrderList() {
-    let result = await this.$parent.queryData('app/appQueryNewOrderList.do', {
-
-    })
+    let result = await this.$parent.queryData(
+      'app/appQueryNewOrderList.do',
+      {}
+    );
     //console.log('最新成交 白银', result);
-    let that = this
-    that.cjbyItem = []
-    for( let i = 0; i<result.length; i++){
+    let that = this;
+    that.cjbyItem = [];
+    for (let i = 0; i < result.length; i++) {
       that.cjbyItem.push({
-          goods_attr: result[i].goods_attr, // 百分比
-          goods_name: result[i].goods_name, // 名称
-          goods_spec: result[i].goods_spec, // 规格
-          goods_type: result[i].goods_type, // 产品类型
-          price: result[i].price.toFixed(2), // 单价
-          month_ticket_status: result[i].month_ticket_status, // 开票状态1为当月开票0为非当月开票
-          goods_weight: result[i].goods_weight.toFixed(4), // 商品重量
-          brand_name: result[i].brand_name, // 品牌名称
-          depot_name: result[i].depot_name, // 仓库位置（depot_name为空时显示storehouse）
-          storehouse: result[i].storehouse, // 仓库位置（depot_name为空时显示storehouse）
-          create_time: result[i].create_time, // 交易时间
-          goodsTypeName: result[i].goodsTypeName // 商品类型名称
-        })
+        goods_attr: result[i].goods_attr, // 百分比
+        goods_name: result[i].goods_name, // 名称
+        goods_spec: result[i].goods_spec, // 规格
+        goods_type: result[i].goods_type, // 产品类型
+        price: result[i].price.toFixed(2), // 单价
+        month_ticket_status: result[i].month_ticket_status, // 开票状态1为当月开票0为非当月开票
+        goods_weight: result[i].goods_weight.toFixed(4), // 商品重量
+        brand_name: result[i].brand_name, // 品牌名称
+        depot_name: result[i].depot_name, // 仓库位置（depot_name为空时显示storehouse）
+        storehouse: result[i].storehouse, // 仓库位置（depot_name为空时显示storehouse）
+        create_time: result[i].create_time, // 交易时间
+        goodsTypeName: result[i].goodsTypeName // 商品类型名称
+      });
     }
-    this.$apply() 
+    this.$apply();
   }
   components = {
     botBar,
@@ -723,5 +764,4 @@ export default class Index extends wepy.page {
 
 <style lang="stylus">
 @import '../../assets/style/index';
-  
 </style>
