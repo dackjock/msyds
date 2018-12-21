@@ -29,26 +29,26 @@
               <view class="right_cont">
                 <view class="flex_box">
                   <view class="w134">规格</view>
-                  <view class="w186">{{item.goods_spec}}</view>
+                  <view class="w150">{{item.goods_spec}}</view>
                    <view class="w85">数量</view>
                     <view class="flex_1">{{item.goods_total_weight}}kg</view>
                 </view>
          
                 <view class="flex_box">
                   <view class="w134">商品属性</view>
-                  <view class="w186">{{item.goods_attr}}</view>
+                  <view class="w150">{{item.goods_attr}}</view>
                   <view class="w85" style="line-height:1em;padding-top:6rpx;"> <text>结算\n方式</text></view>
                   <view class="flex_1 max120">{{item.payMethods}}</view>
                 </view>
                 <view class="flex_box">
                   <view class="w134">交货地</view>
-                  <view class="w186">{{item.city_name}}</view>
+                  <view class="w150">{{item.city_name}}</view>
                   <view class="w85">仓库</view>
                   <view class="flex_1">{{item.storehouse}}</view>
                 </view>
                 <view class="flex_box">
                     <view class="w134">是否上架</view>
-                    <view class="w186">{{item.Status==1?'是':'否'}}</view>
+                    <view class="w150">{{item.status===1?'是':'否'}}{{item.status}}</view>
                     <view class="w85">挂单人</view>
                     <view class="flex_1">{{item.createName}}</view>
                   </view>
@@ -58,10 +58,12 @@
               </view>
             </view>
              <view class="top goods_btn" >
-                <view wx:if="{{item.status==0}}" class="btn_small" @tap="showLayer">填写码单</view>
-                <view class="btn_small" @tap="edit({{item}})">编辑</view>
-                <view class="btn_small" @tap="del({{item}})" >删除</view>
-                <view class="btn_small" @tap="upDownGood({{item}})">{{item.status==0?'上架':'下架'}}</view>
+                <view wx:if="{{item.status===0&&!item.singleCodeId}}" class="btn_small" @tap="showLayer">填写码单</view>
+                <view wx:if="{{item.status!=1&&item.singleCodeId}}" class="btn_small border" @tap="showLayer">查看码单</view>
+                
+                <view class="btn_small"  wx:if="{{item.status===0}}" @tap="edit({{item}})">编辑</view>
+                <view class="btn_small"  wx:if="{{item.status===0}}" @tap="del({{item}})" >删除</view>
+                <view class="btn_small"  wx:if="{{item.status>=0}}"  @tap="upDownGood({{item}})">{{item.status==0?'上架':'下架'}}</view>
             </view>
 
           </view>
@@ -89,6 +91,9 @@
 import wepy from 'wepy';
 
 export default class goodsList extends wepy.page {
+  config = {
+    enablePullDownRefresh: true
+  };
   data = {
     listData: [],
     pageNum: 1,
@@ -112,14 +117,14 @@ export default class goodsList extends wepy.page {
   methods = {
     edit(obj) {
       console.log(obj);
-      
-      wx.navigateTo({url:'../goodsAdd/goodsAdd?id=' + obj.id});
+
+      wx.navigateTo({ url: '../goodsAdd/goodsAdd?id=' + obj.id });
     },
     curChange(index) {
       if (!this.edit_status) {
         return;
       }
-      if (this.listData[index].status == 1) {
+      if (this.listData[index].status != 0) {
         return;
       }
       this.listData[index].editD = !this.listData[index].editD;
@@ -255,6 +260,46 @@ export default class goodsList extends wepy.page {
 
         this.$apply();
       });
+  }
+  async onPullDownRefresh() {
+    wepy.showLoading({
+      title: '加载中…'
+    });
+    wepy.showNavigationBarLoading();
+    let _this = this;
+    this.pageNum = 1;
+    let res = await this.QueryGoodsListFor(this.pageNum);
+    this.listData = res.list;
+    this.$apply();
+    wepy.hideNavigationBarLoading();
+    wx.stopPullDownRefresh(
+      wepy.showToast({
+        title: '请求成功',
+        icon: 'none'
+      })
+    );
+  }
+  async onReachBottom() {
+    wepy.showLoading({
+      title: '加载中…'
+    });
+    wepy.showNavigationBarLoading();
+    this.pageNum = this.pageNum + 1;
+    let res = await this.QueryGoodsListFor(this.pageNum);
+    this.listData.push(...res.list);
+    this.$apply();
+    wepy.hideNavigationBarLoading();
+    if (res.list.length <= 0) {
+      wepy.showToast({
+        title: '没有更多了',
+        icon: 'none'
+      });
+    } else {
+      wepy.showToast({
+        title: '加载成功',
+        icon: 'none'
+      });
+    }
   }
 }
 </script>

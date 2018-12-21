@@ -32,8 +32,8 @@ export default class codesQuery extends wepy.page {
     status: ''
   };
   onLoad(e) {
-    // this.orderId = e.id
-    this.orderId = 5506;
+    this.orderId = e.id
+    // this.orderId = 5506;
   }
   onShow() {
     this.userInfo = this.$parent.globalData.userInfo;
@@ -51,20 +51,24 @@ export default class codesQuery extends wepy.page {
           userId: this.userInfo.userId,
           orderId: this.orderId,
           cargoDepotListId: this.cargoDepotListId,
-          status: this.status,
           type: 1
         }
       );
       if (result) {
-        if (result.key === 0) {
-          // 跳转至支付页面
-          this.$parent.linkPage(
-            '../oderPayment/oderPayment?id=' + this.orderId,
-            4
-          );
-        } else {
-          // 跳转至填写委托函
-        }
+        // if (result.key === 0) {
+        //   // 跳转至支付页面
+        //   this.$parent.linkPage(
+        //     '../order/order',
+        //     4
+        //   );
+        // } else {
+        //   // 跳转至填写委托函
+          
+        // }
+        this.$parent.linkPage(
+          '../order/order',
+          4
+        );
       }
       console.log(result);
     }

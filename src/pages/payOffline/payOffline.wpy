@@ -16,7 +16,7 @@
         <text >线下汇款卡号</text>
         <input name="qy_bank_no" placeholder="请填写线下汇款卡号" value="{{payInfo.buyBankNo}}" />
       </view>
-      <view class="pf-item" wx:if="{{payMethodId === 8}}">
+      <view class="pf-item" wx:if="{{showFlow}}">
         <text >线下汇款流水</text>
         <input name="tradeNo" placeholder="请填写线下汇款流水" value="" />
       </view>
@@ -49,13 +49,33 @@ export default class payOffline extends wepy.page {
     payPrice: '',
     payInfo: {},
     payMethodId: '',
-    YFCdata: ''
+    YFCdata: '',
+    finalSettlementId:''
   };
+  computed={
+    showFlow(){
+      let flag = false
+      switch (this.payMethodId) {
+        case 1:
+          if(this.finalSettlementId !== ''){
+            flag = true
+          }
+          break;
+        case 8:
+          flag = false
+          break;
+      
+        default:
+          break;
+      }
+      return flag
+    }
+  }
   onLoad(e) {
-    // console.log(e)
-    this.enterpriseOrderId = e.id || ''; // 订单id
+    console.log('aaaa',e)
+    this.enterpriseOrderId = e.id; // 订单id
     // this.enterpriseOrderId = 5488;
-    this.payPrice = e.price || ''; // 应付金额
+    this.payPrice = e.price; // 应付金额
     this.settlementId = e.settlementId || '';
     this.YFCdata = this.$parent.globalData.temporary.YFCdata;
   }
@@ -75,6 +95,14 @@ export default class payOffline extends wepy.page {
     },
     subForm(event) {
       let formData = event.detail.value;
+      if(this.finalSettlementId !== ''){
+        if(this.finalSettlementId !== ''&&formData['tradeNo'] === ''){
+          this.$parent.showTip('流水号不能为空')
+          return false;
+        }
+        this.sendSettlement(formData);
+        return false
+      }
       if (this.payMethodId === 1) {
         this.payAccountOrder(formData);
       } else if (this.payMethodId === 2) {
@@ -114,6 +142,8 @@ export default class payOffline extends wepy.page {
     payInfo['bankName'] = result.enterprise.bankName;
     payInfo['bankNo'] = result.enterprise.bankAccount;
     this.payPrice = result.detail.payPrice;
+    this.payMethodId = result.map.pay_method_id;
+    this.finalSettlementId = result.detail.finalSettlementId;
     this.payInfo = payInfo;
     this.$apply();
     console.log(result);
@@ -156,10 +186,12 @@ export default class payOffline extends wepy.page {
       formData,
       true
     );
-    if (result.type > 0) {
+    if (result.data.type > 0) {
       this.$parent.showTip('支付成功');
       // 跳回订单列表
-      // this.$parent.linkPage('', 2);
+      this.$parent.linkPage('../order/order', 4);
+    }else{
+      this.$parent.showTip(result.data.msg)
     }
     console.log(result);
   }
@@ -170,17 +202,18 @@ export default class payOffline extends wepy.page {
     formData['qyBankNo'] = formData['qy_bank_no'];
     formData['qyMoney'] = this.payPrice;
     formData['userId'] = this.userInfo.id;
-    formData['isConfirm'] = 1;
 
     let result = await this.$parent.queryData(
       '/msyApp/updateFinalSettlementByOffline.do',
       formData,
       true
     );
-    if (result.type > 0) {
+    if (result.data.type > 0) {
       this.$parent.showTip('支付成功');
       // 跳回订单列表
-      // this.$parent.linkPage('', 2);
+      this.$parent.linkPage('../order/order', 4);
+    }else{
+      this.$parent.showTip(result.data.msg)
     }
     console.log(result);
   }
@@ -195,10 +228,12 @@ export default class payOffline extends wepy.page {
       formData,
       true
     );
-    if (result.type > 0) {
+    if (result.data.type > 0) {
       this.$parent.showTip('支付成功');
       // 跳回订单列表
-      // this.$parent.linkPage('', 2);
+      this.$parent.linkPage('../order/order', 4);
+    }else{
+      this.$parent.showTip(result.data.msg)
     }
     console.log(result);
   }
@@ -212,10 +247,12 @@ export default class payOffline extends wepy.page {
       true,
       'POST'
     );
-    if (result.type > 0) {
+    if (result.data.type > 0) {
       this.$parent.showTip('操作成功');
       // 跳回订单列表
-      // this.$parent.linkPage('', 2);
+      this.$parent.linkPage('../order/order', 4);
+    }else{
+      this.$parent.showTip(result.data.msg)
     }
     console.log(result);
   }

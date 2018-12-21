@@ -37,8 +37,8 @@ export default class oderPayment extends wepy.page {
   };
   onLoad(e) {
     // console.log(e)
-    // this.enterpriseOrderId = e.id
-    this.enterpriseOrderId = 5506;
+    this.enterpriseOrderId = e.id
+    // this.enterpriseOrderId = 5506;
   }
   onShow() {
     this.userInfo = this.$parent.globalData.userInfo;

@@ -1,14 +1,14 @@
 import wepy from 'wepy'
 
 let firewall = [
-  '../mallIndex/mallIndex',
   '../enterpriseIden1/enterpriseIden1',
   '../enterpriseIden2/enterpriseIden2',
   '../enterpriseIden3/enterpriseIden3',
   '../negotiate/negotiate',
   '../tradeIndex/tradeIndex',
   '../order/order',
-  '../accountIndex/accountIndex'
+  '../accountIndex/accountIndex',
+  '../goodsAdd/goodsAdd'
 ]
 
 let actionType = 1

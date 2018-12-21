@@ -84,7 +84,7 @@
 <script>
 import wepy from 'wepy';
 
-export default class Index extends wepy.page {
+export default class orderDetailItem extends wepy.page {
   data = {
     good_info: '',
     tit_name: '商品详情页',

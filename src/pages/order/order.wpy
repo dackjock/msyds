@@ -66,15 +66,15 @@
                 </view>
                 <view class="flex_box">
                   <view class="w134">总价</view>
-                  <view class="w186">{{item.total_price}}元</view>
+                  <view class="w150">{{item.total_price}}元</view>
                   <view class="w85">数量</view>
-                  <view class="flex_1">{{item.goods_weight}}kg</view>
+                  <view class="w160">{{item.goods_weight}}kg</view>
                 </view>
                     <view class="flex_box">
                   <view class="w134">单价</view>
-                  <view class="w186">{{item.price}}元</view>
+                  <view class="w150">{{item.price}}元</view>
                   <view class="w85" style="line-height:1em;padding-top:6rpx;"> <text>结算\n方式</text></view>
-                  <view class="flex_1 max120">{{item.payMethodName}}</view>
+                  <view class="w160 max120">{{item.payMethodName}}</view>
                 </view>
                 <view class="flex_box">
                   <view class="w134">当前状态</view>
@@ -82,7 +82,22 @@
                   <view class="flex_1 f20">{{item.orderStatusName}}</view>
                 </view>
                 <view class="flex_box right">
-                  <view wx:if="{{item.orderConstraintName}}" class="btn_order {{item.orderConstraintName ==='查看结算'?'':'red'}}"   >{{item.orderConstraintName}}</view>
+                  <view 
+                    wx:if="{{item.orderConstraintName}}" 
+                    class="btn_order {{item.orderConstraintName ==='查看结算'?'':'red'}}" 
+                    data-orderStatus-type="{{item.orderStatusType}}" 
+                    data-contract-id="{{item.contract_id}}" 
+                    data-pay-method-id="{{item.pay_method_id}}" 
+                    data-order-id="{{item.id}}" 
+                    data-cargo-id="{{item.cargoId}}" 
+                    data-depot-list-id="{{item.depot_list_id}}" 
+                    data-index="{{item.index}}" 
+                    data-again="{{item.again}}" 
+                    data-take-time="{{item.take_time}}" 
+                    data-order-type="{{item.order_type}}" 
+                    data-final-settlement-id="{{item.final_settlement_id}}" 
+                    @tap="bindAction"
+                    >{{item.orderConstraintName}}</view>
               
                 <navigator url="../orderDetail/orderDetail?id={{item.id}}&contract_id={{item.contract_id}}" class="btn_order">查看详情</navigator> 
                 </view>
@@ -116,7 +131,7 @@
                 </view>
                 <view class="flex_box">
                   <view class="w134">数量</view>
-                  <view class="w186" style="color:#666">{{item.con_weight}}T</view>
+                  <view class="w150" style="color:#666">{{item.con_weight}}T</view>
                  <view class="w85" style="line-height:1em;padding-top:6rpx;"> <text>结算\n方式</text></view>
                   <view class="flex_1">{{item.settlement_type_name}}</view>
                 </view>
@@ -151,6 +166,7 @@ export default class Order extends wepy.page {
     enablePullDownRefresh: true
   };
   data = {
+    userInfo: {},
     listData: [],
     queryData: {
       orderType: 1,
@@ -175,21 +191,18 @@ export default class Order extends wepy.page {
   };
 
   methods = {
-    goSearch(){
-         this.$parent.linkPage(
-        '../orderSearch/orderSearch',
-        1
-      );
+    goSearch() {
+      this.$parent.linkPage('../orderSearch/orderSearch', 1);
     },
     changeListType(val) {
       this.list_type = val;
-     // console.log(this.list_type);
+      // console.log(this.list_type);
       this.$apply();
     },
     switch1Change(val) {
       this.order_type = val.detail.value ? '采购' : '销售';
       this.queryData_jingkuang.type = val.detail.value ? 1 : 2;
-      this.queryData.orderType = val.detail.value ? 1: 2;
+      this.queryData.orderType = val.detail.value ? 1 : 2;
       this.onPullDownRefresh();
     },
     change() {
@@ -239,6 +252,7 @@ export default class Order extends wepy.page {
           d.orderList.map((v, i) => {
             d.orderList[i].status = _this.methods.statusToStr(v.status);
           });
+          console.log(d);
           return d;
         });
     },
@@ -278,6 +292,86 @@ export default class Order extends wepy.page {
         [19, '预付款押金退回']
       ]);
       return word.get(val);
+    },
+    async bindAction(event) {
+      console.log(event);
+      let dataSet = event.currentTarget.dataset;
+      switch (dataSet.orderstatusType) {
+        case 1:
+          // 需方确认合同
+          let url = await this.getContractUrl(dataSet.contractId);
+          this.$parent.globalData.temporary.webView = url;
+          this.$parent.linkPage('../webView/webView', 1);
+          break;
+        case 3:
+          // 确认码单
+          this.$parent.linkPage(
+            '../codesQuery/codesQuery?id=' + dataSet.orderId,
+            1
+          );
+          break;
+        case 4:
+          // 完成支付
+          if (dataSet.payMethodId === 1) {
+            let parms_4 =
+              '?id=' + dataSet.orderId + '&orderType=' + dataSet.orderType;
+            this.$parent.linkPage(
+              '../chargeConfirm/chargeConfirm' + parms_4,
+              1
+            );
+          }
+          if (dataSet.payMethodId === 8) {
+            this.$parent.linkPage(
+              '../oderPayment/oderPayment?id=' + dataSet.orderId,
+              1
+            );
+          }
+          break;
+        case 5:
+          // 现在提货
+          let parms_5 =
+            '?orderId=' +
+            dataSet.orderId +
+            '&cargoId=' +
+            dataSet.cargoId +
+            '&depotListId=' +
+            dataSet.depotListId +
+            '&index=' +
+            dataSet.index +
+            '&again=' +
+            dataSet.again +
+            '&take_time=' +
+            dataSet.takeTime;
+          this.$parent.linkPage('../pickupGoods/pickupGoods' + parms_5, 1);
+          break;
+        case 6:
+          // 填写委托书
+          let parms_6 =
+            '?orderId=' + dataSet.orderId + '&cargoId=' + dataSet.cargoId;
+          this.$parent.linkPage('../entrustPickup/entrustPickup' + parms_6, 1);
+          break;
+        case 10:
+          // 结算
+          let parms_10 =
+            '?id=' +
+            dataSet.finalSettlementId +
+            '&orderType=' +
+            dataSet.orderType;
+          this.$parent.linkPage('../costConfirm/costConfirm' + parms_10, 1);
+          break;
+        case 12:
+          // 查看结算
+          let parms_12 = '?settlementId=' + dataSet.finalSettlementId;
+          this.$parent.linkPage('../costInfo/costInfo' + parms_12, 1);
+          break;
+        case 13:
+          // 合同管理
+          this.$parent.linkPage('../contract/contract', 1);
+          break;
+
+        default:
+          break;
+      }
     }
   };
 
@@ -290,6 +384,7 @@ export default class Order extends wepy.page {
     );
     this.listData = res.orderList;
     this.listData_jk = jk_res.pageBean.list;
+    this.userInfo = this.$parent.globalData.userInfo;
     console.log(jk_res);
     // console.log(this.methods.statusToStr(-2));
     this.$apply();
@@ -318,6 +413,17 @@ export default class Order extends wepy.page {
         icon: 'none'
       })
     );
+  }
+  async getContractUrl(id) {
+    let result = await this.$parent.queryData(
+      '/msyApp/querySignatureOnline.do',
+      {
+        userType: 1,
+        contractId: id,
+        enterpriseId: this.userInfo.id
+      }
+    );
+    return result.url;
   }
   async onReachBottom(event) {
     //请求更多数据
@@ -358,4 +464,5 @@ export default class Order extends wepy.page {
 
 <style lang="stylus">
 @import '../../assets/style/order';
+
 </style>

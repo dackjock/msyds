@@ -21,6 +21,10 @@
       <text class="red">{{costInfo.order_total_price}}元</text>
     </view>
     <view class="entrust-info" wx:if="{{costInfo.payMethodId === 1}}">
+      <text >账期补偿费用</text>
+      <text class="red">{{costInfo.totalAccountPrice}}元</text>
+    </view>
+    <view class="entrust-info" wx:if="{{costInfo.payMethodId === 1}}">
       <text >合同约定账期</text>
       <text class="red">{{costInfo.accountDay}}天</text>
     </view>
@@ -166,7 +170,7 @@ export default class costConfirm extends wepy.page {
       if (result) {
         this.$parent.showTip('异议提交成功，请等待工作人员处理');
         await this.$parent.sleep(2);
-        this.$parent.linkPage('', 3);
+        this.$parent.linkPage('../order/order', 4);
       }
       console.log(result);
     },
@@ -179,6 +183,7 @@ export default class costConfirm extends wepy.page {
       );
       if(!result){
         this.$parent().showTip('操作成功')
+        this.$parent.linkPage('../order/order', 4);
       }
       console.log(result)
     },
@@ -191,14 +196,15 @@ export default class costConfirm extends wepy.page {
     stopThis() {},
     payForOffline() {
       this.$parent.linkPage(
-        '../payOffline/payOffline?settlementId=' + this.id,
+        '../payOffline/payOffline?settlementId=' + this.id + '&id=' + this.costInfo.enterprise_order_id,
         4
       );
     }
   };
   onLoad(e) {
-    this.id = e.id || 1052;
-    this.orderType = e.orderType || 2;
+    console.log('费用确认参数：',e)
+    this.id = e.id;
+    this.orderType = e.orderType;
   }
   onShow() {
     this.userInfo = this.$parent.globalData.userInfo;
@@ -214,7 +220,7 @@ export default class costConfirm extends wepy.page {
       }
     );
     if (!result) {
-      // this.$parent.linkPage('',3)
+      this.$parent.linkPage('../order/order', 4);
     }
     console.log(result);
     this.costInfo = result;

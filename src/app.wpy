@@ -12,12 +12,17 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/login/login',
+      'pages/financialVoucherManage/financialVoucherManage',
+      'pages/spotPriceSH/spotPriceSH',
+      'pages/spotPriceAudit/spotPriceAudit',
       'pages/invoiceExpressManagement/invoiceExpressManagement',
       'pages/addresseeChange/addresseeChange',
       'pages/addressee/addressee',
       'pages/driverChange/driverChange',
       'pages/driver/driver',
       'pages/index/index',
+      'pages/purchasingHall/purchasingHall',
+      'pages/purchasingGoods/purchasingGoods',
       'pages/consigneeChange/consigneeChange',
       'pages/consignee/consignee',
       'pages/negotiateManagement/negotiateManagement',
@@ -78,7 +83,6 @@ export default class extends wepy.app {
       'pages/costInfo/costInfo',
       'pages/chargeConfirm/chargeConfirm',
       'pages/YFCargo/YFCargo',
-      'pages/mallIndex/mallIndex',
       'pages/goodsList/goodsList',
       'pages/goodsAdd/goodsAdd'
     ],
@@ -101,7 +105,11 @@ export default class extends wepy.app {
       goodsStatue: '',
       contractId: '',
       webView: '',
-      YFCdata:''
+<<<<<<< HEAD
+      YFCdata:'',
+=======
+      YFCdata: '',
+>>>>>>> 33b3cf85a86ca333fb3d8d5232949ee8a4aae0ca
       contractId: ''
     }
   };
