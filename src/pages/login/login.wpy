@@ -62,6 +62,7 @@ export default class Login extends wepy.page {
         .queryData('app/appUserLogin.do', {
           loginName: userName,
           pwd: pwd
+          
         })
         .then(res => {
           if (res) {
