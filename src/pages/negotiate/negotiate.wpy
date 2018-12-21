@@ -252,9 +252,9 @@ export default class negotiate extends wepy.page {
     console.log('提交议价', result);
     if (result.contractId) {
       this.$parent.globalData.temporary.contractId = result.contractId; //合同id（订单是一口价购买的时候生成）
-      this.$parent.linkPage('../index/index', 1); //应该跳转到合同管理页面
+      this.$parent.linkPage('../order/order', 4); //应该跳转到合同管理页面
     } else {
-      this.$parent.linkPage('../index/index', 1); //应该跳转到订单列表页
+      this.$parent.linkPage('../order/order', 4); //应该跳转到订单列表页
     }
     this.$apply();
   }

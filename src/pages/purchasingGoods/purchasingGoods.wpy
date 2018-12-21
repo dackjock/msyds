@@ -1,0 +1,168 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+      <view class="order_header">
+        <image @tap="goback" src="../../assets/images/icon/goback.png"  mode="aspectFit"  />
+         采购大厅
+        <view class="kefu">有疑问    <image @tap="goback" src="../../assets/images/icon/yiwen.png"  mode="aspectFit"  /> </view>
+      </view>
+
+      <view class="h1 mt85">
+        <view class="span">商品信息</view>
+      </view>
+      <view class="goods">
+        <view  class="g_item"><view class="label">品名</view> <view class="span">{{goodInfo.goods_name}}</view></view>
+        <view  class="g_item"><view class="label">规格</view> <view class="span">{{goodInfo.goods_spec}}</view></view>
+        <view  class="g_item"><view class="label">品牌</view> <view class="span">{{goodInfo.brandName}}</view></view>
+        <view  class="g_item"><view class="label">商品属性</view> <view class="span">{{goodInfo.goods_attr}}</view></view>
+        <view  class="g_item"><view class="label">数量（±5%）</view> <view class="span">{{goodInfo.goods_total_weight}}KG</view></view>
+        <view  class="g_item"><view class="label">仓库</view> <view class="span">{{goodInfo.storehouse}}</view></view>
+        <view  class="g_item"><view class="label">单价</view> <view class="span" style="color:#d7092d">{{goodInfo.goods_price}}元/KG</view></view>
+        <view  class="g_item"><view class="label">结算方式</view> <view class="span">{{goodInfo.payMethods}}</view></view>
+      </view>
+    <view class="h1 ">
+        <view class="span">供需信息</view>
+    </view>
+    <view class="flex_box">
+      <view class="label">供方</view>
+      <view class="span">{{goodInfo.enterprise_name}}</view>
+    </view>
+    <view class="flex_box">
+      <view class="label">供方联系电话</view>
+      <view class="span" style="color:#d7092d">
+        {{goodInfo.contact_phone}}
+        <view class="phone_btn" @tap="call">联系商家</view>
+      </view>
+    </view>
+    <view class="h1 " style="margin-top:10rpx;">
+        <view class="span">升贴水选择</view>
+    </view>
+     <view class="info_item" style="margin-bottom:80rpx;">
+                <view class="span">当前升贴水</view>
+                <view class="input_box show_tab">
+                    <view @tap="del" class="del btn">-</view>
+                   
+                    <view class="tab_main {{goodInfo.main_price>0?'red':''}} {{goodInfo.main_price < 0?'lv':''}}" @tap="chang_bx">{{main_priceName}}</view>
+                
+                    <view @tap="add" class="add btn">+</view>
+                </view>
+            </view>
+
+<!-- 按钮 -->
+<view class="bottom_btn" @tap="tijiao">提交报价</view>
+      <!-- 小键盘 -->
+    
+    
+    <keyboard :showfn.sync="showbx" :stnum.sync='shownewnum' @changenum.user="shownewnum"></keyboard>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import keyboard from '@/components/keyboard';
+export default class Index extends wepy.page {
+  components = {
+    keyboard
+  };
+  data = {
+    goodInfo: '',
+    //小键盘
+    showbx: 'false',
+    shownewnum: 8,
+    shuinumber: 5,
+    //升贴水最大最小
+    main_priceName: '平水0',
+    p_min: '',
+    p_max: '',
+    //商品ID
+    goodsId: ''
+  };
+  watch = {
+    goodInfo(newValue, oldValue) {
+      if (newValue.main_price == oldValue.main_price) {
+        return;
+      }
+      if (newValue.main_price > 0) {
+        this.main_priceName = '升水' + newValue.main_price;
+      } else if (newValue.main_price < 0) {
+        this.main_priceName = '贴水' + -newValue.main_price;
+      } else {
+        this.main_priceName = '平水 0';
+      }
+    }
+  };
+  methods = {
+    //提交报价
+    tijiao() {
+      let price =
+        parseInt(this.goodInfo.main_price) +
+        parseInt(this.goodInfo.goods_price);
+      this.$parent
+        .queryData('msyApp/appAddPurchaseOrder.do', {
+          goodsId: this.goodsId,
+          userId: this.$parent.globalData.userInfo.userId,
+          enterpriseId: this.$parent.globalData.userInfo.id,
+          mainPrice: this.goodInfo.main_price,
+          price: price
+        })
+        .then(res => {
+          if (!res) {
+            return;
+          }
+          this.$parent.linkPage('../purchasingHall/purchasingHall', 2);
+        });
+    },
+    add() {
+      this.goodInfo.main_price = parseFloat(this.goodInfo.main_price) + 1;
+      this.$apply();
+    },
+    del() {
+      this.goodInfo.main_price = parseFloat(this.goodInfo.main_price) - 1;
+      this.$apply();
+    },
+    chang_bx() {
+      this.shownewnum = this.goodInfo.main_price;
+      this.showbx = 'true';
+    },
+    //小键盘关闭
+    shownewnum(e) {
+      console.log(e);
+      this.goodInfo.main_price = e;
+      e = parseFloat(e);
+      if (e < this.p_min || e > this.p_max) {
+        this.$parent.showTip('当前升贴水值为 ' + this.p_min + '-' + this.p_max);
+        return;
+      }
+      this.showbx = 'false';
+      this.$apply();
+    },
+    goback() {
+      wx.navigateBack(1);
+    },
+    call() {
+      wx.makePhoneCall({
+        phoneNumber: this.goodInfo.contact_phone
+      });
+    }
+  };
+  async onLoad(option) {
+    console.log(option);
+    this.goodsId = option.id;
+    let res = await this.PurchaseGoodsInit(option.id);
+    this.goodInfo = res.pageMap;
+    this.p_min = res.minAgio;
+    this.p_max = res.maxAgio;
+
+    this.$apply();
+  }
+  PurchaseGoodsInit(id) {
+    return this.$parent.queryData('msyApp/appPurchaseGoodsInit.do', {
+      id: id,
+      userId: this.$parent.globalData.userInfo.userId
+    });
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/purchasingGoods';
+</style>

@@ -107,8 +107,9 @@ export default class chargeConfirm extends wepy.page {
     }
   };
   onLoad(e) {
-    this.id = e.id || 5507;
-    this.orderType = e.orderType || 2;
+    console.log('费用确认参数：',e)
+    this.id = e.id;
+    this.orderType = e.orderType;
   }
   onShow() {
     this.userInfo = this.$parent.globalData.userInfo;
@@ -121,7 +122,7 @@ export default class chargeConfirm extends wepy.page {
       enterpriseId: this.userInfo.id
     });
     if (!result) {
-      // this.$parent.linkPage('',3)
+      this.$parent.linkPage('../order/order', 4);
     }
     console.log(result);
     this.allData = result

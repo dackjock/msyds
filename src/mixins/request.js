@@ -9,8 +9,13 @@ import {
   hexMD5
 } from './md5'
 
-const api = 'http://d7.cto.shovesoft.com/msyapp/'
-const uploadPath = 'http://d7.cto.shovesoft.com/msy_upload/file_upload/mobileImageUpload.do'
+// const api = 'http://d7.cto.shovesoft.com/msyapp/'
+// const uploadPath = 'http://d7.cto.shovesoft.com/msy_upload/file_upload/mobileImageUpload.do'
+
+
+// d2第一期
+const api = 'http://d2.cto.shovesoft.com/msyapp/'
+const uploadPath = 'http://d2.cto.shovesoft.com/msy_upload/file_upload/mobileImageUpload.do'
 
 /**
  * 

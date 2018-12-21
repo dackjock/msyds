@@ -32,7 +32,7 @@
                 <view class="input_box show_tab">
                     <view @tap="del" class="del btn">-</view>
                    
-                    <view class="tab_main {{submitData.mainPrice>0?'red':''}} {{submitData.mainPrice < 0?'lv':''}}">{{mainPriceName}}</view>
+                    <view class="tab_main {{submitData.mainPrice>0?'red':''}} {{submitData.mainPrice < 0?'lv':''}}" @tap="chang_bx">{{mainPriceName}}</view>
                 
                     <view @tap="add" class="add btn">+</view>
                 </view>
@@ -78,7 +78,7 @@
             </view>
             <view class="info_item">
                 <view class="span">提货仓库</view>
-                <view class="input_box"><input placeholder="请输入提货仓库" placeholder-class="Pc_holder" type="text"  data-key='storeHouse' @input="changeData" /></view>
+                <view class="input_box"><input placeholder="请输入提货仓库" placeholder-class="Pc_holder" type="text" value="{{submitData.storeHouse}}"  data-key='storeHouse' @input="changeData" /></view>
             </view>
             <view class="info_item">
                 <view class="span">结算方式</view>
@@ -102,7 +102,7 @@
 
 
       <!-- 小键盘 -->
-    <keyboard :showfn.sync="showbx" :stnum.sync="shownewnum" @changenum.user="shownewnum"></keyboard>
+    <keyboard :showfn.sync="showbx" :stnum.sync='shownewnum' @changenum.user="shownewnum"></keyboard>
     </view>
   </view>
 </template>
@@ -124,8 +124,8 @@ export default class goodsAdd extends wepy.page {
     mainPriceName: '平水0',
     //小键盘
     showbx: 'false',
-    shownewnum: '',
-    shuinumber: '',
+    shownewnum: 8,
+    shuinumber: 5,
     specList: ['国标1#'],
     brandList: [], //品牌列表
     goodsTypeList: [], //商品分类列表
@@ -159,7 +159,10 @@ export default class goodsAdd extends wepy.page {
       userId: '',
       priceType: '',
       pmids: ''
-    }
+    },
+    //升贴水最大最小
+    p_min: 0,
+    p_max: 0
   };
   watch = {
     submitData(newValue, oldValue) {
@@ -176,6 +179,11 @@ export default class goodsAdd extends wepy.page {
     }
   };
   methods = {
+    //小键盘打开
+    chang_bx() {
+      this.shownewnum = this.submitData.mainPrice;
+      this.showbx = 'true';
+    },
     submitWay() {
       this.submitData.userId = this.$parent.globalData.userInfo.userId;
       this.submitData.enterpriseId = this.$parent.globalData.userInfo.id;
@@ -183,7 +191,7 @@ export default class goodsAdd extends wepy.page {
       this.$parent
         .queryData('msyApp/goodsAddOrUpdateForEnt.do', this.submitData, true)
         .then(d => {
-          if (d.type > 0) {
+          if (d.data.type > 0) {
             this.$parent.showTip('添加成功');
             this.$parent.linkPage('../goodsList/goodsList', 2);
           } else {
@@ -209,7 +217,14 @@ export default class goodsAdd extends wepy.page {
     //小键盘关闭
     shownewnum(e) {
       console.log(e);
-      this.$parent.showTip('当前升贴水值为 ' + 0 + '-' + 3);
+      this.submitData.mainPrice = e;
+      e = parseFloat(e);
+      if (e < this.p_min || e > this.p_max) {
+        this.$parent.showTip('当前升贴水值为 ' + 0 + '-' + 3);
+        return;
+      }
+      this.showbx = 'false';
+      this.$apply();
     },
     // 规格picker
 
@@ -276,6 +291,11 @@ export default class goodsAdd extends wepy.page {
   async onLoad(options) {
     let res = await this.initWay(options.id);
     let city = await this.initCity();
+    this.qihuo = await this.queryMarketPrice();
+    this.xianhuo = await this.queryFuturesPrice();
+    //升贴水最大最小赋值
+    this.p_max = res.maxAgio;
+    this.p_min = res.minAgio;
     //  console.log(res);
     if (res.pageMap) {
       for (let key in this.submitData) {
@@ -283,9 +303,38 @@ export default class goodsAdd extends wepy.page {
           return '_' + word.toLowerCase();
         });
 
-        debugger;
         this.submitData[key] = res.pageMap[newkey] || '';
       }
+
+      //单价类型显示赋值
+      this.price_type_chose.map((a, b) => {
+        if (a.value == res.pageMap.price_type) {
+          this.price_type_chose[b].checked = true;
+        }
+      });
+
+      //重量赋值
+      this.submitData.goodsWeiht = res.pageMap.goods_total_weight;
+      this.ProvinceAndCityName =
+        res.pageMap.province_name + res.pageMap.city_name;
+      //品牌名字赋值
+      this.brandName = res.pageMap.brand_name;
+      //分类赋值
+      this.typeName = res.pageMap.goodsTypeName;
+      this.submitData.goodsTypeId = res.pageMap.goods_type_id;
+      //提货仓库赋值
+      this.submitData.storeHouse = res.pageMap.storehouse;
+      //结算方式赋值
+      let pmidsArr = [];
+      res.pageMap.paymethodlist.map((a, b) => {
+        this.payList.map((c, d) => {
+          if (c.value == a.id) {
+            this.payList[d].checked = true;
+            pmidsArr.push(a.id);
+          }
+        });
+      });
+      this.submitData.pmids = pmidsArr.join(',');
       console.log(this.submitData);
     }
     this.brandList = res.brandList;
@@ -293,8 +342,7 @@ export default class goodsAdd extends wepy.page {
     this.objectMultiArray.push(city.provinces);
     this.objectMultiArray.push([{ id: 45052, name: '北京市' }]);
     this.cityData = city.citys;
-    this.qihuo = await this.queryMarketPrice();
-    this.xianhuo = await this.queryFuturesPrice();
+
     this.$apply();
   }
   initWay(id) {

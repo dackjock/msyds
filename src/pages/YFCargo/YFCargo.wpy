@@ -83,7 +83,7 @@
 import wepy from 'wepy';
 import header from '@/components/header';
 
-export default class pickupGoods extends wepy.page {
+export default class YFCargo extends wepy.page {
   components = {
     header
   };

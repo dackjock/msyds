@@ -22,10 +22,10 @@
         <image src="{{imgUrl + 'icon/cmenu_yjb.png'}}"></image>
         <p>商城</p>
       </navigator>
-      <navigator url="#">
-        <image src="{{imgUrl +'icon/cmenu_gd.png'}}"></image>
+      <view  @tap="goGuadan"> 
+        <image src="{{imgUrl +'icon/cmenu_gd.png'}}" ></image>
         <p>我要挂单</p>
-      </navigator>
+      </view>
     </view>
     <!-- 白银价格 -->
     <view class="f-byjg">
@@ -378,6 +378,11 @@ export default class Index extends wepy.page {
     closeName: '', // 闭市name 判断是否节假日
   }
   methods={
+
+    //跳转去挂单
+    goGuadan(){
+      this.$parent.linkPage('../goodsAdd/goodsAdd',1);
+    },
     //一口价
     yikoujia() {
       if (this.userInfo !== '') { // 判断是否登录
