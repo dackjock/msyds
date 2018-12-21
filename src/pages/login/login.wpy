@@ -65,9 +65,9 @@ export default class Login extends wepy.page {
         })
         .then(res => {
           if (res) {
-            this.$parent.globalData.userInfo = result;
+            this.$parent.globalData.userInfo = res;
             console.log('*********** 登录成功 ***********');
-            this.$parent.linkPage('', 3);
+            this.$parent.linkPage('../index/index', 2);
           }
         });
     }
