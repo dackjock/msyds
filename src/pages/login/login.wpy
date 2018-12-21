@@ -32,23 +32,23 @@ export default class Login extends wepy.page {
   onShow() {
     console.log(this);
     this.picPath = this.$parent.globalData.picPath;
-    // this.preToLogin({
-    //   detail: {
-    //     value: {
-    //     userName: 'hnmsy',
-    //       // userName: 'haha',
-    //       // userName: 15527105253,
-    //     pwd: 888888
-    //       // userName: "zwwd_01",
-    //     //  pwd: "123456"
-    //     }
-    //   }
-    // });
+    this.preToLogin({
+      detail: {
+        value: {
+        userName: 'hnmsy',
+          // userName: 'haha',
+          // userName: 15527105253,
+        pwd: 888888
+          // userName: "zwwd_01",
+        //  pwd: "123456"
+        }
+      }
+    });
 
 
 
 
-    
+
   }
   methods = {
     async toLogin(even) {
