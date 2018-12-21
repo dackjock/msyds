@@ -108,7 +108,7 @@ export default class Index extends wepy.page {
           if (!res) {
             return;
           }
-          this.$parent.linkPage('../purchasingHall/purchasingHall', 2);
+          wx.navigateBack();
         });
     },
     add() {

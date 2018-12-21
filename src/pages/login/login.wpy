@@ -35,15 +35,20 @@ export default class Login extends wepy.page {
     this.preToLogin({
       detail: {
         value: {
-         // userName: 'hnmsy',
-          userName: 'haha',
+        userName: 'hnmsy',
+          // userName: 'haha',
           // userName: 15527105253,
-         // pwd: 888888
+        pwd: 888888
           // userName: "zwwd_01",
-          pwd: "123456"
+        //  pwd: "123456"
         }
       }
     });
+
+
+
+
+
   }
   methods = {
     async toLogin(even) {
@@ -58,13 +63,19 @@ export default class Login extends wepy.page {
         });
         return false;
       }
-      let result = await this.$parent.queryData('app/appUserLogin.do', {
-        loginName: userName,
-        pwd: pwd
-      });
-      this.$parent.globalData.userInfo = result;
-      console.log('*********** 登录成功 ***********');
-      this.$parent.linkPage('', 3);
+      let result = await this.$parent
+        .queryData('app/appUserLogin.do', {
+          loginName: userName,
+          pwd: pwd
+
+        })
+        .then(res => {
+          if (res) {
+            this.$parent.globalData.userInfo = res;
+            console.log('*********** 登录成功 ***********');
+            this.$parent.linkPage('../index/index', 2);
+          }
+        });
     }
   };
   async preToLogin(even) {
@@ -86,12 +97,9 @@ export default class Login extends wepy.page {
     this.$parent.globalData.userInfo = result;
     console.log('*********** 登录成功 ***********');
 
-    console.log('用户信息：',result)
-    //this.$parent.linkPage('../accountIndex/accountIndex',2)
-
-    //console.log(result)
-    this.$parent.linkPage('../financialVoucherManage/spotPriceAudit',1)
-    
+    console.log('用户信息：', result);
+    //   this.$parent.linkPage('../purchasingHall/purchasingHall',2)
+    this.$parent.linkPage('../index/index', 2);
   }
 }
 </script>

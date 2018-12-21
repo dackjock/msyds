@@ -183,7 +183,7 @@ export default class Order extends wepy.page {
     listData_jk: [],
     list_type: 0,
     typeName: '整单',
-    order_type: '采购',
+    order_type: '销售',
     toggle_type: false
   };
   components = {
@@ -200,7 +200,7 @@ export default class Order extends wepy.page {
       this.$apply();
     },
     switch1Change(val) {
-      this.order_type = val.detail.value ? '采购' : '销售';
+      this.order_type = val.detail.value ? '销售' : '采购';
       this.queryData_jingkuang.type = val.detail.value ? 1 : 2;
       this.queryData.orderType = val.detail.value ? 1 : 2;
       this.onPullDownRefresh();
