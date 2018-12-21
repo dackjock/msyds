@@ -44,6 +44,11 @@ export default class Login extends wepy.page {
     //     }
     //   }
     // });
+
+
+
+
+    
   }
   methods = {
     async toLogin(even) {
@@ -62,7 +67,7 @@ export default class Login extends wepy.page {
         .queryData('app/appUserLogin.do', {
           loginName: userName,
           pwd: pwd
-          
+
         })
         .then(res => {
           if (res) {
