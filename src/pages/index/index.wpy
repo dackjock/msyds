@@ -510,7 +510,7 @@ export default class Index extends wepy.page {
     this.imgUrl = this.$parent.globalData.picPath;
 
     //新增判断平台
-    this.$parent.globalData.userInfo.isSystem === 1 && (this.isSystem = true);
+    this.userInfo.isSystem === 1 && (this.isSystem = true);
     this.getData();
     if (this.userInfo !== '') {
       this.enterpriseId = this.userInfo.id;

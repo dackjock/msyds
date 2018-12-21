@@ -120,8 +120,8 @@ export default class purchasingHall extends wepy.page {
     showPanel() {
       this.show = true;
     },
-    chose(key,val) {
-      console.log(val)
+    chose(key, val) {
+      console.log(val);
       this[key + 'List'].map((v, i) => {
         if (v.id == val) {
           this[key + 'List'][i]['cur'] = true;
@@ -131,29 +131,40 @@ export default class purchasingHall extends wepy.page {
       });
       this.queryData[key] = val;
     },
-    changeKeyWord(e){
-      this.queryData.keyword=e.detail.value;
+    changeKeyWord(e) {
+      this.queryData.keyword = e.detail.value;
       this.$apply();
     },
-    reset(){
-      this.queryData= {
-        pageNum: 1,brank: 0, payMethod: 0,goodsType: 0, openTicket: 0, orderBy: '',orderStyle: '',keyword:this.queryData.keyword
+    reset() {
+      this.queryData = {
+        pageNum: 1,
+        brank: 0,
+        payMethod: 0,
+        goodsType: 0,
+        openTicket: 0,
+        orderBy: '',
+        orderStyle: '',
+        keyword: this.queryData.keyword
       };
-      let initArr=['goodsTypeList','payMethodList','openTicketList','brankList'];
-      initArr.map((v,i)=>{
-        this[v].map((v_v,i_i)=>{
-          if(v_v.id=="0"){
-
-             this[v][i_i]['cur']=true;
-          }else{
-            this[v][i_i]['cur']=false;
+      let initArr = [
+        'goodsTypeList',
+        'payMethodList',
+        'openTicketList',
+        'brankList'
+      ];
+      initArr.map((v, i) => {
+        this[v].map((v_v, i_i) => {
+          if (v_v.id == '0') {
+            this[v][i_i]['cur'] = true;
+          } else {
+            this[v][i_i]['cur'] = false;
           }
         });
       });
       this.$apply();
     },
-    search(){
-       this.show = false;
+    search() {
+      this.show = false;
       this.onPullDownRefresh();
     }
   };
