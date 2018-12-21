@@ -1,0 +1,137 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="财务凭证管理"></header>
+    <view class="n-ctt">
+      <view class="n-ctta">
+        <view class="n-cttabx {{status == 0? 'cur' : ''}}" @tap="djStat(0)">全部</view>
+        <view class="n-cttabx {{status == 2? 'cur' : ''}}" @tap="djStat(2)">待确定收款</view>
+        <view class="n-cttabx {{status == 1? 'cur' : ''}}" @tap="djStat(1)">已确定收款</view>
+      </view>
+    </view>
+    <view class="fpsh">
+      <view class="fpshli" wx:for="{{djlist}}" wx:key="{{item.index}}">
+        <view class="tc mb10">{{item.review_time}}</view>
+        <view class="fpshlibx">
+          <view class="djp ">订单编号：<text class="c6">{{item.order_code}}</text></view>
+          <view class="djp flex">
+            <view class="fpshlibxl">订单单价：<text class="c6 f22">{{item.price}}元</text></view>
+            <view class="flex-1">合同金额：<text class="c6 f22">{{item.total_price}}元</text></view>
+          </view>
+          <view class="djp flex">
+            <view class="fpshlibxl">需支付金额：<text class="c6 f22">{{item.qy_money}}元</text></view>
+            <view class="flex-1">审核人：<text class="c6">{{item.review_user}}</text></view>
+          </view>
+          <view class="djp flex">
+            <view class="fpshlibxl">支付凭证：
+              <image class="zfpz"  src="{{item.underTradeImg}}" />
+            </view>
+            <view class="flex-1">支付方式：
+              <text class="c6" wx:if="{{item.pay_type == 0}}">无</text>
+              <text class="c6" wx:if="{{item.pay_type == 1}}">银联支付</text>
+              <text class="c6" wx:if="{{item.pay_type == 2}}">微信</text>
+              <text class="c6" wx:if="{{item.pay_type == 3}}">支付宝</text>
+              <text class="c6" wx:if="{{item.pay_type == 4}}">线下</text>
+              </view>
+          </view>
+          <view class="djp">审核时间：
+            <text class="c6">{{item.review_time}}</text>
+          </view>
+          <view class="tr pt10 border-top" wx:if="{{item.underStatus == 1}}">
+            <view class="fpshbtna">点击上传</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="n-nodata" wx:if="{{dataleng}}">暂无更多数据！</view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class financialVoucherManage extends wepy.page {
+  config = {
+    "enablePullDownRefresh": true
+  };
+  data = {
+    userInfo:'',
+    status:0,
+    pageNum: 1,
+    fresh: false,
+    flage: false,
+    dataleng: false,
+    djlist: [],
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.djlist = []
+    this.pageNum = 1
+    this.status = 0
+    this.queryFinancialVoucherList(this.pageNum,this.status)
+  };
+  //财务凭证列表
+  async queryFinancialVoucherList(pageNum,status,fresh) {
+    let result = await this.$parent.queryData('msyApp/queryFinancialVoucherList.do', {
+      enterpriseId: this.userInfo.id,
+      pageNum: pageNum,
+      configStatus: status,
+    })
+    //console.log('财务凭证列表', result);
+    if(fresh){
+      this.djlist = []
+      this.fresh = false
+    }
+    let yfplist = result.info.list
+    if(yfplist.length>0){
+      this.flage= true
+      this.djlist = this.djlist.concat(yfplist)
+    } else{
+      console.log('无更多数据')
+      this.flage= false
+      this.pageNum = 1
+    }
+    if(this.djlist.length>0){
+      this.dataleng = false
+    }else{
+      this.dataleng = true
+    }
+    console.log('财务凭证列表', this.djlist);
+
+    this.$apply()
+  };
+  onPullDownRefresh() {
+    this.pageNum = 1
+    this.fresh = true
+    this.status = 0
+    this.queryFinancialVoucherList(this.pageNum,this.status,this.fresh)
+    
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
+  };
+  onReachBottom() {
+    if (this.flage) {
+        this.pageNum +=1
+        this.queryFinancialVoucherList(this.pageNum,this.status)
+    }
+  };
+  methods = {
+    djStat(id) {
+      this.djlist = []
+      this.status = id
+      this.pageNum = 1
+      this.fresh = true
+      this.queryFinancialVoucherList(this.pageNum,this.status)
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/financialVoucherManage';
+  
+</style>

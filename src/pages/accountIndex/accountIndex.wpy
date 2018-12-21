@@ -109,7 +109,7 @@ export default class accountIndex extends wepy.page {
       {
         key: 6,
         title: '收件人管理',
-        link: ''
+        link: '../addressee/addressee'
       },
       {
         key: 7,
@@ -124,7 +124,7 @@ export default class accountIndex extends wepy.page {
       {
         key: 16,
         title: '发票快递管理',
-        link: ''
+        link: '../invoiceExpressManagement/invoiceExpressManagement'
       },
       {
         key: 8,
@@ -134,12 +134,12 @@ export default class accountIndex extends wepy.page {
       {
         key: 11,
         title: '财务凭证管理',
-        link: ''
+        link: '../financialVoucherManage/financialVoucherManage'
       },
       {
         key: 12,
         title: '点价审核管理',
-        link: ''
+        link: '../spotPriceAudit/spotPriceAudit'
       },
       {
         key: 13,
