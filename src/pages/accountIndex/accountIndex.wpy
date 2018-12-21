@@ -13,7 +13,7 @@
       <view class="ac-icon">
         <image src="../../assets/images/icon/icon-set.png" />
       </view>
-      <view class="ac-icon msg">
+      <view class="ac-icon msg" bindtap="toMsgCt">
         <image src="../../assets/images/icon/icon-msg.png" />
         <text wx:if="{{accountInfo.newMessageCounts > 0}}">{{accountInfo.newMessageCounts > 99 ? '99+' : accountInfo.newMessageCounts}}</text>
       </view>
@@ -89,22 +89,22 @@ export default class accountIndex extends wepy.page {
       {
         key: 2,
         title: '合同管理',
-        link: ''
+        link: '../contract/contract'
       },
       {
         key: 3,
         title: '议价管理',
-        link: ''
+        link: '../negotiateManagement/negotiateManagement'
       },
       {
         key: 4,
         title: '提货人管理',
-        link: ''
+        link: '../consignee/consignee'
       },
       {
         key: 5,
         title: '司机管理',
-        link: ''
+        link: '../driver/driver'
       },
       {
         key: 6,
@@ -114,12 +114,12 @@ export default class accountIndex extends wepy.page {
       {
         key: 7,
         title: '发票管理',
-        link: ''
+        link: '../invoiceManagement/invoiceManagement'
       },
       {
         key: 17,
         title: '发票审核管理',
-        link: ''
+        link: '../invoiceAuditManagement/invoiceAuditManagement'
       },
       {
         key: 16,
@@ -164,7 +164,7 @@ export default class accountIndex extends wepy.page {
       {
         key: 14,
         title: '资金明细',
-        link: ''
+        link: '../capitalManagement/capitalManagement'
       },
       {
         key: 18,
@@ -181,6 +181,9 @@ export default class accountIndex extends wepy.page {
   methods={
     linkTo(url){
       this.$parent.linkPage(url,1)
+    },
+    toMsgCt() {
+      this.$parent.linkPage('../newsCenter/newsCenter',1)
     }
   }
   async getAccIndexInfo() {

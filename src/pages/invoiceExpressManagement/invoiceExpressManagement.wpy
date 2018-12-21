@@ -1,0 +1,251 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="发票快递管理" searchr='true' @searchbx.user="tapSearch"></header>
+    <view class="fpsh">
+      <view class="fpshli" wx:for="{{fplist}}" wx:key="{{item.index}}">
+        <view class="tc mb10">{{item.createTime}}</view>
+        <view class="fpshlibx">
+          <view class="mb10">发票系统编号：<text class="c6">{{item.applyTicketCode}}</text></view>
+          <view class="mb10">快递信息：<text class="c6">{{item.logistics_company}}</text></view>
+          <view class="mb10 flex">
+            <view class="fpshlibxl">快递号码：<text class="c6">{{item.logisticsNumber}}</text></view>
+            <view class="flex-1">当前状态：
+              <text class="c6" wx:if="{{item.status == 2}}">未完成</text>
+              <text class="c6" wx:if="{{item.status > 2}}">已完成</text>
+              </view>
+          </view>
+          
+          <view class="tr">
+            <view class="fpshbtna" wx:if="{{item.status !== 4}}" @tap="checkOrderD({{item.applyTicketCode}})">填写快递信息</view>
+          </view>
+        </view>
+      </view>
+    </view>
+   
+    <!-- 拒绝开票 弹框 -->
+    <view class="kptk" wx:if="{{refuseShow}}">
+      <view class="kptkbx">
+        <form bindsubmit="bindFormSubmit">
+          <view class="tc c6 mb20">拒绝开票</view>
+          <view class="c6 flex">
+            <view class="mr5">填写原因</view>
+            <view class="flex-1"><textarea class="kptktxt"  placeholder="" name="textarea" /></view>
+          </view>
+          <view class="tkbtnbx mt50">
+            <view class="tkbtna" bindtap="canselJJKP">取消</view>
+            <button class="tkbtna tkbtnb" form-type="submit">确定</button>
+          </view>
+        </form>
+      </view>
+    </view>
+    <!-- 右侧搜索 -->
+    <view class="d-screen" wx:if="{{searchshow}}" >
+      <view class="d-bg" bindtap="sxclose"></view>
+      <view class="d-cont {{showconfn ? 'show' : ''}}">
+        <view class="d-contbx">
+          <view class="ssa">
+            <view class="mb10">发票系统编号</view>
+            <view><input class="kptkinp" bindinput="bindKeyInputA" value="{{FPVal}}" type="text" placeholder="请输入发票编号"/></view>
+          </view>
+          <view class="ssa">
+            <view class="mb10">快递名称</view>
+            <view><input class="kptkinp" bindinput="bindKeyInputB" value="{{SQRVal}}" type="text" placeholder="请输入快递名称"/></view>
+          </view>
+          <view class="ssa">
+            <view class="fpkdbtna {{status == '' ? 'cur' : ''}}" >全部</view>
+            <view class="fpkdbtna {{status == '2' ? 'cur' : ''}}" >未完成</view>
+            <view class="fpkdbtna {{status == '3' ? 'cur' : ''}}" >已完成</view>
+          </view>
+        </view>
+        <view class="d-btnbx">
+          <view class="d-btnaa" bindtap="reset">重置</view>
+          <view class="d-btnaa d-btnab" bindtap="sxdone">完成</view>
+        </view>
+      </view>
+    </view>
+    <view class="n-nodata" wx:if="{{dataleng}}">暂无更多数据！</view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class invoiceExpressManagement extends wepy.page {
+  config = {
+    "enablePullDownRefresh": true
+  };
+  data = {
+    tapSearch:'',
+    userInfo:'',
+    pageNum: 1,
+    applyTicketCode: '',
+    logisticsCompany: '',
+    status: '',
+    txt: '',
+    fpid: '',
+    FPVal: '',
+    SQRVal: '',
+    fplist: [],
+    fresh: false,
+    flage: false,
+    dataleng: false,
+    refuseShow: false,
+    searchshow: false,
+    showconfn: false,
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.$parent.globalData.temporary.contractId = ''
+    this.fplist = []
+    this.pageNum = 1
+    this.applyTicketCode = ''
+    this.logisticsCompany = ''
+    this.status = ''
+    this.queryApplyTicketCourierList(this.pageNum,this.applyTicketCode,this.logisticsCompany,this.status)
+  };
+  //开票物流信息列表
+  async queryApplyTicketCourierList(pageNum,applyTicketCode,logisticsCompany,status,fresh) {
+    let result = await this.$parent.queryData('msyApp/queryApplyTicketCourierList.do', {
+      enterpriseId: this.userInfo.id,
+      pageNum: pageNum,
+      applyTicketCode: applyTicketCode,
+      logisticsCompany: logisticsCompany,
+      status: status,
+    })
+    //console.log('发票快递管理', result);
+    if(fresh){
+      this.fplist = []
+      this.fresh = false
+    }
+    let yfplist = result.applyTicketCourierList
+    if(yfplist.length>0){
+      this.flage= true
+      this.fplist = this.fplist.concat(yfplist)
+    } else{
+      console.log('无更多数据')
+      this.flage= false
+      this.pageNum = 1
+    }
+    if(this.fplist.length>0){
+      this.dataleng = false
+    }else{
+      this.dataleng = true
+    }
+    console.log('发票快递管理', this.fplist);
+
+    this.$apply()
+  };
+  //同意或拒绝申请发票
+  async agreeOrNotApplyTicket(id,status,reviewReason) {
+    let result = await this.$parent.queryData('msyApp/agreeOrNotApplyTicket.do', {
+      id: id,
+      status: status,
+      userId: this.userInfo.userId,
+      reviewReason: reviewReason,
+    },true)
+    console.log('done', result);
+    if(result.data.type>0){
+      this.$parent.showTip(result.data.msg)
+      this.fplist = []
+      this.pageNum = 1
+      this.applyTicketCode = ''
+      this.logisticsCompany = ''
+      this.status = ''
+      await this.$parent.sleep(1)
+      this.queryApplyTicketCourierList(this.pageNum,this.applyTicketCode,this.logisticsCompany,this.status)
+    }else{
+      this.$parent.showTip(result.data.msg)
+    }
+    this.fpid = ''
+    this.$apply()
+  };
+  onPullDownRefresh() {
+    this.pageNum = 1
+    this.fresh = true
+    this.applyTicketCode = ''
+    this.logisticsCompany = ''
+    this.status = ''
+    this.queryApplyTicketCourierList(this.pageNum,this.applyTicketCode,this.logisticsCompany,this.status,this.fresh)
+    
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
+  };
+  onReachBottom() {
+    if (this.flage) {
+        this.pageNum +=1
+        this.queryApplyTicketCourierList(this.pageNum,this.applyTicketCode,this.logisticsCompany,this.status)
+    }
+  };
+  bindKeyInputA(e) {
+    this.FPVal = e.detail.value
+    this.$apply()
+  };
+   bindKeyInputB(e) {
+    this.SQRVal = e.detail.value
+    this.$apply()
+  };
+  methods = {
+    //点击 搜索
+    tapSearch() {
+      this.searchshow = true
+      this.showconfn = true
+    },
+    //关闭右侧搜索
+    sxclose() {
+      this.showconfn = false
+      this.searchshow = false
+    },
+    //搜索 重置
+    reset() {
+      this.FPVal = ''
+      this.SQRVal = ''
+    },
+    //搜索 完成
+    sxdone() {
+      console.log(this.FPVal,this.SQRVal)
+      this.pageNum = 1
+      this.user_name = this.SQRVal
+      this.ticket_code = this.FPVal
+      this.fplist = []
+      this.queryApplyTicketCourierList(this.pageNum,this.user_name,this.ticket_code)
+      this.FPVal = ''
+      this.SQRVal = ''
+      this.showconfn = false
+      this.searchshow = false
+    },
+    //点击 拒绝开票
+    refuseKP(id) {
+      this.refuseShow = true
+      this.fpid = id
+    },
+    //拒绝开票 取消
+    canselJJKP() {
+      this.refuseShow = false
+    },
+    //拒绝开票 确认 
+    bindFormSubmit(e) {
+      this.txt = e.detail.value.textarea
+      if(!this.txt){
+        this.$parent.showTip('请填写原因！')
+        return false
+      }
+     // this.agreeOrNotApplyTicket(this.fpid,1,this.txt)
+      this.refuseShow = false
+    },
+    //查看订单详情
+    checkOrderD(code) {
+      
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/invoiceExpressManagement';
+  
+</style>

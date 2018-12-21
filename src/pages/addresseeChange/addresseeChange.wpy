@@ -1,0 +1,236 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header :title.sync="thrtitle"></header>
+    <view class="bgf">
+      <view class="chthr">
+        <view>收件人姓名</view>
+        <view class="w-70"><input class="thrinp" placeholder="请输入收件人姓名" value="{{sjrName}}" bindinput="sjrNameFn"/></view>
+      </view>
+      <view class="chthr">
+        <view>所在区域</view>
+        <view class="w-70">
+          <picker name="addrs"  mode="multiSelector" range="{{citys}}" range-key="name" value="{{cityIndex}}" bindchange="selCity" bindcolumnchange="changeCity">
+            <view class="tr">
+              <text>{{provCity}}</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+      <view class="chthr">
+        <view>街道地址</view>
+        <view class="w-70"><input class="thrinp" placeholder="请输入街道地址" value="{{jdAddr}}" bindinput="jdAddrFn"/></view>
+      </view>
+      <view class="chthr">
+        <view>邮政编码</view>
+        <view class="w-70"><input class="thrinp" placeholder="请输入邮政编码" value="{{sjrCode}}" bindinput="sjrCodeFn"/></view>
+      </view>
+      <view class="chthr">
+        <view>手机号</view>
+        <view class="w-70"><input class="thrinp" placeholder="请输入提货人手机号" value="{{sjrPhone}}" bindinput="sjrPhoneFn"/></view>
+      </view>
+    </view>
+    <view class="thrbbx">
+      <view class="thrbtna" bindtap="cansel">取消</view>
+      <view class="thrbtna" bindtap="save">保存信息</view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class addresseeChange extends wepy.page {
+  data = {
+    thrtitle:'修改收件人信息',
+    userInfo: '',
+    sjrName: '',
+    sjrPhone: '',
+    sjrCode: '',
+    item: '',
+    jdAddr: '',
+    sjrId: '',
+    citys: [],
+    allProvs: [],
+    allCitys: [],
+    nowCitys: [],
+    cityIndex: [0,0],
+    customItem: '',
+    provId: 1,
+    cityId: 1,
+    provCity: '请选择',
+    
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.item = this.$parent.globalData.temporary.goodsData
+    if(this.item){
+      this.thrtitle = '修改收件人信息'
+      this.sjrName = this.item.receiver_name
+      this.sjrPhone = this.item.telephone
+      this.sjrCode = this.item.post_code
+      this.jdAddr = this.item.address
+      this.sjrId = this.item.id
+      this.updateTicketAddressInit()
+    }else{
+      this.thrtitle = '新增收件人信息'
+    }
+    this.appAddTicketAddressInfoInit()
+    
+  };
+ //添加收件人初始化
+  async appAddTicketAddressInfoInit() {
+    let result = await this.$parent.queryData('msyApp/appAddTicketAddressInfoInit.do', {
+      
+    })
+    console.log('done', result);
+    let mock = [];
+    this.allProvs = result.provinces;
+    this.allCitys = result.citys;
+    let tCitys = await this.getCity(1);
+    mock.push(result.provinces, tCitys);
+    this.citys = mock;
+    if(this.item){
+      this.updateTicketAddressInit()
+    }
+    this.$apply()
+  };
+  //修改收件人初始化
+  async updateTicketAddressInit() {
+    let result = await this.$parent.queryData('msyApp/updateTicketAddressInit.do', {
+      id:this.sjrId
+    })
+    //console.log('done2', result);
+    this.provId = result.province_id;
+    this.cityId =result.city_id;
+    let allProvs = this.allProvs;
+    let allCitys = this.allCitys;
+    let sheng = ''
+    let shi = ''
+    for (let p in allProvs){
+      if(allProvs[p].id == this.provId){
+        sheng = allProvs[p].name
+      }
+    }
+    for (let c in allCitys){
+      if(allCitys[c].id == this.cityId){
+        shi = allCitys[c].name
+      }
+    }
+    this.provCity = sheng + shi
+    this.$apply()
+  };
+  getCity(prov) {
+    let allCitys = this.allCitys;
+    let tCitys = [];
+    for (let i in allCitys) {
+      if (allCitys[i].parentid == prov) {
+        tCitys.push(allCitys[i]);
+      }
+    }
+    this.nowCitys = tCitys;
+    return tCitys;
+  }
+  //修改或添加收件人
+  async appAddOrUpdateTicketAddressInfo(receiver_name,post_code,tickTelephone,tickAddress) {
+    let result = await this.$parent.queryData('msyApp/appAddOrUpdateTicketAddressInfo.do', {
+      receiver_name: receiver_name,
+      post_code: post_code,
+      tickTelephone: tickTelephone,
+      tickAddress: tickAddress,
+      province: this.provId,
+      city: this.cityId,
+      areaId: '',
+      isDefault: '',
+      enterpriseId: this.userInfo.id,
+      id: this.sjrId,
+      status: '',
+      userId: this.userInfo.userId,
+    },true)
+    //console.log('done', result);
+    if(result.data.type>0){
+      this.$parent.showTip(result.data.msg)
+      await this.$parent.sleep(1)
+      this.$parent.linkPage('../addressee/addressee',2)
+    }else{
+      this.$parent.showTip(result.data.msg)
+    }
+    
+    this.$apply()
+  };
+  sjrNameFn(event) {
+    this.sjrName = event.detail.value;
+    this.$apply();
+  };
+  sjrPhoneFn(event) {
+    this.sjrPhone = event.detail.value;
+    this.$apply();
+  };
+  sjrCodeFn(event) {
+    this.sjrCode = event.detail.value;
+    this.$apply();
+  };
+  jdAddrFn(event) {
+    this.jdAddr = event.detail.value;
+    this.$apply();
+  };
+  
+  methods = {
+    changeCity(event) {
+      let mock = this.cityIndex;
+      let col = event.detail.column;
+      let val = event.detail.value;
+      mock[col] = val;
+      if (col == 0) {
+        let prov = this.allProvs[val].id;
+        this.citys[1] = this.getCity(prov);
+        mock[1] = 0;
+      }
+      this.cityIndex = mock;
+      
+      this.$apply();
+    },
+    selCity() {
+      this.provId = this.citys[0][this.cityIndex[0]].id
+      this.cityId = this.citys[1][this.cityIndex[1]].id
+      this.provCity = this.citys[0][this.cityIndex[0]].name + this.citys[1][this.cityIndex[1]].name
+      this.$apply();
+    },
+    //取消
+    cansel() {
+      this.$parent.linkPage('../addressee/addressee',3)
+    },
+    //保存
+    save() {
+      if(!this.sjrName){
+        this.$parent.showTip('请输入收件人姓名')
+        return false
+      }else if(this.provCity == '请选择'){
+        this.$parent.showTip('请选择所在区域')
+        return false
+      }else if(!this.jdAddr){
+        this.$parent.showTip('请输入街道地址')
+        return false
+      }else if(!this.sjrCode){
+        this.$parent.showTip('请输入邮政编码')
+        return false
+      }else if(!this.sjrPhone){
+        this.$parent.showTip('请输入手机号码')
+        return false
+      }else{
+        this.appAddOrUpdateTicketAddressInfo(this.sjrName,this.sjrCode,this.sjrPhone,this.jdAddr)
+      }
+      
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/addresseeChange';
+  
+</style>
