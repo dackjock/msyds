@@ -13,7 +13,7 @@
       <view class="ac-icon">
         <image src="../../assets/images/icon/icon-set.png" />
       </view>
-      <view class="ac-icon msg">
+      <view class="ac-icon msg" bindtap="toMsgCt">
         <image src="../../assets/images/icon/icon-msg.png" />
         <text wx:if="{{accountInfo.newMessageCounts > 0}}">{{accountInfo.newMessageCounts > 99 ? '99+' : accountInfo.newMessageCounts}}</text>
       </view>
@@ -89,42 +89,42 @@ export default class accountIndex extends wepy.page {
       {
         key: 2,
         title: '合同管理',
-        link: ''
+        link: '../contract/contract'
       },
       {
         key: 3,
         title: '议价管理',
-        link: ''
+        link: '../negotiateManagement/negotiateManagement'
       },
       {
         key: 4,
         title: '提货人管理',
-        link: ''
+        link: '../consignee/consignee'
       },
       {
         key: 5,
         title: '司机管理',
-        link: ''
+        link: '../driver/driver'
       },
       {
         key: 6,
         title: '收件人管理',
-        link: ''
+        link: '../addressee/addressee'
       },
       {
         key: 7,
         title: '发票管理',
-        link: ''
+        link: '../invoiceManagement/invoiceManagement'
       },
       {
         key: 17,
         title: '发票审核管理',
-        link: ''
+        link: '../invoiceAuditManagement/invoiceAuditManagement'
       },
       {
         key: 16,
         title: '发票快递管理',
-        link: ''
+        link: '../invoiceExpressManagement/invoiceExpressManagement'
       },
       {
         key: 8,
@@ -134,12 +134,12 @@ export default class accountIndex extends wepy.page {
       {
         key: 11,
         title: '财务凭证管理',
-        link: ''
+        link: '../financialVoucherManage/financialVoucherManage'
       },
       {
         key: 12,
         title: '点价审核管理',
-        link: ''
+        link: '../spotPriceAudit/spotPriceAudit'
       },
       {
         key: 13,
@@ -164,7 +164,7 @@ export default class accountIndex extends wepy.page {
       {
         key: 14,
         title: '资金明细',
-        link: ''
+        link: '../capitalManagement/capitalManagement'
       },
       {
         key: 18,
@@ -181,6 +181,9 @@ export default class accountIndex extends wepy.page {
   methods={
     linkTo(url){
       this.$parent.linkPage(url,1)
+    },
+    toMsgCt() {
+      this.$parent.linkPage('../newsCenter/newsCenter',1)
     }
   }
   async getAccIndexInfo() {

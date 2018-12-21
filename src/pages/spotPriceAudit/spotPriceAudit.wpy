@@ -1,0 +1,160 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="点价审核管理"></header>
+    <view class="n-ctt">
+      <view class="n-ctta">
+        <view class="n-cttabx {{status == ''? 'cur' : ''}}" @tap="djStat()">全部</view>
+        <view class="n-cttabx {{status == 1? 'cur' : ''}}" @tap="djStat(1)">待审核</view>
+        <view class="n-cttabx {{status == 3? 'cur' : ''}}" @tap="djStat(3)">审核通过</view>
+        <view class="n-cttabx {{status == 2? 'cur' : ''}}" @tap="djStat(2)">审核拒绝</view>
+      </view>
+    </view>
+    <view class="fpsh">
+      <view class="fpshli" wx:for="{{djlist}}" wx:key="{{item.index}}">
+        <view class="tc mb10">{{item.create_time}}</view>
+        <view class="fpshlibx">
+          <view class="djp border-bottom">订单编号：<text class="c6">{{item.order_code}}</text></view>
+          <view class="djp border-bottom flex">
+            <view class="fpshlibxl">点价人：<text class="c6">{{item.price_controller}}</text></view>
+            <view class="flex-1">最终单价：<text class="c6">{{item.price}}元/KG</text></view>
+          </view>
+          <view class="djp border-bottom flex">
+            <view class="fpshlibxl">费率：<text class="c6">{{item.rate}}</text></view>
+            <view class="flex-1">订单重量：<text class="c6">{{item.weight}}KG</text></view>
+          </view>
+          <view class="djp border-bottom flex">
+            <view class="fpshlibxl">总金额：<text class="c6">{{item.account}}元</text></view>
+            <view class="flex-1">状态：
+              <text class="c6" wx:if="{{item.status == 1}}">申请中</text>
+              <text class="c6" wx:if="{{item.status == 2}}">审核未通过</text>
+              <text class="c6" wx:if="{{item.status == 3}}">审核通过</text>
+              </view>
+          </view>
+          <view class="djp border-bottom">审核原因：<text class="c6">{{item.description}}</text></view>
+          <view class="djp">审核时间：
+            <text class="c6" wx:if="{{item.audit_time_stamp !== 'NaN-NaN-NaN NaN:NaN:NaN'}}">{{item.audit_time_stamp}}</text>
+            <text class="c6" wx:else="{{item.audit_time_stamp == 'NaN-NaN-NaN NaN:NaN:NaN'}}">{{item.create_time}}</text>
+            </view>
+          <view class="tr pt10 border-top" wx:if="{{item.status == 1}}">
+            <view class="fpshbtna" @tap="shenhe({{item.id}})" >审核</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="n-nodata" wx:if="{{dataleng}}">暂无更多数据！</view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class spotPriceAudit extends wepy.page {
+  config = {
+    "enablePullDownRefresh": true
+  };
+  data = {
+    userInfo:'',
+    status:'',
+    pageNum: 1,
+    fresh: false,
+    flage: false,
+    dataleng: false,
+    djlist: [],
+  };
+  onShow() {
+    this.userInfo = this.$parent.globalData.userInfo
+    this.djlist = []
+    this.pageNum = 1
+    this.status = ''
+    this.queryPiontPriceAuditList(this.pageNum,this.status)
+  };
+  //点价审核管理
+  async queryPiontPriceAuditList(pageNum,status,fresh) {
+    let result = await this.$parent.queryData('msyApp/queryPiontPriceAuditList.do', {
+      enterpriseId: this.userInfo.id,
+      pageNum: pageNum,
+      startTime: '',
+      endTime: '',
+      status: status,
+    })
+    //console.log('点价审核管理', result);
+    if(fresh){
+      this.djlist = []
+      this.fresh = false
+    }
+    let yfplist = result.pageBean.list
+    if(yfplist.length>0){
+      for(let i = 0;i<yfplist.length;i++){
+        yfplist[i].audit_time_stamp = this.ormatDate(yfplist[i].audit_time_stamp)
+      }
+      this.flage= true
+      this.djlist = this.djlist.concat(yfplist)
+    } else{
+      console.log('无更多数据')
+      this.flage= false
+      this.pageNum = 1
+    }
+    if(this.djlist.length>0){
+      this.dataleng = false
+    }else{
+      this.dataleng = true
+    }
+    console.log('点价审核管理', this.djlist);
+
+    this.$apply()
+  };
+  onPullDownRefresh() {
+    this.pageNum = 1
+    this.fresh = true
+    this.status = ''
+    this.queryPiontPriceAuditList(this.pageNum,this.status,this.fresh)
+    
+    wepy.stopPullDownRefresh();
+    wepy.showToast({ title: '刷新成功' });
+  };
+  onReachBottom() {
+    if (this.flage) {
+        this.pageNum +=1
+        this.queryPiontPriceAuditList(this.pageNum,this.status)
+    }
+  };
+  ormatDate(inputTime) {
+    var date = new Date(inputTime);
+    var y = date.getFullYear();
+    var m = date.getMonth() + 1;
+    m = m < 10 ? ('0' + m) : m;
+    var d = date.getDate();
+    d = d < 10 ? ('0' + d) : d;
+    var h = date.getHours();
+    h = h < 10 ? ('0' + h) : h;
+    var minute = date.getMinutes();
+    var second = date.getSeconds();
+    minute = minute < 10 ? ('0' + minute) : minute;
+    second = second < 10 ? ('0' + second) : second;
+    return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
+  };
+  methods = {
+    djStat(id) {
+      this.djlist = []
+      this.status = id
+      this.pageNum = 1
+      this.fresh = true
+      this.queryPiontPriceAuditList(this.pageNum,this.status)
+    },
+    shenhe(id) {
+      this.$parent.globalData.temporary.contractId = id
+      this.$parent.linkPage('../spotPriceSH/spotPriceSH',1)
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/spotPriceAudit';
+  
+</style>

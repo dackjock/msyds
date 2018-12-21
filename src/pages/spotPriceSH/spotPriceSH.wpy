@@ -1,0 +1,65 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="填写审核原因"></header>
+    <view class="shbx">
+      <view class="mr20">填写审核原因</view>
+      <view class="flex-1"><input class="yyinp" bindinput="bindKeyInput" value="{{reasonVal}}" type="text" placeholder="请输入审核原因"/></view>
+    </view>
+    <view class="shbtnbx">
+      <view class="shbtna" @tap="shenH(2)">审核拒绝</view>
+      <view class="shbtna shbtnb" @tap="shenH(3)">审核通过</view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class spotPriceSH extends wepy.page {
+  data = {
+    reasonVal:'',
+    djid:'',
+  };
+  onShow() {
+    this.djid = this.$parent.globalData.temporary.contractId
+    this.$parent.globalData.temporary.contractId = ''
+  };
+   //审核点价
+  async piontPriceAudit() {
+    let result = await this.$parent.queryData('msyApp/piontPriceAudit.do', {
+      id: this.djid,
+      status: this.status,
+      content: this.reasonVal,
+    },true)
+    console.log('审核点价', result);
+    if(result.data.type>0){
+      this.$parent.showTip('操作成功')
+      await this.$parent.sleep(1)
+      this.$parent.linkPage('../spotPriceAudit/spotPriceAudit',1)
+    }else{
+      this.$parent.showTip(result.data.msg)
+    }
+    this.$apply()
+  };
+  bindKeyInput(e) {
+    this.reasonVal = e.detail.value
+    this.$apply()
+  };
+  methods = {
+    shenH(sta) {
+      this.status = sta
+      this.piontPriceAudit()
+    }
+  };
+  
+  components = {
+    header
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/spotPriceSH';
+  
+</style>

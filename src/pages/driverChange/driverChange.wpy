@@ -3,16 +3,20 @@
     <header :title.sync="thrtitle"></header>
     <view class="bgf">
       <view class="chthr">
-        <view>提货人姓名</view>
-        <view class="w-70"><input class="thrinp" placeholder="请输入提货人姓名" value="{{thrName}}" bindinput="thrNameFn"/></view>
+        <view>司机姓名</view>
+        <view class="w-70"><input class="thrinp" placeholder="请输入司机姓名" value="{{thrName}}" bindinput="thrNameFn"/></view>
       </view>
       <view class="chthr">
         <view>手机号</view>
-        <view class="w-70"><input class="thrinp" placeholder="请输入提货人手机号" value="{{thrPhone}}" bindinput="thrPhoneFn"/></view>
+        <view class="w-70"><input class="thrinp" placeholder="请输入司机手机号" value="{{thrPhone}}" bindinput="thrPhoneFn"/></view>
+      </view>
+      <view class="chthr">
+        <view>车牌号</view>
+        <view class="w-70"><input class="thrinp" placeholder="请输入司机车牌号" value="{{thrCarNum}}" bindinput="thrCarNumFn"/></view>
       </view>
       <view class="chthr">
         <view>证件号</view>
-        <view class="w-70"><input class="thrinp" placeholder="请输入提货人证件号" value="{{thrZj}}" bindinput="thrZjFn"/></view>
+        <view class="w-70"><input class="thrinp" placeholder="请输入司机证件号" value="{{thrZj}}" bindinput="thrZjFn"/></view>
       </view>
       <view wx:if="{{item}}">
         <view class="thrsfz">
@@ -61,14 +65,15 @@
 import wepy from 'wepy';
 import header from '@/components/header';
 
-export default class consigneeChange extends wepy.page {
+export default class driverChange extends wepy.page {
   data = {
-    thrtitle:'提货人信息修改',
+    thrtitle:'司机信息修改',
     userInfo: '',
     imgUrl: '',
     thrName: '',
     thrPhone: '',
     thrZj: '',
+    thrCarNum: '',
     picUpload: '',
     item: '',
     thrId: '',
@@ -81,16 +86,18 @@ export default class consigneeChange extends wepy.page {
     this.picUpload = this.imgUrl +'l-uploadAdd.png'
     this.item = this.$parent.globalData.temporary.goodsData
     if(this.item){
-      this.thrtitle = '提货人信息修改'
+      this.thrtitle = '司机信息修改'
       this.thrName = this.item.name
       this.thrPhone = this.item.phone
       this.thrZj = this.item.card
+      this.thrCarNum = this.item.license
       this.thrId = this.item.id
       this.imgarr.push(this.item.cardFrontImg)
       this.imgarr.push(this.item.cardBackImg)
     }else{
-      this.thrtitle = '新增提货人'
+      this.thrtitle = '新增司机信息'
     }
+    //console.log(this.item)
     
   };
   //上传照片
@@ -109,11 +116,12 @@ export default class consigneeChange extends wepy.page {
     
     this.$apply();
   };
-  //修改或添加提货人
-  async appConsigneeAddOrUpdate(id,name,card,cardFrontImg,cardBackImg,phone) {
-    let result = await this.$parent.queryData('msyApp/appConsigneeAddOrUpdate.do', {
+  //修改或添加司机
+  async appDriverAddOrUpdate(id,name,license,card,cardFrontImg,cardBackImg,phone) {
+    let result = await this.$parent.queryData('msyApp/appDriverAddOrUpdate.do', {
       id: id,
       name: name,
+      license: license,
       card: card,
       cardFrontImg: cardFrontImg,
       cardBackImg: cardBackImg,
@@ -124,7 +132,7 @@ export default class consigneeChange extends wepy.page {
     if(result.data.type>0){
       this.$parent.showTip(result.data.msg)
       await this.$parent.sleep(1)
-      this.$parent.linkPage('../consignee/consignee',2)
+      this.$parent.linkPage('../driver/driver',2)
     }else{
       this.$parent.showTip(result.data.msg)
     }
@@ -137,6 +145,10 @@ export default class consigneeChange extends wepy.page {
   };
   thrPhoneFn(event) {
     this.thrPhone = event.detail.value;
+    this.$apply();
+  };
+  thrCarNumFn(event) {
+    this.thrCarNum = event.detail.value;
     this.$apply();
   };
   thrZjFn(event) {
@@ -162,15 +174,18 @@ export default class consigneeChange extends wepy.page {
     },
     //取消
     cansel() {
-      this.$parent.linkPage('../consignee/consignee',3)
+      this.$parent.linkPage('../driver/driver',3)
     },
     //保存
     save() {
       if(!this.thrName){
-        this.$parent.showTip('请输入提货人姓名')
+        this.$parent.showTip('请输入司机姓名')
         return false
       }else if(!this.thrPhone){
         this.$parent.showTip('请输入手机号')
+        return false
+      }else if(!this.thrCarNum){
+        this.$parent.showTip('请输入车牌号')
         return false
       }else if(!this.thrZj){
         this.$parent.showTip('请输入证件号')
@@ -182,7 +197,7 @@ export default class consigneeChange extends wepy.page {
         this.$parent.showTip('请上传身份证反面照片')
         return false
       }else{
-        this.appConsigneeAddOrUpdate(this.thrId,this.thrName,this.thrZj,this.imgarr[0],this.imgarr[1],this.thrPhone)
+        this.appDriverAddOrUpdate(this.thrId,this.thrName,this.thrCarNum,this.thrZj,this.imgarr[0],this.imgarr[1],this.thrPhone)
       }
       
     }
@@ -195,6 +210,6 @@ export default class consigneeChange extends wepy.page {
 </script>
 
 <style lang="stylus">
-@import '../../assets/style/consigneeChange';
+@import '../../assets/style/driverChange';
   
 </style>
