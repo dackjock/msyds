@@ -226,7 +226,7 @@ export default class purchasingHall extends wepy.page {
     wepy.showNavigationBarLoading();
     let _this = this;
     this.queryData.pageNum = 1;
-    await this.PurchaseGoodsList();
+    this.list_main = await this.PurchaseGoodsList();
     wepy.hideNavigationBarLoading();
     wx.stopPullDownRefresh();
   }

@@ -36,8 +36,8 @@
           <view class="djp">审核时间：
             <text class="c6">{{item.review_time}}</text>
           </view>
-          <view class="tr pt10 border-top" wx:if="{{item.underStatus == 1}}">
-            <view class="fpshbtna">点击上传</view>
+          <view class="tr pt10 border-top" @tap="goUpload({{item.supplier_enterprise_id}},{{item.underLineId}})" wx:if="{{item.underStatus == 1}}">
+            <view class="fpshbtna" >点击上传</view>
           </view>
         </view>
       </view>
@@ -116,6 +116,9 @@ export default class financialVoucherManage extends wepy.page {
     }
   };
   methods = {
+    goUpload(param1,param2){
+      this.$parent.linkPage('../financialVoucherUpload/financialVoucherUpload?enterpriseOrderId='+param1+'&underLineId='+param2,1)
+    },
     djStat(id) {
       this.djlist = []
       this.status = id

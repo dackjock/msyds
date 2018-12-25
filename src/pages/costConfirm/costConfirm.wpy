@@ -10,7 +10,8 @@
     </view>
     <view class="entrust-info">
       <text >码单重量</text>
-      <text >{{costInfo.total_weight}}KG</text>
+      <text wx:if="{{!first}}" > {{costInfo.total_weight}}KG</text>
+      <text wx:else > {{costInfo.singleWeight}}KG</text>
     </view>
     <view class="entrust-info">
       <text >合同的单价</text>
@@ -18,7 +19,8 @@
     </view>
     <view class="entrust-info">
       <text >合同签订金额</text>
-      <text class="red">{{costInfo.order_total_price}}元</text>
+       <text wx:if="{{!first}}" class="red" > {{costInfo.order_total_price}}元</text>
+      <text wx:else class="red"  > {{costInfo.total_price}}元</text>
     </view>
     <view class="entrust-info" wx:if="{{costInfo.payMethodId === 1}}">
       <text >账期补偿费用</text>
@@ -34,11 +36,25 @@
     </view>
     <view class="entrust-info">
       <text >订单实际金额</text>
-      <text class="red">{{costInfo.order_pay_price}}元</text>
+      <text wx:if="{{!first}}" class="red" > {{costInfo.order_pay_price}}元</text>
+      <text wx:else class="red"  > {{costInfo.pay_price}}元</text>
     </view>
     <view class="entrust-info">
       <text >已支付的金额</text>
-      <text class="red">{{costInfo.order_pay_price}}元</text>
+      <text wx:if="{{!first}}" class="red" > {{costInfo.order_pay_price}}元</text>
+      <text wx:else class="red"  > {{costInfo.pay_price}}元</text>
+    </view>
+        <view wx:if="{{first}}" class="entrust-info">
+      <text >订单支付时间</text>
+       <text >{{costInfo.pay_time}}</text>
+    </view>
+     <view wx:if="{{first}}" class="entrust-info">
+      <text >最晚提货时间</text>
+       <text >{{costInfo.take_time}}</text>
+    </view>
+    <view wx:if="{{first}}" class="entrust-info">
+      <text >实际提货时间</text>
+       <text >{{costInfo.cargo_time}}</text>
     </view>
     <view class="entrust-info">
       <view class="has-tips">
@@ -56,13 +72,17 @@
     </view>
     <view class="entrust-info">
       <text >是否支付仓储费</text>
-      <text >{{costInfo.is_pay_storehouse ? '线下已付款' : '线下未付款'}}</text>
+      <text wx:if="{{!first}}">{{costInfo.is_pay_storehouse ? '线下已付款' : '线下未付款'}}</text>
+      <picker mode="selector" wx:else @change="bindPickerChange" range="{{array}}">
+          <text>{{select}}&gt;</text>
+      </picker>
     </view>
     <view class="entrust-info">
       <text >仓储费用</text>
-      <text class="red">{{storehouse_price}}元</text>
+      <text class="red" wx:if="{{!first}}">{{storehouse_price}}元</text>
+      <input wx:else class="rightInput" @input="changeData" value="{{submitData.storeHouseFee}}" data-key="storeHouseFee" />
     </view>
-    <view class="entrust-info">
+    <view class="entrust-info" wx:if="{{!first}}">
       <text >小计</text>
       <text class="red">{{storehouse_price}}元</text>
     </view>
@@ -71,17 +91,20 @@
     </view>
     <view class="entrust-info">
       <text >金额</text>
-      <text class="red">{{other_price}}元</text>
+      <text class="red" wx:if="{{!first}}">{{other_price}}元</text>
+      <input wx:else class="rightInput" @input="changeData" data-key="otherPrice" value="{{submitData.otherPrice}}" />
+     
     </view>
     <view class="entrust-info">
       <text >备注</text>
-      <text >{{costInfo.other_remark}}</text>
+      <text class="" wx:if="{{!first}}">{{costInfo.other_remark}}元</text>
+      <input wx:else class="rightInput" @input="changeData" value="{{submitData.otherRemark}}" data-key="otherRemark" />
     </view>
-    <view class="entrust-info">
+    <view class="entrust-info" wx:if="{{!first}}">
       <text >小计</text>
       <text class="red">{{other_price}}元</text>
     </view>
-    <view class="cost-foot">
+    <view class="cost-foot"  wx:if="{{!first}}">
       <view class="cf-top">
         <text >合计：<text class="red">{{costInfo.allPayMoney}}元</text></text>
         <text >已支付：<text class="red">{{costInfo.already_price}}元</text></text>
@@ -94,6 +117,16 @@
       <button wx:if="{{costInfo.payPrice <= 0}}" class="page-btn" @tap.stop="confirmPay">确定</button>
       <button wx:else class="page-btn" @tap.stop="choosePayWay">支付</button>
     </view>
+     <view class="entrust-title bord-top" wx:if="{{first}}">
+      <text class="et-name">已支付金额</text>
+    </view>
+    <view class="entrust-info">
+      <text >已支付金额</text>
+
+      <input class="rightInput" @input="changeData" data-key="alreadyPrice" value="{{submitData.alreadyPrice}}" />
+     
+    </view>
+ 
     <view class="diff-dialog" wx:if="{{diffShow}}">
       <form class="dd-wrap" bindsubmit="sendDiff">
         <text class="w-head">有异议</text>
@@ -118,6 +151,8 @@
         </view>
       </view>
     </view>
+
+    <view class="sumbitFrist" @tap="sumbitFrist">提交</view>
   </view>
 </template>
 
@@ -130,22 +165,42 @@ export default class costConfirm extends wepy.page {
     header
   };
   data = {
+    //线上下
+    array: ['线下未支付', '线下已支付'],
+    select: '线下未支付',
+    submitData: {
+      storeHouseFee: '0.00',
+      otherPrice: '0.00',
+      alreadyPrice: '',
+      otherRemark: '',
+      isPay: 0,
+      orderId: ''
+    },
+
     title: '费用确认',
     id: '',
     orderType: '',
     diffShow: false,
     costInfo: [],
-    payWay: false
+    payWay: false,
+    //判断是否第一次结算
+    first: false
   };
   computed = {
     goods_weight() {
       return Number.parseFloat(this.costInfo.goods_weight).toFixed(4);
     },
     price() {
-      return Number.parseFloat(this.costInfo.price).toFixed(2);
+      return Number.parseFloat(
+        this.first ? this.costInfo.goodsPrice : this.costInfo.price
+      ).toFixed(2);
     },
     compensate_price() {
-      return Number.parseFloat(this.costInfo.compensate_price).toFixed(2);
+      return Number.parseFloat(
+        this.first
+          ? this.costInfo.differencePrice
+          : this.costInfo.compensate_price
+      ).toFixed(2);
     },
     storehouse_price() {
       return Number.parseFloat(this.costInfo.storehouse_price).toFixed(2);
@@ -155,6 +210,29 @@ export default class costConfirm extends wepy.page {
     }
   };
   methods = {
+    //input赋值
+    changeData(e) {
+      this.submitData[e.currentTarget.dataset.key] = e.detail.value;
+    },
+    //发起结算
+    sumbitFrist() {
+      if(this.submitData.alreadyPrice==""||this.submitData.otherRemark==""){
+        wx.showTip("请完善信息")
+        return
+      }
+      let result = this.$parent
+        .queryData('/msyApp/appSetStoreHouseFee.do', this.submitData)
+        .then(res => {
+          if (res) {
+            this.$parent.linkPage('../order/order', 2);
+          }
+        });
+    },
+    //选择器
+    bindPickerChange(e) {
+      this.select = this.array[e.detail.value];
+      this.submitData.isPay = e.detail.value;
+    },
     changeDiffShow() {
       let flag = this.diffShow;
       this.diffShow = !flag;
@@ -181,11 +259,11 @@ export default class costConfirm extends wepy.page {
           finalSettlementId: this.id
         }
       );
-      if(!result){
-        this.$parent().showTip('操作成功')
+      if (!result) {
+        this.$parent().showTip('操作成功');
         this.$parent.linkPage('../order/order', 4);
       }
-      console.log(result)
+      console.log(result);
     },
     choosePayWay() {
       this.payWay = true;
@@ -196,29 +274,42 @@ export default class costConfirm extends wepy.page {
     stopThis() {},
     payForOffline() {
       this.$parent.linkPage(
-        '../payOffline/payOffline?settlementId=' + this.id + '&id=' + this.costInfo.enterprise_order_id,
+        '../payOffline/payOffline?settlementId=' +
+          this.id +
+          '&id=' +
+          this.costInfo.enterprise_order_id,
         4
       );
     }
   };
   onLoad(e) {
-    console.log('费用确认参数：',e)
+    console.log('费用确认参数：', e);
     this.id = e.id;
+    this.submitData.orderId = e.id;
     this.orderType = e.orderType;
-  }
-  onShow() {
+    // 判断第一次
+    this.first = e.first ? true : false;
     this.userInfo = this.$parent.globalData.userInfo;
     this.getCostInfo();
   }
+  onShow() {}
   async getCostInfo() {
-    let result = await this.$parent.queryData(
-      '/msyApp/queryFinalSettlementDetail.do',
-      {
+    let url, parmas;
+    if (this.first) {
+      url = '/msyApp/appAddFinalSettlementInit.do';
+      parmas = {
+        orderId: this.id,
+        orderType: this.orderType
+      };
+    } else {
+      url = '/msyApp/queryFinalSettlementDetail.do';
+      parmas = {
         id: this.id,
         orderType: this.orderType,
         enterpriseId: this.userInfo.id
-      }
-    );
+      };
+    }
+    let result = await this.$parent.queryData(url, parmas);
     if (!result) {
       this.$parent.linkPage('../order/order', 4);
     }

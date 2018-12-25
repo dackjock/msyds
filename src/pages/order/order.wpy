@@ -200,7 +200,7 @@ export default class Order extends wepy.page {
       this.$apply();
     },
     switch1Change(val) {
-      this.order_type = val.detail.value ? '销售' : '采购';
+      this.order_type = val.detail.value ? '采购' : '销售';
       this.queryData_jingkuang.type = val.detail.value ? 1 : 2;
       this.queryData.orderType = val.detail.value ? 1 : 2;
       this.onPullDownRefresh();
@@ -350,6 +350,12 @@ export default class Order extends wepy.page {
             '?orderId=' + dataSet.orderId + '&cargoId=' + dataSet.cargoId;
           this.$parent.linkPage('../entrustPickup/entrustPickup' + parms_6, 1);
           break;
+        case 8:
+          //采购结算
+          let parms_8 =
+            '?id=' + dataSet.orderId + '&orderType=' + dataSet.orderType+ '&first=' +1;
+          this.$parent.linkPage('../costConfirm/costConfirm' + parms_8, 1);
+          break;
         case 10:
           // 结算
           let parms_10 =
@@ -464,5 +470,4 @@ export default class Order extends wepy.page {
 
 <style lang="stylus">
 @import '../../assets/style/order';
-
 </style>

@@ -1,0 +1,187 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+     <header title="上传凭证"></header>
+
+     <view class="flex_item">
+         <view class="label">企业汇款银行</view>
+         <view class="span">{{initData.qyBankName}}</view>
+     </view>
+     
+     <view class="flex_item">
+         <view class="label">企业汇款卡号</view>
+         <view class="span">{{initData.qyBankNo}}</view>
+     </view>
+    <view class="flex_item">
+        <view class="label">平台开户银行</view>
+        <view class="span">{{initData.bankName}}</view>
+    </view>
+    <view class="flex_item">
+        <view class="label">平台银行卡号</view>
+        <view class="span">{{initData.bankNo}}</view>
+    </view>
+    <view class="flex_item">
+        <view class="label">是否通过</view>
+        <picker mode="selector" range="{{agereeOrNode}}" @change="agreeChange" class="">
+          <view class="span">{{agereeOrNode[index]}}&gt;</view>
+        </picker>
+    </view>
+        <view class="flex_item" wx:if="{{index==1}}">
+        <input class="text_input " type="text" @input="inputRes" placeholder="请输入拒绝原因"/>
+    </view>
+    <view class="flex_item">
+        <view class="label">平台汇款金额</view>
+        <view class="span red">{{initData.qyMoney}}.00</view>
+    </view>
+     <view class="upLoad">
+         <view class="just_p">上传交易凭证  <view class="red">(最多上传10张)</view></view>
+         <view class="img_list">
+             <image @tap="showImg({{item}})" wx:for="{{imglist}}"  wx:key="{{index}}" mode="aspectFit" src="{{item}}" />
+             <view class="upload_btn" @tap="choosePic">
+                 <image class="btn_img" mode="aspectFit" src="http://d7.cto.shovesoft.com/msywap/images/icon/c-addpic.png" />
+             </view>
+         </view>
+     </view>
+     <view class="sumit_btn" @tap="submit">提交</view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class Index extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    initData: '',
+    agereeOrNode: ['确认收款', '拒绝收款'],
+    index: 0,
+    price: '',
+    imglist: [],
+    submitData: {
+      agree: '',
+      id: '',
+      qyMoney: '',
+      tradeImg: '',
+      reviewUserId: '',
+      remark: '',
+      underLineId: ''
+    }
+  };
+  computed = {
+    // price(){
+    //   if(!initData){return}
+    //   return initData.qyMoney&&parseFloat(initData.qyMoney).toFixed(2);
+    // }
+  };
+  methods = {
+    showImg(e) {
+      wx.previewImage({
+        urls: [e]
+      });
+    },
+    choosePic() {
+      let that = this;
+      if (this.imglist.length > 10) {
+        wepy.showToast({
+          title: '限传10张图片',
+          icon: 'none'
+        });
+        return;
+      }
+      wx.chooseImage({
+        success: function(res) {
+          let base64 = wx
+            .getFileSystemManager()
+            .readFileSync(res.tempFilePaths[0], 'base64');
+          wx.getImageInfo({
+            src: res.tempFilePaths[0],
+            success(res) {
+              that.uploadPic(base64, res.type);
+            }
+          });
+        }
+      });
+    },
+    agreeChange(e) {
+      this.index = e.detail.value;
+      e.detail.value == 0 && (this.submitData.remark = '');
+
+      this.$apply();
+    },
+    inputRes(e) {
+      this.submitData.remark = e.detail.value;
+    },
+    submit() {
+      this.submitData.agree = this.index + 1;
+      this.submitData.tradeImg = this.imglist.join(',');
+      if (this.submitData.tradeImg == '') {
+        wepy.showToast({
+          title: '请上传财务凭证.',
+          icon: 'none'
+        });
+        return;
+      }
+      if (this.index == 1 && this.submitData.remark == '') {
+        wepy.showToast({
+          title: '请输入拒绝原因.',
+          icon: 'none'
+        });
+        return;
+      }
+      console.log(this.submitData);
+      this.$parent
+        .queryData('msyApp/frontpayOrder.do', this.submitData)
+        .then(res => {
+          if (res) {
+            this.$parent.linkPage('../order/order');
+          }
+        });
+    }
+  };
+  async onLoad(e) {
+    this.initData = await this.frontpayOrderInit(
+      e.enterpriseOrderId,
+      e.underLineId
+    );
+    this.submitData.id = e.enterpriseOrderId;
+    this.submitData.underLineId = e.underLineId;
+    this.submitData.reviewUserId = this.$parent.globalData.userInfo.userId;
+    this.submitData.qyMoney = this.initData.qyMoney;
+    this.$apply();
+  }
+  //上传照片
+  async uploadPic(data, filetype) {
+    let result = await this.$parent.queryData(
+      '/upload',
+      {
+        data: data,
+        filetype: filetype,
+        user_id: this.$parent.globalData.userInfo.userId
+      },
+      '',
+      'POST'
+    );
+    //console.log(result);
+    this.imglist.push(result.imgurl);
+
+    this.$apply();
+  }
+  frontpayOrderInit(p1, p2) {
+    return this.$parent
+      .queryData('msyApp/frontpayOrderInit.do', {
+        enterpriseOrderId: p1,
+        underLineId: p2
+      })
+      .then(res => {
+        console.log(res);
+        return res.pageMap;
+      });
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/financialVoucherUpload';
+</style>
