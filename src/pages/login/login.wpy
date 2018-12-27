@@ -37,11 +37,11 @@ export default class Login extends wepy.page {
         value: {
        //  userName: 'hnmsy',
         //  userName: 'billyxm',
-        //  userName: 'haha',
+         userName: 'haha',
 //     userName: 15527105253,
       //  pwd: 888888
-          userName: "zwwd_01",
-         pwd: "a123456"
+          // userName: "zwwd_01",
+         pwd: "123456"
         }
       }
     });
@@ -100,7 +100,7 @@ export default class Login extends wepy.page {
 
     console.log('用户信息：', result);
     //   this.$parent.linkPage('../purchasingHall/purchasingHall',2)
-    this.$parent.linkPage('../order/order', 2);
+    this.$parent.linkPage('../safePayManage/safePayManage', 2);
   }
 }
 </script>

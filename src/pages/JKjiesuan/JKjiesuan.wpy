@@ -1,0 +1,58 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <view class="order_header">
+        <image @tap="goback" src="../../assets/images/icon/goback.png"  mode="aspectFit"  />
+         查看结算信息
+        <view class="kefu">有疑问    <image @tap="goback" src="../../assets/images/icon/yiwen.png"  mode="aspectFit"  /> </view>
+    </view>
+    <view class="file_cont">
+        <view class="flex_box" wx:for="{{list}}" wx:key="{{index}}">
+            <view class="name">{{item.attachment_name}}</view>
+            <view class="yulan" @tap="preView({{item.attachment_url}})">预览</view>
+        </view>
+    </view>
+      <view class="info_warm">
+        <image src="../../assets/images/icon/gt-tips.png" mode="aspectFit" />
+        <view class="flex_1">温馨提示：预览支持图片格式（gif,jpg,jpeg,png,bmp）文档格式（pdf,PDF,doc,docx,xls,xlsx,ppt）</view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+export default class Index extends wepy.page {
+  data = {
+    list: ''
+  };
+  methods = {
+    preView(url) {
+      if (url.match(/http.+?(gif|jpg|jpeg|bmp|png)/gi)) {
+        wx.previewImage({
+          urls: [url]
+        });
+      } else {
+        this.$parent.globalData.temporary.webView = url;
+        this.$parent.linkPage('../webView/webView', 1);
+      }
+    }
+  };
+  async onLoad(e) {
+    this.list = await this.getJlist(e.id);
+    this.$apply();
+  }
+  getJlist(id) {
+    return this.$parent
+      .queryData('msyApp/queryConcentrateAttachment.do', {
+        applyId: id
+      })
+      .then(res => {
+        return res.list;
+      });
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/Jkjiesuan';
+</style>

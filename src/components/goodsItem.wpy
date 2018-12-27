@@ -54,7 +54,7 @@
     </view>
     <view class="b-e">
       <text class="date">{{date.dateStrYmd(item.create_time)}}</text>
-      <text class="buy">{{item.resultType}}</text>
+      <text class="buy" @tap="jinGO({{item.id}})">{{item.resultType}}</text>
     </view>
   </view>
 </template>
@@ -100,9 +100,12 @@ export default class goodsItem extends wepy.component {
           enableBuy: 1
         };
         this.$parent.$parent.globalData.temporary.goodsData = goodsData;
-        this.$parent.$parent.linkPage('../negotiate/negotiate',1)
+        this.$parent.$parent.linkPage('../negotiate/negotiate', 1);
       }
       console.log(result);
+    },
+    jinGO(id) {
+      this.$parent.$parent.linkPage('../concentratePact/concentratePact?id='+id, 1);
     }
   };
 }

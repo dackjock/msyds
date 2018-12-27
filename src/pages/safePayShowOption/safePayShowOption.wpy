@@ -1,0 +1,52 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+     <view class="order_header">
+        <image @tap="goback" src="../../assets/images/icon/goback.png"  mode="aspectFit"  />
+         我要{{tit}}
+        <view class="kefu">有疑问    <image @tap="goback" src="../../assets/images/icon/yiwen.png"  mode="aspectFit"  /> </view>
+    </view>
+     <view class="info_warm" style="margin-top:85rpx;margin-bottom:0">
+        <image src="../../assets/images/icon/gt-tips.png" mode="aspectFit" />
+        <view class="flex_1">温馨提示：以下{{tit}}操作只能在PC上进行！</view>
+    </view>
+  
+    <view class="file_cont" style="margin-top:0">
+       <view class="flex_box">
+          <view class="span" >1、请按照本账号的绑定类型选择以下入金方式：</view>
+        </view>
+        <view class="flex_box">
+          <view class="span" >企业网银用户 <view class="orange">(支持)</view></view>
+        </view>
+        <view class="flex_box">
+          <view class="span" >他行企业客户和个人用户 <view class="orange">(支持)</view></view>
+        </view>
+    </view>
+
+
+    <view class="sumit_btn" @tap="goback">我已完成{{tit}}操作</view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import botBar from '@/components/botBar';
+
+export default class Index extends wepy.page {
+  data = {
+    tit: ''
+  };
+  onLoad(e) {
+    this.tit = e.tit;
+    this.$apply();
+  }
+  methods = {
+    goback() {
+      wx.navigateBack();
+    }
+  };
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/safePayManage';
+</style>

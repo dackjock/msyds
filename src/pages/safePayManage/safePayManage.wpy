@@ -1,0 +1,88 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <view class="order_header">
+        <image @tap="goback" src="../../assets/images/icon/goback.png"  mode="aspectFit"  />
+         平安支付管理
+        <view class="kefu">有疑问    <image @tap="goback" src="../../assets/images/icon/yiwen.png"  mode="aspectFit"  /> </view>
+    </view>
+      <view class="file_cont" wx:if="{{resData.isCreate==1}}">
+        <view class="h3"><view class="span">账户明细</view></view>
+        <view class="flex_box">
+            <view class="label">平安账户总金额</view>
+            <view class="red" >{{resData.pingAnMap.totalAmount}}元</view>
+        </view>
+        <view class="flex_box">
+            <view class="label">平安账户可用余额</view>
+            <view class="red" >{{resData.pingAnMap.totalBalance}}元</view>
+        </view>
+        <view class="flex_box">
+            <view class="label">平安账户冻结余额</view>
+            <view class="red" >{{resData.pingAnMap.totalFreezeAmount}}元</view>
+        </view>
+        <view class="detail_order">
+            <view class="item" @tap="goDetail">
+                <image mode="aspectFit" src="http://d7.cto.shovesoft.com/msywap/images/icon/c-zfgla.png" />
+                出入金明细
+            </view>
+            <view class="item" @tap="goEdit">
+                <image mode="aspectFit" src="http://d7.cto.shovesoft.com/msywap/images/icon/c-zfglb.png" />
+                修改密码
+            </view>
+        </view>
+        <view class="detail_option">
+              <view class="item" @tap="option('入金')">
+                <image mode="aspectFit" src="http://d7.cto.shovesoft.com/msywap/images/icon/c-zfgld.png" />
+                我要入金
+            </view>
+            <view class="item"  @tap="option('复核')">
+                <image mode="aspectFit" src="http://d7.cto.shovesoft.com/msywap/images/icon/c-zfgle.png" />
+                我要复核
+            </view>
+            <view class="item" @tap="goOut" >
+                <image mode="aspectFit" src="http://d7.cto.shovesoft.com/msywap/images/icon/c-zfglf.png" />
+                我要出金
+            </view>
+        </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+export default class Index extends wepy.page {
+  data = {
+    resData: ''
+  };
+  methods = {
+    option(e) {
+      this.$parent.linkPage(
+        '../safePayShowOption/safePayShowOption?tit=' + e,
+        1
+      );
+    },
+    goOut() {
+      this.$parent.linkPage('../safePayShowOut/safePayShowOut', 1);
+    },
+    goDetail() {
+      this.$parent.linkPage('../safePayDetail/safePayDetail', 1);
+    },
+    goEdit(){
+       this.$parent.linkPage('../safepayPasswrdEdit/safepayPasswrdEdit', 1);
+    }
+  };
+  async onLoad() {
+    this.resData = await this.queryPingAn();
+    this.$apply();
+  }
+  queryPingAn() {
+    return this.$parent.queryData('msyApp/queryPingAn.do', {
+      enterpriseId: this.$parent.globalData.userInfo.id
+    });
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/safePayManage';
+</style>

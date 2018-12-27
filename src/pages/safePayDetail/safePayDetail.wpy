@@ -1,0 +1,150 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <view class="order_header">
+        <image @tap="goback" src="../../assets/images/icon/goback.png"  mode="aspectFit"  />
+         出入金明细
+        <view class="kefu">有疑问    <image @tap="goback" src="../../assets/images/icon/yiwen.png"  mode="aspectFit"  /> </view>
+    </view>
+    <view class="show_data" wx:if="{{show_data}}">
+        <view style="display:flex">
+            <view class="section">
+                    <view class="section__title">开始时间</view>
+                <picker
+                mode="date"
+                value="{{date_star}}"
+                @change="bindDateChange(date_star)">
+                <view class="picker"> {{date_star}}</view>
+                </picker>
+            </view>
+            <view class="section">
+                <view class="section__title">结束时间</view>
+                <picker style="width:100%"
+                mode="date"
+                value="{{date_end}}"
+                @change="bindDateChange('date_end')">
+                <view class="picker"> {{date_end}}</view>
+                </picker>
+            </view>
+        </view>
+        <view class="submit_btn" @tap="timerChose">确定</view>
+    </view>
+    <view @tap="showData" class="option_div">{{timer}} <image src="http://d7.cto.shovesoft.com/msywap/images/icon/xiala.png" /></view>
+    <view class=" option_div"> 
+        <picker
+            @change="bindDateChange('type')" range="{{array}}">
+            {{array[type]}} <image src="http://d7.cto.shovesoft.com/msywap/images/icon/xiala.png" />
+        </picker>
+    </view>
+    <view class="data_show">
+        <view >筛选结果：<view class="bigred">{{size}}</view>条</view>
+        <view class="con">
+            <view class="item">{{payIn}}<view class="name">总收入金额</view></view>
+            <view class="item">{{payOut}}<view class="name">总支出金额</view></view>
+        </view>
+    </view>
+    <view class="list_cont">
+        <view class="item" wx:for="{{list}}" wx:key="{{index}}">
+            <view class="tiemr">{{item.create_time}}</view>
+            <view class="mian">
+                <view class="type"> {{item.type ==1?'入金':'出金'}}   <view class="fl {{item.type==1?'red':'lv'}} ">-10.00元</view></view>
+                <view class="time_g"> {{item.create_time}}</view>
+            </view>
+        </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+export default class Index extends wepy.page {
+  data = {
+    list: [],
+    timer: '近3个月',
+    revier: '资金流向',
+    date_star: '',
+    date_end: '',
+    show_data: false,
+    type: '0',
+    array: ['全部', '入金', '出金'],
+    payIn: '0',
+    payOut: '0',
+    size: '10',
+    pageNum: 1
+  };
+  methods = {
+    showData() {
+      this.show_data = true;
+      this.$apply();
+    },
+    timerChose() {
+      this.timer = this.date_star + '至' + this.date_end;
+      this.show_data = false;
+    },
+    bindDateChange(key, e) {
+      this[key] = e.detail.value;
+    }
+  };
+  async onLoad() {
+    this.date_star = this.formatTime(new Date(), 3);
+    this.date_end = this.formatTime(new Date(), 0);
+    let res = await this.queryMoneylogList();
+    this.size = res.totalMap.realCount;
+    this.payIn = res.totalMap.depositAmount;
+    this.payOut = res.totalMap.withdrawalAmount;
+    this.list = res.userWithdrawalList;
+    this.$apply();
+  }
+  formatTime(date, nim) {
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1 - nim;
+    var day = date.getDate();
+
+    return [year, month, day].map(this.formatNumber).join('-');
+  }
+
+  formatNumber(n) {
+    n = n.toString();
+    return n[1] ? n : '0' + n;
+  }
+  queryMoneylogList() {
+    return this.$parent.queryData('msyApp/queryUserWithdrawalList.do', {
+      enterpriseId: this.$parent.globalData.userInfo.id,
+      beginDate: this.date_star,
+      endTime: this.date_end,
+      type: parseFloat(this.type) ? this.type : '-1',
+      pageNum: this.pageNum
+    });
+  }
+  async onReachBottom(event) {
+    console.log('onReachBottom', event);
+    wepy.showLoading({
+      title: '加载中…'
+    });
+    wepy.showNavigationBarLoading();
+    this.pageNum = this.pageNum + 1;
+    let res = await this.queryMoneylogList();
+    this.size = res.totalMap.realCount;
+    this.payIn = res.totalMap.depositAmount;
+    this.payOut = res.totalMap.withdrawalAmount;
+    this.list.concat(res.userWithdrawalList);
+    wepy.hideNavigationBarLoading();
+    if (res.userWithdrawalList <= 0) {
+      wepy.showToast({
+        title: '没有更多了',
+        icon: 'none'
+      });
+    } else {
+      wepy.showToast({
+        title: '加载成功',
+        icon: 'none'
+      });
+    }
+    this.$apply();
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/safePayDetail';
+</style>

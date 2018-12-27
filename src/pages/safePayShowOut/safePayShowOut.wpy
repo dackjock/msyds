@@ -1,0 +1,91 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+     <view class="order_header">
+        <image @tap="goback" src="../../assets/images/icon/goback.png"  mode="aspectFit"  />
+         我要出金
+        <view class="kefu">有疑问    <image @tap="goback" src="../../assets/images/icon/yiwen.png"  mode="aspectFit"  /> </view>
+    </view>
+    <view class="file_cont" >
+        <view class="flex_box">
+            <view class="label">企业账户账号</view>
+            <view class="span" >{{info.custAcctId}}</view>
+        </view>
+        <view class="flex_box">
+            <view class="label">出金账户名称</view>
+            <view class="span" >{{info.acctName}}</view>
+        </view>
+         <view class="flex_box">
+            <view class="label">出金开户行名</view>
+            <view class="span" >{{info.bankName}}</view>
+        </view>
+         <view class="flex_box">
+            <view class="label">出金银行卡号</view>
+            <view class="span" >{{info.relatedAcctId}}</view>
+        </view>
+        <view class="flex_box">
+            <view class="label">可出金金额</view>
+            <view class="red" >{{info.totalBalance}}元</view>
+        </view>
+        <view class="flex_box">
+            <view class="label">申请出金金额</view>
+            <view class="span" ><input type="text" @input="change('tranAmount')" style="width:300rpx;text-align:right" placeholder="请输入金额" /></view>
+        </view>
+        <view class="flex_box">
+            <view class="label">请输入支付密码</view>
+            <view class="span" ><input type="text" @input="change('payPwd_0')"  style="width:300rpx;text-align:right" placeholder="请输入支付密码" password="{{true}}" /></view>
+        </view>
+        <view class="flex_box" style="justify-content:flex-end;background:transparent;border:none">
+
+            <navigator class="red" >忘记密码</navigator>
+        </view>
+    </view>
+
+
+    <view class="sumit_btn" @tap="addUserWithdrawal">提交</view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import botBar from '@/components/botBar';
+import { encryptDES3 } from '../../mixins/des3';
+export default class Index extends wepy.page {
+  data = {
+    info: '',
+    tranAmount: '',
+    payPwd: '', //加密
+    payPwd_0: '' //未加密
+  };
+  async onLoad(e) {
+    this.info = await this.WithdrawalInit();
+    this.$apply();
+  }
+  computed = {
+    payPwd() {
+      return encryptDES3(this.payPwd_0);
+    }
+  };
+  methods = {
+    change(key, e) {
+      this[key] = e.detail.value;
+    }
+  };
+  WithdrawalInit() {
+    return this.$parent.queryData('msyApp/addUserWithdrawalInit.do', {
+      enterpriseId: this.$parent.globalData.userInfo.id
+    });
+  }
+  addUserWithdrawal() {
+    return this.$parent.queryData('msyApp/addUserWithdrawalInit.do', {
+      enterpriseId: this.$parent.globalData.userInfo.id,
+      userId: this.$parent.globalData.userInfo.userId,
+      payPwd: this.payPwd_0,
+      tranAmount: this.payPwd
+    });
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/safePayManage';
+</style>

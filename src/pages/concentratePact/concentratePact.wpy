@@ -1,0 +1,167 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+    <header title="精矿详情"></header>
+    <view class="main_content">
+        <view class="flex_box">
+            <view class="label">产品品名</view>
+            <view class="span">{{orderInfo.name}}</view>
+        </view>
+        <view class="flex_box">
+            <view class="label">{{orderInfo.type==2?'需方':"供方"}}</view>
+            <view class="span">{{orderInfo.enterprise_name}}</view>
+        </view>
+        <view class="flex_box">
+            <view class="label">购销类型</view>
+            <view class="span">{{orderInfo.type==2?'采购':"销售"}}</view>
+        </view>
+         <view class="table_box">
+            <view class="label">规格</view>
+            <view class="table">
+                <view class="thead">
+                    <view class="th">金属名称</view>
+                    <view class="th">金属含量</view>
+                    <view class="th">计价方式</view>
+                    <view class="th">计价/减扣单位</view>
+                </view>
+            <view class="tbody" wx:for="{{specList}}" wx:key='{{index}}'>
+                <view class="td">{{item.spec_name}}</view>
+                    <view class="td">{{item.spec_value}}</view>
+                    <view class="td">{{item.spec_desc}}</view>
+                    <view class="td">{{item.spec_unit}}</view>
+                </view>
+                
+            </view>
+        </view>
+         <view class="flex_box">
+            <view class="label">数量</view>
+            <view class="span">{{orderInfo.contract_weight }}T</view>
+        </view>
+        <view class="flex_box">
+            <view class="label">交货地点</view>
+            <view class="span">{{orderInfo.delivery}}</view>
+        </view>
+        <view class="flex_box">
+            <view class="label">定价日</view>
+            <view class="span"><view style="display:inline" wx:key="{{index}}" wx:for="{{priceDayList}}">{{item.settingName}}</view></view>
+        </view>
+        <view class="flex_box">
+            <view class="label">附含</view>
+            <view class="span">{{orderInfo.rich_in}}</view>
+        </view>
+        <view class="flex_box">
+            <view class="label">杂质</view>
+            <view class="span">{{orderInfo.impurity}}</view>
+        </view>
+         <view class="flex_box">
+            <view class="label">包装</view>
+            <view class="span"><view style="display:inline"  wx:key="{{index}}"  wx:for="{{packList}}">{{item.settingName}}</view></view>
+        </view>
+         <view class="flex_box">
+            <view class="label">结算方式</view>
+            <view class="span"><view style="display:inline"  wx:key="{{index}}"  wx:for="{{settlementList}}">{{item.settingName}}</view></view>
+        </view>
+        <view class="flex_box">
+            <view class="label">发票要求</view>
+            <view class="span">{{orderInfo.invoice_type==2?"增值税发票":'普通发票'}}</view>
+        </view>
+    </view>
+
+
+    <view class="fixed_cont">
+        <view wx:if="{{isBuy==1}}">
+        <checkbox-group bindchange="checkboxC" style="display:inline-block">
+                <checkbox value="1" />
+        </checkbox-group>
+           我已同意以上报价并遵守
+        <view style="display:inline;">《马上银产业互联网交易总则》</view>
+        </view>
+        <view class="btn_group">
+            <button open-type="contact" class="btn"><image class="kefu_icon" mode="aspectFit" src="http://d7.cto.shovesoft.com/msywap/images/icon/yiwen.png" />在线客服</button>
+            <view wx:if="{{isBuy==1}}" @tap="bugSomeThing" class="btn red">{{orderInfo.type==1?"提交购买":'提交申请'}}</view>
+            <view wx:else class="btn red" @tap="back">返回商品列表</view>
+        </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import header from '@/components/header';
+
+export default class Index extends wepy.page {
+  components = {
+    header
+  };
+  data = {
+    orderInfo: {},
+    specList: '',
+    priceDayList: '', //定价日
+    packList: '',
+    settlementList: '',
+    agree: false,
+    isBuy: false,
+    id: ''
+  };
+  methods = {
+    checkboxC(e) {
+      e.detail.value && (this.agree = true);
+    },
+    back() {
+      wx.navigateBack();
+    },
+    bugSomeThing() {
+      if (!this.agree) {
+        wepy.showToast({
+          title: '请勾选协议',
+          icon: 'none'
+        });
+        return
+      }
+      this.$parent
+        .queryData('msyApp/frontConcentrateContractOrder.do', {
+          concentrateContractId: this.id,
+          type: this.orderInfo.type,
+          userId: this.$parent.globalData.userInfo.userId,
+          enterpriseId: this.$parent.globalData.userInfo.id,
+          goodsName: this.orderInfo.name,
+          buyWeight: this.orderInfo.contract_weight
+        })
+        .then(res => {
+          if (res) {
+            this.$parent.linkPage('../order/order?jingkuang=1', 2);
+          }
+        });
+    }
+  };
+  async onLoad(e) {
+    this.id = e.id;
+    let res = await this.frontInit(e.id);
+    this.orderInfo = res.concentrate;
+    this.specList = res.specList;
+    this.priceDayList = res.priceDayList;
+    this.packList = res.packList;
+    this.settlementList = res.settlementList;
+
+    this.$apply();
+  }
+  frontInit(id) {
+    return this.$parent
+      .queryData('msyApp/frontConcentrateContractOrderInit.do', {
+        id: id,
+        enterpriseIdNow: this.$parent.globalData.userInfo.id,
+        userId: this.$parent.globalData.userInfo.userId
+      })
+      .then(res => {
+        if (res) {
+          this.isBuy = res.isBuy;
+          console.log(res.isBuy);
+          return res.result;
+        }
+      });
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/concentratePact';
+</style>

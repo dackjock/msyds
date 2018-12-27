@@ -1,0 +1,135 @@
+<template lang="wxml" minapp="wepy">
+  <view class="container">
+     <view class="order_header">
+        <image @tap="goback" src="../../assets/images/icon/goback.png"  mode="aspectFit"  />
+         修改支付密码
+        <view class="kefu">有疑问    <image @tap="goback" src="../../assets/images/icon/yiwen.png"  mode="aspectFit"  /> </view>
+    </view>
+    <view class="file_cont" >
+        <view class="flex_box">
+            <view class="label">手机验证</view>
+            <view class="span" >{{info.phone}}</view>
+        </view>
+
+        <view class="flex_box">
+            <view class="label">请输入验证码</view>
+            <view class="span" >
+                <input type="text" @input="change('tranAmount')" class="inline_input" placeholder="请输入验证码" />
+                <view class="getCode" @tap="getCode">{{getCode}}</view>
+
+            </view>
+        </view>
+        <view class="info_warm" style="margin-bottom:0">
+            <image src="../../assets/images/icon/gt-tips.png" mode="aspectFit" />
+            <view class="flex_1">温馨提示：当前手机号是企业总账号的注册手机。</view>
+         </view>
+        <view class="flex_box">
+            <view class="label">新密码</view>
+            <view class="span" ><input type="text" @input="change('payPwd_1')"  style="width:300rpx;text-align:right" placeholder="请输入支付密码" password="{{true}}" /></view>
+        </view>
+        <view class="flex_box">
+            <view class="label">再次输入新密码</view>
+            <view class="span" ><input type="text" @input="change('payPwd_0')"  style="width:300rpx;text-align:right" placeholder="请输入支付密码" password="{{true}}" /></view>
+        </view>
+   
+    </view>
+
+
+    <view class="sumit_btn" @tap="submit">提交</view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import botBar from '@/components/botBar';
+import { encryptDES3 } from '../../mixins/des3';
+export default class Index extends wepy.page {
+  data = {
+    info: '',
+    tranAmount: '',
+    payPwd_1: '', //
+    payPwd_0: '', //
+
+    payPwd_a: '', //加密
+    payPwd_b: '', //加密
+    getCode: '获取验证码',
+    geting: false,
+    timeLoad: 60,
+    IntervalID: '',
+
+    codeV:"",
+  };
+  async onLoad(e) {
+    this.info = await this.addOrupdatePayPwdInit();
+
+    this.$apply();
+  }
+  computed = {
+    payPwd_a() {
+      return encryptDES3(this.payPwd_1);
+    },
+    payPwd_b() {
+      return encryptDES3(this.payPwd_0);
+    }
+  };
+  methods = {
+    change(key, e) {
+      this[key] = e.detail.value;
+    },
+    getCode() {
+      if (this.geting) {
+        return;
+      }
+      this.geting = true;
+      this.$parent.queryData('sendWXValidateCodeWithoutImgcode.do', {
+        phone: this.info.phone,
+        type: this.info.type
+      });
+      this.IntervalID = setInterval(() => {
+        this.timeLoad = this.timeLoad - 1;
+        if (this.timeLoad < 0) {
+          this.getCode = '获取验证码';
+          clearInterval(this.IntervalID);
+          this.geting = false;
+        } else {
+          this.getCode = '重新获取(' + this.timeLoad + ')';
+        }
+        this.$apply();
+      }, 1000);
+    },
+    async submit() {
+      let res = this.addOrupdatePayPwd();
+    }
+  };
+  addOrupdatePayPwdInit() {
+    return this.$parent.queryData('msyApp/addOrupdatePayPwdInit.do', {
+      enterpriseId: this.$parent.globalData.userInfo.id
+    });
+  }
+  addOrupdatePayPwd() {
+    if (this.payPwd_1 !== this.payPwd_0) {
+      wepy.showToast({
+        title: '两次输入不一致',
+        icon: 'none'
+      });
+      return;
+    } else if (this.tranAmount == '') {
+      wepy.showToast({
+        title: '请输入验证码',
+        icon: 'none'
+      });
+    }
+    return this.$parent.queryData('msyApp/addOrupdatePayPwd.do', {
+      enterpriseId: this.$parent.globalData.userInfo.id,
+      userId: this.$parent.globalData.userInfo.userId,
+      newPwd: this.payPwd_a,
+      cNewPwd: this.payPwd_b,
+      code: this.tranAmount
+    });
+  }
+}
+</script>
+
+<style lang="stylus">
+@import '../../assets/style/safePayManage';
+</style>

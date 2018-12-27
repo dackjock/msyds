@@ -210,7 +210,7 @@ export default class tradeIndex extends wepy.page {
     defaultApiOreData: {},
     goodsList: []
   };
-  onShow() {
+  onLoad() {
     this.userInfo = this.$parent.globalData.userInfo;
     this.apiData.enterpriseId = this.userInfo.id;
     this.apiOreData.enterpriseId = this.userInfo.id;

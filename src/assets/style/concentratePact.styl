@@ -1,0 +1,94 @@
+page 
+    background-color: #eee;
+.main_content
+    margin-top: 10rpx;
+    font-size: 24rpx;
+    margin-bottom: 170rpx;
+    .flex_box
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height:80rpx;
+        padding:0 20rpx;
+        border-bottom: 1px solid #eee;
+        background: #fff;
+    .label
+        color: #999;
+    .span
+        color: #333;
+    .table_box
+        padding: 10rpx 20rpx;
+        margin-bottom: 20rpx;
+        background: #fff;
+        .table
+            width: 100%;
+            margin-top: 15rpx;
+            font-size: 22rpx;
+            border-right: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            border-left: 1px solid #eee;
+
+            .thead
+                height: 50rpx;
+                display: flex;
+                .th
+                    flex: 1;
+                    text-align: center;
+                    line-height: 50rpx;
+                    background-color: #666;
+                    color: #fff;
+                    +.th
+                        border-left: 1px solid #eee;
+
+            .tbody
+                display: flex;
+                color: #666;
+                .td
+                    display: flex;
+                    flex: 1;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 10rpx;
+                    &:first-child 
+                        border-bottom: 1px solid #eee;
+                    +.td
+                        border-left: 1px solid #eee;
+                        border-top: 1px solid #eee;
+
+            
+.fixed_cont
+    position: fixed;
+    font-size: 24rpx;
+    bottom: 0;
+    padding:20rpx 0;
+    width: 100%;
+    background: #fff;
+    box-shadow: 0 0 5px #ccc;
+    checkbox
+        margin-left: 20rpx;
+    .btn_group
+        margin-top: 15rpx;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 50rpx;
+        .btn
+            width: 270rpx;
+            height 70rpx;
+            line-height: 70rpx;
+            border-radius: 10rpx;
+            border: none;
+            background-color: #ff9d00;
+            color :#fff;
+            display: inline-block;
+            padding: 0;
+            margin: 0;
+            font-size: 24rpx;
+            text-align: center;
+            .kefu_icon
+                width :28rpx;
+                height: 28rpx;
+                vertical-align: middle;
+                margin-right: 10rpx;
+            &.red
+                background-color: #d7092d;
+

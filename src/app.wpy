@@ -12,6 +12,13 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/login/login',
+      'pages/safePayDetail/safePayDetail',
+      'pages/safepayPasswrdEdit/safepayPasswrdEdit',
+      'pages/safePayShowOut/safePayShowOut',
+      'pages/safePayShowOption/safePayShowOption',
+      'pages/safePayManage/safePayManage',
+      'pages/JKjiesuan/JKjiesuan',
+      'pages/concentratePact/concentratePact',
       'pages/financialVoucherUpload/financialVoucherUpload',
       'pages/index/index',
       'pages/financialVoucherManage/financialVoucherManage',
@@ -106,7 +113,7 @@ export default class extends wepy.app {
       goodsStatue: '',
       contractId: '',
       webView: '',
-      YFCdata:'',
+      YFCdata: '',
       contractId: ''
     }
   };

@@ -213,235 +213,261 @@ import header from '@/components/header';
 
 export default class contract extends wepy.page {
   config = {
-      "enablePullDownRefresh": true
+    enablePullDownRefresh: true
   };
   data = {
-    userInfo:'',
-    byList:[],//白银
-    jkList:[],//精矿
-    gylList:[],//供应链
+    userInfo: '',
+    byList: [], //白银
+    jkList: [], //精矿
+    gylList: [], //供应链
     typea: 1,
     typeb: -1,
     scrollid: '',
     pageNum: 1,
-    status: -1,//状态
-    supplierStatus: '',//供方合同状态
+    status: -1, //状态
+    supplierStatus: '', //供方合同状态
     isSystem: '',
     fresh: false,
     flage: false,
-    dataleng: false,
+    dataleng: false
   };
-  onShow() {
-    this.userInfo = this.$parent.globalData.userInfo
-    this.byList = []
-    this.queryContract(this.pageNum,this.status,this.supplierStatus)
-  };
- //白银合同列表
-  async queryContract(pageNum,status,supplierStatus,fresh) {
+
+  onLoad(e) {
+    this.userInfo = this.$parent.globalData.userInfo;
+    this.byList = [];
+    console.log(e);
+    this.typea = e.typea;
+
+    this.queryJKContractList(this.pageNum, this.status);
+    if (this.typea == 1) {
+      this.queryContract(this.pageNum, this.status, this.supplierStatus);
+    } else if (this.typea == 2) {
+      this.queryJKContractList(this.pageNum, this.status, this.fresh);
+    } else if (this.typea == 3) {
+      this.querySupplyChainContract(this.pageNum, this.status, this.fresh);
+    }
+    this.$apply();
+  }
+  //白银合同列表
+  async queryContract(pageNum, status, supplierStatus, fresh) {
     let result = await this.$parent.queryData('msyApp/queryContract.do', {
       userId: this.userInfo.userId,
-      enterpriseId:this.userInfo.id,
-      pageNum:pageNum,
-      pageSize:'',
-      status:status,
-      supplierStatus:supplierStatus,
-    })
-    if(fresh){
-      this.byList = []
-      this.fresh = false
+      enterpriseId: this.userInfo.id,
+      pageNum: pageNum,
+      pageSize: '',
+      status: status,
+      supplierStatus: supplierStatus
+    });
+    if (fresh) {
+      this.byList = [];
+      this.fresh = false;
     }
-    if(result.contractList.length>0){
-      this.flage= true
-      this.byList = this.byList.concat(result.contractList)
-    } else{
-      console.log('无更多数据')
-      this.flage= false
-      this.pageNum = 1
+    if (result.contractList.length > 0) {
+      this.flage = true;
+      this.byList = this.byList.concat(result.contractList);
+    } else {
+      console.log('无更多数据');
+      this.flage = false;
+      this.pageNum = 1;
     }
-    this.isSystem = result.isSystem
-    if(this.byList.length>0){
-      this.dataleng = false
-    }else{
-      this.dataleng = true
+    this.isSystem = result.isSystem;
+    if (this.byList.length > 0) {
+      this.dataleng = false;
+    } else {
+      this.dataleng = true;
     }
     console.log('白银合同', this.byList);
-    this.$apply()
-  };
+    this.$apply();
+  }
   //精矿合同列表
-  async queryJKContractList(pageNum,status,fresh) {
+  async queryJKContractList(pageNum, status, fresh) {
     let result = await this.$parent.queryData('msyApp/queryJKContractList.do', {
-      pageNum:pageNum,
-      enterpriseId:this.userInfo.id,
-      status:status,
-      userId: this.userInfo.userId,
-    })
+      pageNum: pageNum,
+      enterpriseId: this.userInfo.id,
+      status: status,
+      userId: this.userInfo.userId
+    });
     //console.log('精矿合同', result);
-    if(fresh){
-      this.jkList = []
-      this.fresh = false
+    if (fresh) {
+      this.jkList = [];
+      this.fresh = false;
     }
-    if(result.pageBean.list.length>0){
-      this.flage= true
-      this.jkList = this.jkList.concat(result.pageBean.list)
-    } else{
-      console.log('无更多数据')
-      this.flage= false
-      this.pageNum = 1
+    if (result.pageBean.list.length > 0) {
+      this.flage = true;
+      this.jkList = this.jkList.concat(result.pageBean.list);
+    } else {
+      console.log('无更多数据');
+      this.flage = false;
+      this.pageNum = 1;
     }
-    this.isSystem = result.isSystem
-    if(this.jkList.length>0){
-      this.dataleng = false
-    }else{
-      this.dataleng = true
+    this.isSystem = result.isSystem;
+    if (this.jkList.length > 0) {
+      this.dataleng = false;
+    } else {
+      this.dataleng = true;
     }
     console.log('精矿合同', this.jkList);
-    this.$apply()
-  };
+    this.$apply();
+  }
   //供应链合同列表
-  async querySupplyChainContract(pageNum,status,fresh) {
-    let result = await this.$parent.queryData('msyApp/querySupplyChainContract.do', {
-      userId: this.userInfo.userId,
-      enterpriseId:this.userInfo.id,
-      pageNum:pageNum,
-      status:status,
-    })
+  async querySupplyChainContract(pageNum, status, fresh) {
+    let result = await this.$parent.queryData(
+      'msyApp/querySupplyChainContract.do',
+      {
+        userId: this.userInfo.userId,
+        enterpriseId: this.userInfo.id,
+        pageNum: pageNum,
+        status: status
+      }
+    );
     //console.log('供应链合同', result);
-    if(fresh){
-      this.gylList = []
-      this.fresh = false
+    if (fresh) {
+      this.gylList = [];
+      this.fresh = false;
     }
-    if(result.contractList.length>0){
-      this.flage= true
-      this.gylList = this.gylList.concat(result.contractList)
-    } else{
-      console.log('无更多数据')
-      this.flage= false
-      this.pageNum = 1
+    if (result.contractList.length > 0) {
+      this.flage = true;
+      this.gylList = this.gylList.concat(result.contractList);
+    } else {
+      console.log('无更多数据');
+      this.flage = false;
+      this.pageNum = 1;
     }
-    this.isSystem = result.isSystem
-    if(this.gylList.length>0){
-      this.dataleng = false
-    }else{
-      this.dataleng = true
+    this.isSystem = result.isSystem;
+    if (this.gylList.length > 0) {
+      this.dataleng = false;
+    } else {
+      this.dataleng = true;
     }
     console.log('供应链合同', this.gylList);
-    this.$apply()
-  };
+    this.$apply();
+  }
   //审核提醒
   async pushCheckControctMessage(contractId) {
-    let result = await this.$parent.queryData('msyApp/pushCheckControctMessage.do', {
-      contractId:contractId,
-      enterpriseId:this.userInfo.id,
-      userId: this.userInfo.userId,
-    },true)
+    let result = await this.$parent.queryData(
+      'msyApp/pushCheckControctMessage.do',
+      {
+        contractId: contractId,
+        enterpriseId: this.userInfo.id,
+        userId: this.userInfo.userId
+      },
+      true
+    );
     //console.log('提醒', result);
-    let msg = result.data.msg
-    this.$parent.showTip(msg)
-  };
-   //签署合同
-  async querySignatureOnline(id,i) {
-    let result = await this.$parent.queryData('msyApp/querySignatureOnline.do', {
-      userType: i,
-      contractId: id
-    },true)
+    let msg = result.data.msg;
+    this.$parent.showTip(msg);
+  }
+  //签署合同
+  async querySignatureOnline(id, i) {
+    let result = await this.$parent.queryData(
+      'msyApp/querySignatureOnline.do',
+      {
+        userType: i,
+        contractId: id
+      },
+      true
+    );
     console.log('签署', result);
-    if(result.data.type>0){
-      let url = result.data.returnMap.url
-      this.$parent.globalData.temporary.webView = url
+    if (result.data.type > 0) {
+      let url = result.data.returnMap.url;
+      this.$parent.globalData.temporary.webView = url;
       this.$parent.linkPage('../webView/webView', 1);
-    }else{
-      this.$parent.showTip(result.data.msg)
+    } else {
+      this.$parent.showTip(result.data.msg);
     }
-    
-  };
+  }
   onPullDownRefresh() {
-    this.pageNum = 1
-    this.fresh = true
-    if(this.typea == 1){
-      this.queryContract(this.pageNum,this.status,this.supplierStatus,this.fresh)
-    }else if(this.typea == 2){
-      this.queryJKContractList(this.pageNum,this.status,this.fresh)
-    }else if(this.typea == 3){
-        this.querySupplyChainContract(this.pageNum,this.status,this.fresh)
-      }
-    
+    this.pageNum = 1;
+    this.fresh = true;
+    if (this.typea == 1) {
+      this.queryContract(
+        this.pageNum,
+        this.status,
+        this.supplierStatus,
+        this.fresh
+      );
+    } else if (this.typea == 2) {
+      this.queryJKContractList(this.pageNum, this.status, this.fresh);
+    } else if (this.typea == 3) {
+      this.querySupplyChainContract(this.pageNum, this.status, this.fresh);
+    }
+
     wepy.stopPullDownRefresh();
     wepy.showToast({ title: '刷新成功' });
-  };
+  }
   onReachBottom() {
     if (this.flage) {
-        this.pageNum +=1
-        if(this.typea == 1){
-          this.queryContract(this.pageNum,this.status,this.supplierStatus)
-        }else if(this.typea == 2){
-          this.queryJKContractList(this.pageNum,this.status)
-        }else if(this.typea == 3){
-        this.querySupplyChainContract(this.pageNum,this.status)
+      this.pageNum += 1;
+      if (this.typea == 1) {
+        this.queryContract(this.pageNum, this.status, this.supplierStatus);
+      } else if (this.typea == 2) {
+        this.queryJKContractList(this.pageNum, this.status);
+      } else if (this.typea == 3) {
+        this.querySupplyChainContract(this.pageNum, this.status);
       }
     }
-  };
+  }
   methods = {
     // 白银 精矿 供应链 点击
     htjs(id) {
-      this.typea = id
-      this.byList = []
-      this.jkList = []
-      this.gylList = []
-      this.pageNum =1
-      this.status = -1
-      this.typeb = -1
-      if(this.typea == 1){
-        this.queryContract(this.pageNum,this.status,this.supplierStatus)
-      }else if(this.typea == 2){
-        this.queryJKContractList(this.pageNum,this.status)
-      }else if(this.typea == 3){
-        this.querySupplyChainContract(this.pageNum,this.status)
+      this.typea = id;
+      this.byList = [];
+      this.jkList = [];
+      this.gylList = [];
+      this.pageNum = 1;
+      this.status = -1;
+      this.typeb = -1;
+      if (this.typea == 1) {
+        this.queryContract(this.pageNum, this.status, this.supplierStatus);
+      } else if (this.typea == 2) {
+        this.queryJKContractList(this.pageNum, this.status);
+      } else if (this.typea == 3) {
+        this.querySupplyChainContract(this.pageNum, this.status);
       }
     },
     //状态 点击
-    typetap(type,scorllid){
-      this.typeb = type
-      this.scrollid = scorllid
-      this.byList = []
-      this.jkList = []
-      this.gylList = []
-      this.pageNum =1
-      this.status = type
-      if(this.typea == 1){
-        this.queryContract(this.pageNum,this.status,this.supplierStatus)
-      }else if(this.typea == 2){
-        this.queryJKContractList(this.pageNum,this.status)
-      }else if(this.typea == 3){
-        this.querySupplyChainContract(this.pageNum,this.status)
+    typetap(type, scorllid) {
+      this.typeb = type;
+      this.scrollid = scorllid;
+      this.byList = [];
+      this.jkList = [];
+      this.gylList = [];
+      this.pageNum = 1;
+      this.status = type;
+      if (this.typea == 1) {
+        this.queryContract(this.pageNum, this.status, this.supplierStatus);
+      } else if (this.typea == 2) {
+        this.queryJKContractList(this.pageNum, this.status);
+      } else if (this.typea == 3) {
+        this.querySupplyChainContract(this.pageNum, this.status);
       }
     },
     //查看合同
     checkht(item) {
-      let url = item.viewUrl
-      if(url){
-        this.$parent.globalData.temporary.webView = url
+      let url = item.viewUrl;
+      if (url) {
+        this.$parent.globalData.temporary.webView = url;
         this.$parent.linkPage('../webView/webView', 1);
-      }else {
-        this.$parent.globalData.temporary.goodsData = item
-        this.$parent.globalData.temporary.goodsStatue = this.isSystem
-        this.$parent.linkPage('../contractCheck/contractCheck',1)
-        
+      } else {
+        this.$parent.globalData.temporary.goodsData = item;
+        this.$parent.globalData.temporary.goodsStatue = this.isSystem;
+        this.$parent.linkPage('../contractCheck/contractCheck', 1);
       }
     },
     //审核合同
-    htAudit(item){
-      this.$parent.globalData.temporary.goodsData = item
-      this.$parent.globalData.temporary.goodsStatue = this.isSystem
-      this.$parent.linkPage('../contractAudit/contractAudit',1)
+    htAudit(item) {
+      this.$parent.globalData.temporary.goodsData = item;
+      this.$parent.globalData.temporary.goodsStatue = this.isSystem;
+      this.$parent.linkPage('../contractAudit/contractAudit', 1);
     },
     //签署合同
-    initqian(id,i){
-      this.querySignatureOnline(id,i)
+    initqian(id, i) {
+      this.querySignatureOnline(id, i);
     },
     //发起审核提醒
-    shtip(id){
-      this.pushCheckControctMessage(id)
-    },
+    shtip(id) {
+      this.pushCheckControctMessage(id);
+    }
   };
   components = {
     header
@@ -451,5 +477,4 @@ export default class contract extends wepy.page {
 
 <style lang="stylus">
 @import '../../assets/style/contract';
-  
 </style>

@@ -116,7 +116,7 @@
           <view class="order_item">
             <view class="top">
               {{item.enterprise_name}}
-              <view class="timer">{{item.create_time}}</view>
+              <view class="timer">{{item.concentrate_create_time}}</view>
             </view>
 
             <view class="main_cont">
@@ -135,6 +135,11 @@
                  <view class="w85" style="line-height:1em;padding-top:6rpx;"> <text>结算\n方式</text></view>
                   <view class="flex_1">{{item.settlement_type_name}}</view>
                 </view>
+                 <view class="flex_box">
+                  <view class="w134">申请时间</view>
+                
+                  <view class="flex_1 f20">{{item.create_time}}</view>
+                </view>
                 <view class="flex_box">
                   <view class="w134">当前状态</view>
                 
@@ -143,8 +148,8 @@
                 <view class="flex_box right">
                   <view wx:if="{{item.orderConstraintName}}" class="btn_order {{item.orderConstraintName ==='查看结算'?'':'red'}}"   >{{item.orderConstraintName}}</view>
               
-                <view wx:if="{{item.anniuNameTwo}}" class="btn_order red">{{item.anniuNameTwo}}</view> 
-                <view wx:if="{{item.anniuName}}" class="btn_order">{{item.anniuName}}</view> 
+                <view wx:if="{{item.anniuNameTwo}}" class="btn_order red" @tap="JKtype({{item.anniuTypeTwo}},{{item}})">{{item.anniuNameTwo}}</view> 
+                <view wx:if="{{item.anniuName}}" @tap="JKtype({{item.anniuType}},{{item}})" class="btn_order">{{item.anniuName}}</view> 
                 
                 </view>
               </view>
@@ -189,19 +194,54 @@ export default class Order extends wepy.page {
   components = {
     botBar
   };
-
+  onLoad(e) {
+    e.jingkuang && (this.list_type = 1);
+  }
   methods = {
+    JKtype(type, item) {
+      let arr = [];
+      arr[8] = 3;
+      arr[9] = 1;
+      arr[3] = 1;
+      arr[2] = 3;
+      switch (type) {
+        case 4:
+          this.$parent.linkPage('../JKjiesuan/JKjiesuan?id=' + item.id, 1);
+          break;
+        case 7:
+          this.methods.changeJK(2, '子单', this);
+          break;
+        case 9:
+        case 8:
+        case 2:
+        case 3:
+          this.$parent.globalData.temporary.goodsData = {
+            id: item.contract_id,
+            orderType: arr[type],
+            status: item.contract_status,
+            supplierStatus: item.contract_supplier_status,
+            isReview: item.isReview,
+            isReviewUser: item.isReviewUser
+          };
+          this.$parent.globalData.temporary.goodsStatue =
+            this.$parent.globalData.userInfo.isSystem == 1 ? 2 : 1;
+          this.$parent.linkPage('../contractCheck/contractCheck', 1);
+          break;
+        case 10:
+          this.$parent.linkPage('../contract/contract?typea=2', 1);
+          break;
+      }
+    },
     goSearch() {
       this.$parent.linkPage('../orderSearch/orderSearch', 1);
     },
     changeListType(val) {
       this.list_type = val;
-      // console.log(this.list_type);
       this.$apply();
     },
     switch1Change(val) {
       this.order_type = val.detail.value ? '采购' : '销售';
-      this.queryData_jingkuang.type = val.detail.value ? 1 : 2;
+      this.queryData_jingkuang.type = val.detail.value ? 2 : 1;
       this.queryData.orderType = val.detail.value ? 1 : 2;
       this.onPullDownRefresh();
     },
@@ -227,17 +267,18 @@ export default class Order extends wepy.page {
       this.$apply();
     },
 
-    async changeJK(val, str) {
-      this.queryData_jingkuang.orderType = val;
-      this.queryData_jingkuang.pageNum = 1;
-      this.typeName = str;
-      let jk_res = await this.methods.getList_jinkuang(
-        this,
-        this.queryData_jingkuang
+    async changeJK(val, str, _this) {
+      _this = _this.queryData_jingkuang ? _this : this;
+      _this.queryData_jingkuang.orderType = val;
+      _this.queryData_jingkuang.pageNum = 1;
+      _this.typeName = str;
+      let jk_res = await _this.methods.getList_jinkuang(
+        _this,
+        _this.queryData_jingkuang
       );
-      this.listData_jk = jk_res.pageBean.list;
-      this.toggle_type = false;
-      this.$apply();
+      _this.listData_jk = jk_res.pageBean.list;
+      _this.toggle_type = false;
+      _this.$apply();
     },
     getList(_this, obj) {
       return _this.$parent
@@ -252,7 +293,6 @@ export default class Order extends wepy.page {
           d.orderList.map((v, i) => {
             d.orderList[i].status = _this.methods.statusToStr(v.status);
           });
-          console.log(d);
           return d;
         });
     },
@@ -294,7 +334,6 @@ export default class Order extends wepy.page {
       return word.get(val);
     },
     async bindAction(event) {
-      console.log(event);
       let dataSet = event.currentTarget.dataset;
       switch (dataSet.orderstatusType) {
         case 1:
@@ -353,7 +392,12 @@ export default class Order extends wepy.page {
         case 8:
           //采购结算
           let parms_8 =
-            '?id=' + dataSet.orderId + '&orderType=' + dataSet.orderType+ '&first=' +1;
+            '?id=' +
+            dataSet.orderId +
+            '&orderType=' +
+            dataSet.orderType +
+            '&first=' +
+            1;
           this.$parent.linkPage('../costConfirm/costConfirm' + parms_8, 1);
           break;
         case 10:
@@ -391,8 +435,6 @@ export default class Order extends wepy.page {
     this.listData = res.orderList;
     this.listData_jk = jk_res.pageBean.list;
     this.userInfo = this.$parent.globalData.userInfo;
-    console.log(jk_res);
-    // console.log(this.methods.statusToStr(-2));
     this.$apply();
   }
   async onPullDownRefresh() {
@@ -410,7 +452,6 @@ export default class Order extends wepy.page {
     );
     this.listData = res.orderList;
     this.listData_jk = jk_res.pageBean.list;
-    // console.log(this.listData);
     this.$apply();
     wepy.hideNavigationBarLoading();
     wx.stopPullDownRefresh(
